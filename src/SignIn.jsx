@@ -2,10 +2,6 @@ import React, { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import fakeAuth from "./auth/fakeAuth";
 
-/**
- * Login component renders the login form and handles user authentication.
- * @returns JSX element
- */
 const SignIn = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
