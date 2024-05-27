@@ -9,7 +9,6 @@ const app = express();
 const port = 3000;
 
 app.use(cors());
-// app.use(express.json());
 app.use(bodyParser.json());
 
 const db = mysql.createConnection({
@@ -27,21 +26,26 @@ db.connect((error) => {
   }
 });
 
-app.get("/cors", (req, res) => {
-  const sqlCors = "SELECT * FROM cors";
-  db.query(sqlCors, (errorCors, resultsCors) => {
-    if (errorCors) {
-      console.error("Error fetching cors data:", errorCors.message);
-      return res.status(500).json({ error: "Internal Server Error" });
-    }
+const SECRET_KEY = "Ekorrensattigranen12%%";
 
-    // Combine results from both tables and send response
-    const combinedResults = {
-      cors: resultsCors,
-    };
-    res.json(combinedResults);
-  });
-});
+// Middleware to authenticate JWT token
+const authenticateJWT = (req, res, next) => {
+  const authHeader = req.header("Authorization");
+  if (!authHeader)
+    return res.status(401).json({ error: "Access denied, no token provided" });
+
+  const token = authHeader.split(" ")[1];
+  if (!token)
+    return res.status(401).json({ error: "Access denied, no token provided" });
+
+  try {
+    const decoded = jwt.verify(token, SECRET_KEY);
+    req.user = decoded;
+    next();
+  } catch (ex) {
+    res.status(400).json({ error: "Invalid token" });
+  }
+};
 
 // Register a new user
 app.post("/register", async (req, res) => {
@@ -77,6 +81,8 @@ app.post("/register", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+// Login a user
 app.post("/login", async (req, res) => {
   const { user, pwd } = req.body;
 
@@ -103,7 +109,7 @@ app.post("/login", async (req, res) => {
       const match = await bcrypt.compare(pwd, userRecord.password);
       if (match) {
         const payload = { sub: userRecord.username };
-        const token = jwt.sign(payload, "Ekorrensattigranen12%%", {
+        const token = jwt.sign(payload, SECRET_KEY, {
           expiresIn: "1h",
         });
         return res.status(200).json({
@@ -120,6 +126,88 @@ app.post("/login", async (req, res) => {
       console.error("Error during password comparison:", err.message);
       return res.status(500).json({ error: "Internal Server Error" });
     }
+  });
+});
+
+app.post("/posts", (req, res) => {
+  const title = req.body.newPostTitle;
+  const content = req.body.newPostContent;
+
+  db.query(
+    "INSERT INTO posts (title, content) VALUES (?,?)",
+    [title, content],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json({ error: "Failed to create post" });
+      }
+      console.log(result);
+      res.status(201).json({ message: "Post created successfully" });
+    }
+  );
+});
+
+//////////////////////////////////
+
+/* app.post("/posts", authenticateJWT, (req, res) => {
+  const title = req.body.newPostTitle;
+  const content = req.body.newPostContent;
+  const authorId = req.user.sub; // Assuming `req.user.sub` contains the user ID or username
+
+  db.query(
+    "INSERT INTO posts (title, content, author) VALUES (?,?,?)",
+    [title, content, authorId],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json({ error: "Failed to create post" });
+      }
+      console.log(result);
+
+      // Fetch additional user details from the "users" table
+      db.query(
+        "SELECT * FROM users WHERE id = ?",
+        [authorId],
+        (userErr, userResult) => {
+          if (userErr) {
+            console.log(userErr);
+            return res.status(500).json({ error: "Failed to fetch user" });
+          }
+
+          const author = userResult[0]; // Assuming there is only one user with the provided ID
+          res
+            .status(201)
+            .json({ message: "Post created successfully", author });
+        }
+      );
+    }
+  );
+}); */
+
+// Route to get all posts
+app.get("/posts", (req, res) => {
+  const query = "SELECT * FROM posts";
+
+  db.query(query, (error, results) => {
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+
+    res.json(results);
+  });
+});
+
+// Delete post
+app.delete("/posts/:postId", (req, res) => {
+  const postId = req.params.postId;
+  const deleteId = "DELETE FROM posts WHERE id = ?";
+  db.query(deleteId, postId, (error) => {
+    if (error) {
+      console.error("Error deleting post:", error);
+      res.status(500).json({ error: "Internal server error" });
+      return;
+    }
+    res.sendStatus(204); // No content
   });
 });
 

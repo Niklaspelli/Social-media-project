@@ -16,6 +16,8 @@ const SignIn = () => {
     setCorrectCredentials(null);
     setIsLoading(true);
 
+    /*  (`${process.env.REACT_APP_API_URL}/login` */
+
     try {
       const response = await fetch("http://localhost:3000/login", {
         method: "POST",

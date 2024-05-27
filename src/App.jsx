@@ -72,7 +72,7 @@ import UserProfile from "./UserProfile";
 import Navbar from "./Navbar";
 import Home from "./Home";
 import Test from "./Test";
-import Blog from "./Blog";
+import Blog from "./NewBlog/Blog";
 import Cors from "./Cors";
 import SignUp from "./SignUp";
 
