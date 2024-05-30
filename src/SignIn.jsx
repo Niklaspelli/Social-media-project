@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import fakeAuth from "./auth/fakeAuth";
 
@@ -7,16 +7,20 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [correctCredentials, setCorrectCredentials] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [loggedInUsername, setLoggedInUsername] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Function to handle user login
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("loggedInUsername");
+    if (storedUsername) {
+      setLoggedInUsername(storedUsername);
+    }
+  }, []);
+
   const login = async () => {
-    // Reset state variables and set loading state to true
     setCorrectCredentials(null);
     setIsLoading(true);
-
-    /*  (`${process.env.REACT_APP_API_URL}/login` */
 
     try {
       const response = await fetch("http://localhost:3000/login", {
@@ -37,11 +41,15 @@ const SignIn = () => {
       }
 
       const token = data.token;
+      const loggedInUsername = data.username;
+      setLoggedInUsername(loggedInUsername);
       localStorage.setItem("token", token);
+      localStorage.setItem("loggedInUsername", loggedInUsername);
       fakeAuth.signIn(() => {
         setCorrectCredentials(true);
-        navigate("/userprofile");
       });
+
+      navigate("/userprofile", { state: { username: loggedInUsername } });
     } catch (error) {
       setCorrectCredentials(false);
       console.error("Login failed:", error.message);
@@ -77,10 +85,13 @@ const SignIn = () => {
           </span>
         </div>
       )}
+      {isLoading && <div>Laddar...</div>}
       {location.state && location.state.protectedRoute && (
         <div>Snälla logga in</div>
       )}
-      {isLoading && <div>Laddar...</div>}
+      {loggedInUsername && (
+        <div style={{ color: "red" }}>Welcome, {loggedInUsername}!</div>
+      )}
       <Link to="/SignUp">SignUp</Link>
     </div>
   );

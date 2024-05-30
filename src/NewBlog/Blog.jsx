@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import BlogList from "./BlogList";
+
 const BackendURL = "http://localhost:3000";
 
-const Blog = ({ token }) => {
+const Blog = ({ token, currentUsername }) => {
   const [newPostTitle, setNewPostTitle] = useState("");
   const [newPostContent, setNewPostContent] = useState("");
   const [posts, setPosts] = useState([]);
@@ -37,11 +38,12 @@ const Blog = ({ token }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Ensure the token is correctly passed
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          newPostTitle,
-          newPostContent,
+          title: newPostTitle,
+          content: newPostContent,
+          author: currentUsername, // Include the username
         }),
       });
       if (!response.ok) {
@@ -63,6 +65,11 @@ const Blog = ({ token }) => {
     }
   };
 
+  const handleDelete = (postId) => {
+    // Update the state to remove the deleted post
+    setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+  };
+
   return (
     <div>
       <h2>Create a New Post</h2>
@@ -79,7 +86,11 @@ const Blog = ({ token }) => {
         onChange={(e) => setNewPostContent(e.target.value)}
       ></textarea>
       <button onClick={handleCreatePost}>Create Post</button>
-      {loading ? <p>Loading posts...</p> : <BlogList posts={posts} />}
+      {loading ? (
+        <p>Loading posts...</p>
+      ) : (
+        <BlogList posts={posts} onDelete={handleDelete} />
+      )}
     </div>
   );
 };

@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import cors from "cors";
 import mysql from "mysql";
@@ -26,11 +28,12 @@ db.connect((error) => {
   }
 });
 
-const SECRET_KEY = "Ekorrensattigranen12%%";
+const SECRET_KEY = process.env.REACT_APP_SECRET_KEY;
 
-// Middleware to authenticate JWT token
+// JWT Authentication Middleware
 const authenticateJWT = (req, res, next) => {
   const authHeader = req.header("Authorization");
+
   if (!authHeader)
     return res.status(401).json({ error: "Access denied, no token provided" });
 
@@ -51,13 +54,8 @@ const authenticateJWT = (req, res, next) => {
 app.post("/register", async (req, res) => {
   const { user, pwd } = req.body;
 
-  if (!user) {
-    return res.status(400).send("Användarnamn behövs!");
-  }
-
-  if (!pwd) {
-    return res.status(400).send("Lösenord behövs!");
-  }
+  if (!user) return res.status(400).send("Användarnamn behövs!");
+  if (!pwd) return res.status(400).send("Lösenord behövs!");
 
   try {
     const hashedPassword = await bcrypt.hash(pwd, 10);
@@ -103,7 +101,6 @@ app.post("/login", async (req, res) => {
     }
 
     const userRecord = result[0];
-    console.log("userRecord", userRecord.password);
 
     try {
       const match = await bcrypt.compare(pwd, userRecord.password);
@@ -116,6 +113,7 @@ app.post("/login", async (req, res) => {
           success: true,
           message: "Godkänd",
           token: token,
+          username: userRecord.username, // Include username in the response
         });
       } else {
         return res
@@ -129,7 +127,108 @@ app.post("/login", async (req, res) => {
   });
 });
 
-app.post("/posts", (req, res) => {
+// Protect routes
+app.get("/protected", authenticateJWT, (req, res) => {
+  res.status(200).json({ message: "This is a protected route" });
+});
+
+/* // Create a new post
+app.post("/posts", authenticateJWT, (req, res) => {
+  const { title, content } = req.body;
+  const userId = req.user.sub; // Assuming the user's ID is stored in req.user.sub
+
+  if (!title || !content || !userId) {
+    return res.status(400).send("Title, content, and user ID are required");
+  }
+
+  // Fetch the user's username based on the user's ID
+  const query = "SELECT username FROM users WHERE id = ?";
+  db.query(query, [userId], (error, results) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+
+    if (results.length === 0) {
+      return res.status(404).send("User not found");
+    }
+
+    const author = results[0].username;
+
+    // Insert the post with the fetched author
+    const insertQuery =
+      "INSERT INTO posts (title, content, author) VALUES (?, ?, ?)";
+    db.query(
+      insertQuery,
+      [title, content, author],
+      (insertError, insertResults) => {
+        if (insertError) {
+          return res.status(500).send(insertError);
+        }
+        const createdPost = {
+          id: insertResults.insertId,
+          title,
+          content,
+          author,
+          date: new Date(),
+        };
+        res.status(201).send(createdPost);
+      }
+    );
+  });
+}); */
+app.post("/posts", authenticateJWT, (req, res) => {
+  const { title, content, author } = req.body;
+
+  if (!title || !content) {
+    return res.status(400).json({ error: "Title and content are required" });
+  }
+
+  db.query(
+    "INSERT INTO posts (title, content, author) VALUES (?, ?, ?)",
+    [title, content, author],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json({ error: "Failed to create post" });
+      }
+      console.log(result);
+      res.status(201).json({
+        message: "Post created successfully",
+        id: result.insertId,
+        title,
+        content,
+        author,
+      });
+    }
+  );
+});
+
+app.get("/posts", (req, res) => {
+  const query = "SELECT * FROM posts";
+  db.query(query, (error, results) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+    res.status(200).send(results);
+  });
+});
+
+app.delete("/posts/:id", authenticateJWT, (req, res) => {
+  const postId = req.params.id;
+  const query = "DELETE FROM posts WHERE id = ?";
+  db.query(query, [postId], (error, results) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+    res.status(204).send();
+  });
+});
+
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
+
+/* app.post("/posts", (req, res) => {
   const title = req.body.newPostTitle;
   const content = req.body.newPostContent;
 
@@ -145,8 +244,32 @@ app.post("/posts", (req, res) => {
       res.status(201).json({ message: "Post created successfully" });
     }
   );
+}); */
+/* 
+app.post("/posts", authenticateJWT, (req, res) => {
+  const { title, content, author } = req.body;
+  if (!title || !content || !author) {
+    return res
+      .status(400)
+      .send({ message: "Title, content, and author are required" });
+  }
+  // Insert the post into the database
+  const query = "INSERT INTO posts (title, content, author) VALUES (?, ?, ?)";
+  db.query(query, [title, content, author], (error, results) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+    const createdPost = {
+      id: results.insertId,
+      title,
+      content,
+      author,
+      date: new Date(),
+    };
+    res.status(201).send(createdPost);
+  });
 });
-
+ */
 //////////////////////////////////
 
 /* app.post("/posts", authenticateJWT, (req, res) => {
@@ -185,7 +308,7 @@ app.post("/posts", (req, res) => {
 }); */
 
 // Route to get all posts
-app.get("/posts", (req, res) => {
+/* app.get("/posts", (req, res) => {
   const query = "SELECT * FROM posts";
 
   db.query(query, (error, results) => {
@@ -195,22 +318,51 @@ app.get("/posts", (req, res) => {
 
     res.json(results);
   });
-});
+}); */
 
-// Delete post
-app.delete("/posts/:postId", (req, res) => {
+/* // Delete post
+app.delete("/posts/:postId", authenticateJWT, (req, res) => {
   const postId = req.params.postId;
-  const deleteId = "DELETE FROM posts WHERE id = ?";
-  db.query(deleteId, postId, (error) => {
+  const userId = req.user.id; // Assuming user information is attached to the request after authentication
+
+  // Check if the post belongs to the authenticated user
+  const query = "SELECT * FROM posts WHERE id = ? AND id = ?";
+  db.query(query, [postId, userId], (error, results) => {
     if (error) {
-      console.error("Error deleting post:", error);
-      res.status(500).json({ error: "Internal server error" });
-      return;
+      console.error("Error checking post ownership:", error);
+      return res.status(500).json({ error: "Något fel på server error" });
     }
-    res.sendStatus(204); // No content
+
+    // If post doesn't exist or doesn't belong to the user
+    if (results.length === 0) {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
+
+    // If post exists and belongs to the user, proceed with deletion
+    const deleteQuery = "DELETE FROM posts WHERE id = ?";
+    db.query(deleteQuery, [postId], (error) => {
+      if (error) {
+        console.error("Error deleting post:", error);
+        return res.status(500).json({ error: "Något fel på  server error" });
+      }
+      res.sendStatus(204); // No content
+    });
+  });
+}); */
+/* 
+app.delete("/posts/:id", (req, res) => {
+  const id = req.params.id;
+
+  db.query("DELETE FROM posts WHERE id= ?", id, (err, result) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ error: "Failed to delete post" });
+    }
+    console.log(result);
+    res.status(201).json({ message: "Post deleted successfully" });
   });
 });
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
-});
+}); */
