@@ -9,7 +9,7 @@ const UserProfile = () => {
   const { username } = location.state || {};
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentUsername, setCurrentUsername] = useState(username || "");
+  const [currentUser, setCurrentUser] = useState(username || "");
   const [token, setToken] = useState(localStorage.getItem("token")); // Use state for token
 
   useEffect(() => {
@@ -22,24 +22,23 @@ const UserProfile = () => {
     }
 
     setIsAuthenticated(fakeAuth.isAuthenticated);
-    setCurrentUsername(storedUsername);
+    setCurrentUser(storedUsername || ""); // Initialize currentUser with an empty string if not available
     setToken(localStorage.getItem("token")); // Update token state
   }, [navigate, location.state, token]);
 
   return (
     <>
       <h2>
-        Du är inne i userProfilen{" "}
-        {currentUsername && (
+        {currentUser && (
           <p>
             Du är inloggad som:
-            <div className="username"> {currentUsername}</div>{" "}
+            <div className="username"> {currentUser}</div>{" "}
           </p>
         )}
       </h2>
       <p>Ser du det här, då är du inne innanför protectedroute</p>
-      <Blog token={token} currentUsername={currentUsername} />{" "}
-      {/* Pass token and currentUsername as props */}
+      <Blog token={token} currentUser={currentUser} />{" "}
+      {/* Pass token and currentUser as props */}
     </>
   );
 };

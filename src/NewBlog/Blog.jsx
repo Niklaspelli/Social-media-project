@@ -3,7 +3,7 @@ import BlogList from "./BlogList";
 
 const BackendURL = "http://localhost:3000";
 
-const Blog = ({ token, currentUsername }) => {
+const Blog = ({ token, currentUser }) => {
   const [newPostTitle, setNewPostTitle] = useState("");
   const [newPostContent, setNewPostContent] = useState("");
   const [posts, setPosts] = useState([]);
@@ -43,7 +43,7 @@ const Blog = ({ token, currentUsername }) => {
         body: JSON.stringify({
           title: newPostTitle,
           content: newPostContent,
-          author: currentUsername, // Include the username
+          author: currentUser, // Include the username
         }),
       });
       if (!response.ok) {
@@ -81,7 +81,7 @@ const Blog = ({ token, currentUsername }) => {
         onChange={(e) => setNewPostTitle(e.target.value)}
       />
       <textarea
-        placeholder="Content"
+        placeholder="Meddelande:"
         value={newPostContent}
         onChange={(e) => setNewPostContent(e.target.value)}
       ></textarea>
@@ -89,7 +89,11 @@ const Blog = ({ token, currentUsername }) => {
       {loading ? (
         <p>Loading posts...</p>
       ) : (
-        <BlogList posts={posts} onDelete={handleDelete} />
+        <BlogList
+          posts={posts}
+          onDelete={handleDelete}
+          currentUser={currentUser}
+        />
       )}
     </div>
   );

@@ -1,11 +1,8 @@
 import React, { useCallback } from "react";
-import { useParams } from "react-router-dom";
 
 const BackendURL = "http://localhost:3000";
 
-const BlogList = ({ posts, onDelete }) => {
-  const { postId } = useParams();
-
+const BlogList = ({ posts, onDelete, currentUser }) => {
   const handleDelete = useCallback(
     async (postId) => {
       try {
@@ -19,7 +16,9 @@ const BlogList = ({ posts, onDelete }) => {
         if (response.ok) {
           onDelete(postId);
         } else {
-          console.error("Failed to delete post");
+          console.error("Failed to delete post, status code:", response.status);
+          const errorData = await response.json();
+          console.error("Error message:", errorData.error);
         }
       } catch (error) {
         console.error("Error deleting post:", error);
@@ -31,21 +30,22 @@ const BlogList = ({ posts, onDelete }) => {
   return (
     <div>
       <h2>All Posts</h2>
-      <ul>
-        {posts.map((post) => (
-          <li key={post.id}>
-            <h3>{post.title}</h3>
-            <div className="chat-bg">
-              <p>{post.content}</p>
-            </div>
-            <p>
-              User: <div className="username">{post.author}</div>
-            </p>
-            <p>Date: {new Date(post.date).toLocaleString()}</p>
+      {posts.map((post) => (
+        <li key={post.id} className="message-border">
+          <p>
+            <span className="username">{post.author}</span> skrev:
+          </p>
+          <p>Datum: {new Date(post.date).toLocaleString()}</p>
+          <h3>{post.title}</h3>
+          <div className="chat-bg">
+            <p>{post.content}</p>
+          </div>
+
+          {currentUser === post.author && (
             <button onClick={() => handleDelete(post.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
+          )}
+        </li>
+      ))}{" "}
     </div>
   );
 };

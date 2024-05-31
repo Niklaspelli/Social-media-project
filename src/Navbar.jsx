@@ -23,22 +23,14 @@ const Navbar = () => {
           <Link to={"/"}>Home</Link>
         </li>
         <li>
-          <Link to={"/Test"}>Test</Link>
-        </li>
-        <li>
-          <Link to={"/Cors"}>Cors</Link>
-        </li>
-        <li>
           {!fakeAuth.isAuthenticated ? (
-            <Link to={"/login"}>Sign In</Link>
+            <Link to={"/login"}>Sign In/ Sign Up</Link>
           ) : (
             <span onClick={logout}>Logout</span>
           )}
         </li>
         <li>
-          <Link to="/userprofile">
-            Userprofile {isAuthenticated ? "" : "🔒"}
-          </Link>
+          <Link to="/userprofile">Forum {isAuthenticated ? "" : "🔒"}</Link>
         </li>
       </ul>
     </nav>

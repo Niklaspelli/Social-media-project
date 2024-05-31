@@ -71,9 +71,8 @@ import SignIn from "./SignIn";
 import UserProfile from "./UserProfile";
 import Navbar from "./Navbar";
 import Home from "./Home";
-import Test from "./Test";
 import Blog from "./NewBlog/Blog";
-import Cors from "./Cors";
+
 import SignUp from "./SignUp";
 
 function App() {
@@ -85,8 +84,6 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<SignIn />} />
           <Route path="/SignUp" element={<SignUp />} />
-          <Route path="/Test" element={<Test />} />
-          <Route path="/Cors" element={<Cors />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/blog" element={<Blog />} />
             <Route path="/userprofile" element={<UserProfile />} />
