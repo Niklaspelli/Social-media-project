@@ -77,21 +77,33 @@ function ThreadDetail() {
 
   return (
     <div>
+      {/* Display thread title and body */}
       <h3>{thread.title}</h3>
       <p>{thread.body}</p>
 
+      {/* Response form */}
       <form onSubmit={handleResponseSubmit}>
         <textarea
           value={responseText}
           onChange={(e) => setResponseText(e.target.value)}
           placeholder="Write your response here..."
+          required
         ></textarea>
         <button type="submit">Post Response</button>
       </form>
 
+      {/* Display responses */}
       <div>
         {responses.length > 0 ? (
-          responses.map((res) => <p key={res.id}>{res.body}</p>)
+          responses.map((res) => (
+            <div key={res.id}>
+              <p>
+                <strong>{res.username}</strong> (
+                {new Date(res.created_at).toLocaleString()})
+              </p>
+              <p>{res.body}</p>
+            </div>
+          ))
         ) : (
           <p>No responses yet.</p>
         )}

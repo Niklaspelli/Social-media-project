@@ -13,6 +13,7 @@ const port = 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
+// MySQL Database connection
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -20,6 +21,7 @@ const db = mysql.createConnection({
   database: "forum",
 });
 
+// Connect to MySQL
 db.connect((error) => {
   if (error) {
     console.error("Error connecting to MySQL:", error.message);
@@ -178,37 +180,40 @@ app.get("/forum/threads/:threadId", async (req, res) => {
   const { threadId } = req.params;
 
   try {
-    const threadQuery = "SELECT * FROM threads WHERE id = ?";
-    db.query(threadQuery, [threadId], async (error, threadResult) => {
-      if (error) {
-        console.error("Error fetching thread:", error);
-        return res.status(500).json({ message: "Failed to fetch thread" });
-      }
-
-      if (threadResult.length === 0) {
-        return res.status(404).json({ message: "Thread not found." });
-      }
-
-      const responsesQuery = "SELECT * FROM responses WHERE thread_id = ?";
-      db.query(responsesQuery, [threadId], (error, responsesResult) => {
-        if (error) {
-          console.error("Error fetching responses:", error);
-          return res.status(500).json({ message: "Failed to fetch responses" });
+    const [thread] = await new Promise((resolve, reject) => {
+      db.query(
+        "SELECT * FROM threads WHERE id = ?",
+        [threadId],
+        (error, results) => {
+          if (error) return reject(error);
+          resolve(results);
         }
-
-        res.status(200).json({
-          thread: threadResult[0],
-          responses: responsesResult,
-        });
-      });
+      );
     });
+
+    const responses = await new Promise((resolve, reject) => {
+      db.query(
+        "SELECT responses.*, users.username FROM responses JOIN users ON responses.user_id = users.id WHERE thread_id = ?",
+        [threadId],
+        (error, results) => {
+          if (error) return reject(error);
+          resolve(results);
+        }
+      );
+    });
+
+    if (!thread) {
+      return res.status(404).json({ message: "Thread not found." });
+    }
+
+    res.status(200).json({ thread, responses });
   } catch (error) {
-    console.error("Unexpected error while fetching thread:", error);
+    console.error("Error fetching thread:", error);
     res.status(500).json({ message: "Failed to fetch thread" });
   }
 });
 
-// Route for posting responses to a thread
+// Post a response to a thread
 app.post("/forum/threads/:threadId/responses", authenticateJWT, (req, res) => {
   const { threadId } = req.params;
   const { body } = req.body; // Extracting body from the request
@@ -229,7 +234,12 @@ app.post("/forum/threads/:threadId/responses", authenticateJWT, (req, res) => {
 
     res.status(201).json({
       message: "Response posted successfully.",
-      response: { id: result.insertId, body, user_id: userId },
+      response: {
+        id: result.insertId,
+        body,
+        user_id: userId,
+        created_at: new Date(), // Add this if you want to set the current date for the new response
+      },
     });
   });
 });
