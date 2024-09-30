@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import fakeAuth from "./auth/fakeAuth";
+import fakeAuth from "../../../auth/fakeAuth";
 
 const SignIn = () => {
   const [username, setUsername] = useState("");

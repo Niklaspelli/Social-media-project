@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import fakeAuth from "./auth/fakeAuth";
-import Blog from "./NewBlog/Blog";
+import Blog from "./components/NewBlog/Blog";
 
 const UserProfile = () => {
   const location = useLocation();

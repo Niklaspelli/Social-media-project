@@ -67,13 +67,13 @@ You can use the above points as a coding guideline when building React applicati
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./auth/ProtectedRoute";
-import SignIn from "./SignIn";
+import SignIn from "./components/NewBlog/pages/SignIn";
 import UserProfile from "./UserProfile";
-import Navbar from "./Navbar";
-import Home from "./Home";
-import Blog from "./NewBlog/Blog";
+import Navbar from "./components/Navbar";
+import Home from "./components/NewBlog/pages/Home";
+import Blog from "./components/NewBlog/Blog";
 
-import SignUp from "./SignUp";
+import SignUp from "./components/NewBlog/pages/SignUp";
 
 function App() {
   return (
