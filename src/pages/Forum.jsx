@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import fakeAuth from "./auth/fakeAuth";
-import Blog from "./components/NewBlog/Blog";
+import fakeAuth from "../auth/fakeAuth";
+/* import Blog from "../components/NewBlog/Blog"; */
+import CreateThread from "../components/thread/CreateThread";
 
-const UserProfile = () => {
+const Forum = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { username } = location.state || {};
@@ -37,10 +38,11 @@ const UserProfile = () => {
         )}
       </h2>
       <p>Ser du det här, då är du inne innanför protectedroute</p>
-      <Blog token={token} currentUser={currentUser} />{" "}
+      {/* <Blog token={token} currentUser={currentUser} />{" "} */}
       {/* Pass token and currentUser as props */}
+      <CreateThread token={token} currentUser={currentUser} />
     </>
   );
 };
 
-export default UserProfile;
+export default Forum;

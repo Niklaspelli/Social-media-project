@@ -5,7 +5,7 @@ import {
   faInfoCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import "./index.css";
+import "../index.css";
 import { Container, Button, Row, Col } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 
