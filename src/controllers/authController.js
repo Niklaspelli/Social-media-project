@@ -5,11 +5,13 @@ import dotenv from "dotenv";
 
 dotenv.config(); // Load .env variables
 
-const SECRET_KEY = process.env.SECRET_KEY;
+const JWT_SECRET = process.env.JWT_SECRET; // Make sure this is defined in your .env file
 
+// Register user
 export const registerUser = async (req, res) => {
-  const { user, pwd } = req.body; // 'user' and 'pwd' are correctly destructured
+  const { user, pwd } = req.body; // Destructure username and password
 
+  // Input validation
   if (!user || !pwd) {
     return res
       .status(400)
@@ -17,26 +19,27 @@ export const registerUser = async (req, res) => {
   }
 
   try {
-    const hashedPassword = await bcrypt.hash(pwd, 10); // Use 'pwd' here to hash the password
+    const hashedPassword = await bcrypt.hash(pwd, 10); // Hash the password
     const addUser = "INSERT INTO users (username, password) VALUES (?, ?)";
 
     db.query(addUser, [user, hashedPassword], (err, result) => {
       if (err) {
-        console.error("Error inserting data:", err.message);
+        console.error("Error inserting data:", err.message); // Log the error for debugging
         return res.status(500).json({ error: "Internal Server Error" });
       }
       res.status(201).json({ id: result.insertId, user });
     });
   } catch (error) {
-    console.error("Error hashing password:", error.message);
+    console.error("Error hashing password:", error.message); // Log the error
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
 // Login user
 export const loginUser = async (req, res) => {
-  const { user, pwd } = req.body; // Changed field names to match the frontend
+  const { user, pwd } = req.body; // Destructure username and password
 
+  // Input validation
   if (!user || !pwd) {
     return res
       .status(400)
@@ -47,7 +50,7 @@ export const loginUser = async (req, res) => {
 
   db.query(sql, [user], async (err, result) => {
     if (err) {
-      console.error("Error fetching data:", err.message);
+      console.error("Error fetching data:", err.message); // Log the error
       return res.status(500).json({ error: "Internal Server Error" });
     }
 
@@ -58,10 +61,12 @@ export const loginUser = async (req, res) => {
     const userRecord = result[0];
 
     try {
-      const match = await bcrypt.compare(pwd, userRecord.password); // Use 'pwd' here
+      // Compare the hashed password with the user input password
+      const match = await bcrypt.compare(pwd, userRecord.password);
       if (match) {
+        // Create JWT token if credentials are valid
         const payload = { id: userRecord.id, username: userRecord.username }; // Include user ID in payload
-        const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "1h" });
+        const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
         return res.status(200).json({
           success: true,
           message: "Authenticated",
@@ -72,7 +77,7 @@ export const loginUser = async (req, res) => {
         return res.status(400).json({ error: "Invalid credentials!" });
       }
     } catch (err) {
-      console.error("Error during password comparison:", err.message);
+      console.error("Error during password comparison:", err.message); // Log the error
       return res.status(500).json({ error: "Internal Server Error" });
     }
   });

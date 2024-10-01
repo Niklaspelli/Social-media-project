@@ -65,28 +65,23 @@ export const getThreadWithResponses = (req, res) => {
   });
 };
 
-// Post a response to a thread
 export const postResponseToThread = (req, res) => {
   const { threadId } = req.params;
-  const { body } = req.body; // Extracting body from the request
-  const userId = req.user.id; // Getting user ID from JWT token
+  const { body } = req.body;
+  const userId = req.user.id; // Assuming user ID is stored in the JWT token
 
-  // Check if the response body is provided
   if (!body) {
-    return res.status(400).json({ message: "Response body is required." });
+    return res.status(400).json({ error: "Response body is required!" });
   }
 
-  // SQL query to insert a new response
   const insertResponseQuery =
     "INSERT INTO responses (thread_id, user_id, body) VALUES (?, ?, ?)";
-
   db.query(insertResponseQuery, [threadId, userId, body], (error, result) => {
     if (error) {
-      console.error("Error posting response:", error);
-      return res.status(500).json({ message: "Failed to post response." });
+      console.error("Error posting response:", error.message);
+      return res.status(500).json({ error: "Internal Server Error" });
     }
 
-    // Respond with the newly created response data
     res.status(201).json({
       message: "Response posted successfully.",
       response: {
