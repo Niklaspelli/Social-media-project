@@ -52,8 +52,13 @@ export const getThreadWithResponses = (req, res) => {
 
     const thread = threadResults[0]; // Get the first result (the thread)
 
-    // Fetch associated responses
-    const responsesQuery = "SELECT * FROM responses WHERE thread_id = ?";
+    // Fetch associated responses along with usernames
+    const responsesQuery = `
+      SELECT responses.*, users.username 
+      FROM responses 
+      JOIN users ON responses.user_id = users.id 
+      WHERE thread_id = ?
+    `;
     db.query(responsesQuery, [threadId], (err, responsesResults) => {
       if (err) {
         console.error("Database error while fetching responses:", err);
