@@ -42,10 +42,10 @@ function ThreadList() {
       {threads.length > 0 ? (
         threads.map((thread) => (
           <div key={thread.id}>
-            <h3>
+            <h2>
               <Link to={`/threads/${thread.id}`}>{thread.title}</Link>{" "}
               {/* Link to thread detail */}
-            </h3>
+            </h2>
             <p>{thread.body}</p>
           </div>
         ))

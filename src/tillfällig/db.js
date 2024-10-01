@@ -1,4 +1,4 @@
-import dotenv from "dotenv";
+/* import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import cors from "cors";
@@ -244,7 +244,63 @@ app.post("/forum/threads/:threadId/responses", authenticateJWT, (req, res) => {
   });
 });
 
+// DELETE a user's response
+app.delete(
+  "/forum/threads/:threadId/responses/:responseId",
+  authenticateJWT,
+  async (req, res) => {
+    const { threadId, responseId } = req.params;
+    const userId = req.user.id; // Get the logged-in user's ID from the token
+
+    try {
+      // Check if the response belongs to the logged-in user
+      const [response] = await new Promise((resolve, reject) => {
+        db.query(
+          "SELECT user_id FROM responses WHERE id = ? AND thread_id = ?",
+          [responseId, threadId],
+          (error, results) => {
+            if (error) return reject(error);
+            resolve(results);
+          }
+        );
+      });
+
+      if (response.length === 0) {
+        return res.status(404).json({ message: "Response not found." });
+      }
+
+      if (response[0].user_id !== userId) {
+        return res.status(403).json({
+          message: "You do not have permission to delete this response.",
+        });
+      }
+
+      // Proceed to delete the response
+      const [result] = await new Promise((resolve, reject) => {
+        db.query(
+          "DELETE FROM responses WHERE id = ? AND thread_id = ?",
+          [responseId, threadId],
+          (error, results) => {
+            if (error) return reject(error);
+            resolve(results);
+          }
+        );
+      });
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: "Response not found." });
+      }
+
+      res.status(204).send(); // No content
+    } catch (error) {
+      console.error("Error deleting response:", error);
+      res.status(500).json({ message: "Failed to delete response" });
+    }
+  }
+);
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+ */

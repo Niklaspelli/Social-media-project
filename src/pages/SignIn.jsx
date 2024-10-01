@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import fakeAuth from "../auth/fakeAuth";
+import fakeAuth from "../auth/fakeAuth"; // Placeholder for your authentication logic
 
 const SignIn = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [correctCredentials, setCorrectCredentials] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [loggedInUsername, setLoggedInUsername] = useState("");
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [username, setUsername] = useState(""); // State for username
+  const [password, setPassword] = useState(""); // State for password
+  const [correctCredentials, setCorrectCredentials] = useState(null); // State for tracking login success/failure
+  const [isLoading, setIsLoading] = useState(false); // State for loading spinner
+  const [loggedInUsername, setLoggedInUsername] = useState(""); // State for storing logged-in username
+  const navigate = useNavigate(); // Hook for navigation
+  const location = useLocation(); // Hook for accessing location data
 
+  // Effect to check for a previously logged-in username in local storage
   useEffect(() => {
     const storedUsername = localStorage.getItem("loggedInUsername");
     if (storedUsername) {
@@ -18,66 +19,87 @@ const SignIn = () => {
     }
   }, []);
 
+  // Function to handle login logic
   const login = async () => {
     setCorrectCredentials(null);
-    setIsLoading(true);
+    setIsLoading(true); // Start loading
 
     try {
-      const response = await fetch("http://localhost:3000/login", {
+      const response = await fetch("http://localhost:3000/forum/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          user: username,
-          pwd: password,
+          user: username, // Sending username as 'user'
+          pwd: password, // Sending password as 'pwd'
         }),
       });
 
       const data = await response.json();
 
+      // Check if the response is not ok
       if (!response.ok) {
         throw new Error(data.error || "Login failed");
       }
 
+      // Save token and username
       const token = data.token;
       const loggedInUsername = data.username;
       setLoggedInUsername(loggedInUsername);
-      localStorage.setItem("token", token);
-      localStorage.setItem("loggedInUsername", loggedInUsername);
+      localStorage.setItem("token", token); // Store token in local storage
+      localStorage.setItem("loggedInUsername", loggedInUsername); // Store username in local storage
+
+      // Simulate authentication
       fakeAuth.signIn(() => {
-        setCorrectCredentials(true);
+        setCorrectCredentials(true); // Indicate successful login
       });
 
-      navigate("/userprofile", { state: { username: loggedInUsername } });
+      // Navigate to the forum page with state
+      navigate("/forum", { state: { username: loggedInUsername } });
     } catch (error) {
-      setCorrectCredentials(false);
-      console.error("Login failed:", error.message);
+      setCorrectCredentials(false); // Indicate failed login
+      console.error("Login failed:", error.message); // Log error
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Stop loading
     }
+  };
+
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Prevent page refresh
+    login(); // Call login function
   };
 
   return (
     <div>
       <h2>Sign in!</h2>
-      <label>Username:</label>
-      <input
-        type="text"
-        placeholder="username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <label>Password:</label>
-      <input
-        type="password"
-        placeholder="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button onClick={login} disabled={isLoading}>
-        Sign in
-      </button>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="username">Username:</label>
+        <input
+          id="username"
+          type="text"
+          placeholder="username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)} // Update username state
+          required
+        />
+
+        <label htmlFor="password">Password:</label>
+        <input
+          id="password"
+          type="password"
+          placeholder="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)} // Update password state
+          required
+        />
+
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "Logging in..." : "Sign in"}{" "}
+          {/* Conditional button text */}
+        </button>
+      </form>
       {correctCredentials === false && (
         <div role="alert" className="ml-1 mt-4 w-52 alert alert-error">
           <span className="text-xs text-center">
@@ -85,16 +107,12 @@ const SignIn = () => {
           </span>
         </div>
       )}
-      {isLoading && <div>Laddar...</div>}
-      {location.state && location.state.protectedRoute && (
-        <div>Snälla logga in</div>
-      )}
       {loggedInUsername && (
         <div style={{ color: "red" }}>Welcome, {loggedInUsername}!</div>
       )}
-      <Link to="/SignUp">SignUp</Link>
+      <Link to="/SignUp">SignUp</Link> {/* Link to sign-up page */}
     </div>
   );
 };
 
-export default SignIn;
+export default SignIn; // Export SignIn component

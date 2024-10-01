@@ -30,7 +30,10 @@ const Navbar = () => {
           )}
         </li>
         <li>
-          <Link to="/userprofile">Forum {isAuthenticated ? "" : "🔒"}</Link>
+          <Link to="/forum">Forum {isAuthenticated ? "" : "🔒"}</Link>
+        </li>
+        <li>
+          <Link to="/profile">Profile</Link>
         </li>
       </ul>
     </nav>
