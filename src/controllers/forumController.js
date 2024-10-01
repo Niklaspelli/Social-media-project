@@ -2,23 +2,23 @@ import { db } from "../config/db.js"; // Adjust this path based on your project 
 
 // Create a new thread
 export const createThread = (req, res) => {
-  const { title, content } = req.body;
+  const { title, body } = req.body;
   const userId = req.user.id; // Assuming user ID is stored in the token
 
   // Validate input
-  if (!title || !content) {
-    return res.status(400).json({ error: "Title and content are required!" });
+  if (!title || !body) {
+    return res.status(400).json({ error: "Title and body are required!" });
   }
 
   // SQL query to insert a new thread
-  const sql = "INSERT INTO threads (title, content, user_id) VALUES (?, ?, ?)";
-  db.query(sql, [title, content, userId], (err, result) => {
+  const sql = "INSERT INTO threads (title, body, user_id) VALUES (?, ?, ?)";
+  db.query(sql, [title, body, userId], (err, result) => {
     if (err) {
       console.error("Error inserting thread:", err.message);
       return res.status(500).json({ error: "Internal Server Error" });
     }
     // Respond with the newly created thread data
-    res.status(201).json({ id: result.insertId, title, content });
+    res.status(201).json({ id: result.insertId, title, body });
   });
 };
 
