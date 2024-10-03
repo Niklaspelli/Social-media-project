@@ -1,10 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext"; // Adjust the path accordingly
 
 const BackendURL = "http://localhost:3000"; // Backend URL
 
 function ThreadDetail() {
   const { threadId } = useParams();
+  const { authData } = useAuth(); // Get auth data from context
+  const { token } = authData; // Extract token from authData
   const [thread, setThread] = useState({});
   const [responses, setResponses] = useState([]);
   const [responseText, setResponseText] = useState("");
@@ -39,7 +42,6 @@ function ThreadDetail() {
   // Handle submitting a new response
   const handleResponseSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
 
     try {
       const response = await fetch(
@@ -48,7 +50,7 @@ function ThreadDetail() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`, // Use token from context
           },
           body: JSON.stringify({ body: responseText }),
         }

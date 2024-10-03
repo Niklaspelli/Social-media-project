@@ -85,34 +85,22 @@ export const loginUser = async (req, res) => {
 };
 
 // Delete user
-export const deleteUser = async (req, res) => {
-  const { id } = req.params; // Get the user ID from request parameters
+export const deleteUser = (req, res) => {
+  const userId = req.params.id; // Extract the ID from the request params
+  console.log(`Received DELETE request for user ID: ${userId}`); // Log the ID for debugging
 
-  // Input validation
-  if (!id) {
-    return res.status(400).json({ error: "User ID is required!" });
-  }
-
-  try {
-    const deleteUserQuery = "DELETE FROM users WHERE id = ?";
-
-    // Return a promise for the query
-    const result = await new Promise((resolve, reject) => {
-      db.query(deleteUserQuery, [id], (err, result) => {
-        if (err) {
-          return reject(err); // Reject promise on error
-        }
-        resolve(result); // Resolve promise with result
-      });
-    });
-
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: "User not found!" });
+  const sql = "DELETE FROM users WHERE id = ?";
+  db.query(sql, [userId], (err, result) => {
+    if (err) {
+      console.error("Error deleting user:", err.message);
+      return res.status(500).json({ error: "Internal Server Error" });
     }
 
-    res.status(200).json({ message: "User successfully deleted!" });
-  } catch (error) {
-    console.error("Error processing delete request:", error.message); // Log the error
-    res.status(500).json({ error: "Internal Server Error" });
-  }
+    // Check if the user was deleted
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.status(200).json({ message: "User deleted successfully" });
+  });
 };

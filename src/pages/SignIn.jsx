@@ -1,28 +1,28 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation, Link } from "react-router-dom";
-import fakeAuth from "../auth/fakeAuth"; // Placeholder for your authentication logic
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import "../index.css";
 
 const SignIn = () => {
-  const [username, setUsername] = useState(""); // State for username
-  const [password, setPassword] = useState(""); // State for password
-  const [correctCredentials, setCorrectCredentials] = useState(null); // State for tracking login success/failure
-  const [isLoading, setIsLoading] = useState(false); // State for loading spinner
-  const [loggedInUsername, setLoggedInUsername] = useState(""); // State for storing logged-in username
-  const navigate = useNavigate(); // Hook for navigation
-  const location = useLocation(); // Hook for accessing location data
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const errRef = useRef();
+  const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
 
-  // Effect to check for a previously logged-in username in local storage
   useEffect(() => {
-    const storedUsername = localStorage.getItem("loggedInUsername");
-    if (storedUsername) {
-      setLoggedInUsername(storedUsername);
+    if (isAuthenticated) {
+      navigate("/profile"); // Navigate to profile if already authenticated
     }
-  }, []);
+  }, [isAuthenticated, navigate]);
 
-  // Function to handle login logic
-  const login = async () => {
-    setCorrectCredentials(null);
-    setIsLoading(true); // Start loading
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoginError("");
+    setIsLoading(true);
 
     try {
       const response = await fetch("http://localhost:3000/forum/login", {
@@ -30,57 +30,39 @@ const SignIn = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          user: username, // Sending username as 'user'
-          pwd: password, // Sending password as 'pwd'
-        }),
+        body: JSON.stringify({ user: username, pwd: password }),
       });
 
       const data = await response.json();
 
-      // Log the entire response to see the structure
-      console.log("API Response Data:", data);
-
-      // Extract the user's ID (assuming the API response has 'id' field)
-      const userId = data.id;
-      console.log("User ID:", userId); // <== This will print the user ID to the console
-
-      // Check if the response is not ok
       if (!response.ok) {
         throw new Error(data.error || "Login failed");
       }
 
-      // Save token and username
       const token = data.token;
       const loggedInUsername = data.username;
-      setLoggedInUsername(loggedInUsername);
-      localStorage.setItem("token", token); // Store token in local storage
-      localStorage.setItem("loggedInUsername", loggedInUsername); // Store username in local storage
+      const userId = data.id;
 
-      // Simulate authentication
-      fakeAuth.signIn(() => {
-        setCorrectCredentials(true); // Indicate successful login
-      });
-
-      // Navigate to the forum page with state
-      navigate("/forum", { state: { username: loggedInUsername } });
+      login(token, loggedInUsername, userId); // Call login function
+      setSuccess(true);
+      navigate("/forum"); // Navigate to profile after successful login
     } catch (error) {
-      setCorrectCredentials(false); // Indicate failed login
-      console.error("Login failed:", error.message); // Log error
+      setLoginError(error.message);
+      if (errRef.current) errRef.current.focus();
     } finally {
-      setIsLoading(false); // Stop loading
+      setIsLoading(false);
     }
-  };
-
-  // Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault(); // Prevent page refresh
-    login(); // Call login function
   };
 
   return (
     <div>
       <h2>Sign in!</h2>
+      {isLoading && <p>Loading...</p>}
+      {loginError && (
+        <p style={{ color: "red" }} ref={errRef} role="alert">
+          {loginError}
+        </p>
+      )}
       <form onSubmit={handleSubmit}>
         <label htmlFor="username">Username:</label>
         <input
@@ -88,38 +70,25 @@ const SignIn = () => {
           type="text"
           placeholder="username"
           value={username}
-          onChange={(e) => setUsername(e.target.value)} // Update username state
+          onChange={(e) => setUsername(e.target.value)}
           required
         />
-
         <label htmlFor="password">Password:</label>
         <input
           id="password"
           type="password"
           placeholder="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)} // Update password state
+          onChange={(e) => setPassword(e.target.value)}
           required
         />
-
         <button type="submit" disabled={isLoading}>
-          {isLoading ? "Logging in..." : "Sign in"}{" "}
-          {/* Conditional button text */}
+          {isLoading ? "Logging in..." : "Sign in"}
         </button>
       </form>
-      {correctCredentials === false && (
-        <div role="alert" className="ml-1 mt-4 w-52 alert alert-error">
-          <span className="text-xs text-center">
-            Wrong username or password, try again!
-          </span>
-        </div>
-      )}
-      {loggedInUsername && (
-        <div style={{ color: "red" }}>Welcome, {loggedInUsername}!</div>
-      )}
-      <Link to="/SignUp">SignUp</Link> {/* Link to sign-up page */}
+      <Link to="/signup">Sign Up</Link>
     </div>
   );
 };
 
-export default SignIn; // Export SignIn component
+export default SignIn;

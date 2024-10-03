@@ -1,73 +1,50 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // Adjust the path accordingly
 import { Button, Modal } from "react-bootstrap";
 import "../index.css";
 
 const Profile = () => {
-  const { id: paramUserId } = useParams(); // Extract userId from URL parameters
-  const location = useLocation();
-  const navigate = useNavigate();
-  const errRef = useRef(null);
-
-  // Get token and userId from state or localStorage
-  const stateToken = location.state?.token || "";
-  const stateUserId = location.state?.userId || ""; // Use userId from state
-
-  const [token, setToken] = useState(
-    stateToken || localStorage.getItem("token") || ""
-  );
-
-  const [userId, setUserId] = useState(
-    stateUserId || paramUserId || localStorage.getItem("userId") || ""
-  ); // Use userId from state or URL params
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [errMsg, setErrMsg] = useState("");
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [showPictureModal, setShowPictureModal] = useState(false);
-  const [selectedPicture, setSelectedPicture] = useState(
-    localStorage.getItem("profilePicture") || "https://i.pravatar.cc/200"
-  );
-  const [tempPicture, setTempPicture] = useState(selectedPicture);
+  const { authData, logout } = useAuth(); // Access auth data and logout function
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [errMsg, setErrMsg] = useState("");
+  const [selectedPicture, setSelectedPicture] = useState(""); // Store the selected picture
+  const [tempPicture, setTempPicture] = useState(""); // Store temporary picture URL
+  const [showPictureModal, setShowPictureModal] = useState(false); // State to control picture modal
+  const [showConfirmation, setShowConfirmation] = useState(false); // Confirmation for delete
+  const navigate = useNavigate();
+  const errRef = useRef();
 
-  useEffect(() => {
-    console.log("Extracted userId:", userId); // Debugging log
-    const checkCredentials = async () => {
-      if (!token || !userId) {
-        setError("Token or ID is missing");
-        console.error("Token or ID is missing:", { token, userId });
-      } else {
-        console.log("Token and ID are present:", { token, userId });
-      }
-      setIsLoading(false);
-    };
-
-    checkCredentials();
-  }, [token, userId]);
+  const userId = authData.userId; // Get userId from authData
+  const token = authData.token; // Get token from authData
 
   const handleDelete = async () => {
     if (!token || !userId) {
       setError("ID or token is missing");
-      console.error("Missing token or id:", { token, userId });
-      return;
+      console.error("Missing token or ID:", { token, userId });
+      return; // Early exit if token or userId is not present
     }
     setIsLoading(true);
     try {
       console.log("Attempting to DELETE:", userId); // Debugging log
-      const response = await fetch(`http://localhost:3000/profile/${userId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `http://localhost:3000/forum/profile/${userId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
           errorData.message || `Failed to delete user: ${response.statusText}`
         );
       }
+      // Clear token and user ID from local storage
       localStorage.removeItem("token");
       localStorage.removeItem("userId");
       localStorage.removeItem("profilePicture");
@@ -151,6 +128,13 @@ const Profile = () => {
     }
   };
 
+  useEffect(() => {
+    if (success) {
+      alert("Account deleted successfully!"); // Alert on successful deletion
+      navigate("/signup"); // Redirect to register page after deletion
+    }
+  }, [success, navigate]);
+
   if (isLoading) {
     return <p>Loading...</p>;
   }
@@ -160,16 +144,7 @@ const Profile = () => {
       <div style={ProfileContainerStyle}>
         {success ? (
           <section>
-            <h1>Kontot raderat! Välkommen tillbaka!</h1>
-            <div style={HomeContainerStyle}>
-              <Button
-                style={{ backgroundColor: "#185bac", margin: "20px" }}
-                type="submit"
-                onClick={() => navigate("/register")}
-              >
-                Skapa
-              </Button>
-            </div>
+            <h1>Account deleted! Welcome back!</h1>
           </section>
         ) : (
           <section>
@@ -192,7 +167,7 @@ const Profile = () => {
                 )}
 
                 <div className="selected-picture">
-                  <h4>Din valda bild:</h4>
+                  <h4>Your selected picture:</h4>
                   <img
                     src={selectedPicture}
                     alt="Selected Avatar"
@@ -208,7 +183,7 @@ const Profile = () => {
                   style={{ backgroundColor: "black", margin: "20px" }}
                   onClick={openPictureModal}
                 >
-                  Välj profilbild
+                  Choose Profile Picture
                 </Button>
                 <div className="center">
                   <Modal
@@ -223,7 +198,7 @@ const Profile = () => {
                       <Modal.Title
                         style={{ justifyContent: "center", display: "flex" }}
                       >
-                        Välj en profilbild
+                        Choose a Profile Picture
                       </Modal.Title>
                     </Modal.Header>
                     <Modal.Body
@@ -246,7 +221,7 @@ const Profile = () => {
                       style={{ justifyContent: "center", display: "flex" }}
                     >
                       <Button variant="primary" onClick={handleSavePicture}>
-                        Spara
+                        Save
                       </Button>
                     </Modal.Footer>
                   </Modal>
@@ -263,18 +238,18 @@ const Profile = () => {
                   </Button>
                 ) : (
                   <div className="confirmation-prompt">
-                    <p>Är du säker att vill radera kontot?</p>
+                    <p>Are you sure you want to delete your account?</p>
                     <button
                       onClick={handleConfirmAction}
                       className="btn btn-primary"
                     >
-                      Ja
+                      Yes
                     </button>
                     <button
                       onClick={handleCancelDelete}
                       className="btn btn-secondary"
                     >
-                      Nej
+                      No
                     </button>
                   </div>
                 )}

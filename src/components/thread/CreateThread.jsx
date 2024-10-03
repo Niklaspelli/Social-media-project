@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { useAuth } from "../../context/AuthContext"; // Make sure the path is correct
 import ThreadList from "./ThreadList";
 
 const BackendURL = "http://localhost:3000";
 
-function CreateThread({ token, currentUser }) {
+function CreateThread() {
+  const { authData } = useAuth(); // Use the custom hook
+  const { token, username } = authData; // Destructure token and username from authData
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [error, setError] = useState(null);
@@ -12,9 +15,8 @@ function CreateThread({ token, currentUser }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-    setSuccess(false); // Reset success message on each new submit
+    setSuccess(false);
 
-    // Ensure that both title and body are not empty
     if (!title || !body) {
       setError("Title and content are required");
       return;
@@ -25,12 +27,12 @@ function CreateThread({ token, currentUser }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`, // Use the token here
         },
         body: JSON.stringify({
           title: title,
           body: body,
-          author: currentUser, // Include the current username or user ID
+          author: username, // Use the username here
         }),
       });
 
@@ -44,12 +46,9 @@ function CreateThread({ token, currentUser }) {
       const createdThread = await response.json();
       console.log("Thread created successfully:", createdThread);
 
-      // Clear input fields after successful thread creation
       setTitle("");
       setBody("");
-      setSuccess(true); // Show success message
-
-      // Optionally, you can add logic here to refresh the list of threads in the parent component
+      setSuccess(true);
     } catch (error) {
       console.error("Failed to create thread:", error.message);
       setError(error.message);
@@ -75,8 +74,8 @@ function CreateThread({ token, currentUser }) {
       {error && <p style={{ color: "red" }}>{error}</p>}
       {success && (
         <p style={{ color: "green" }}>Thread created successfully!</p>
-      )}{" "}
-      <ThreadList currentUser={currentUser} />
+      )}
+      <ThreadList />
     </div>
   );
 }

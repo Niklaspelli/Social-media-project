@@ -1,12 +1,12 @@
+// auth/ProtectedRoute.jsx
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import fakeAuth from "./fakeAuth";
+import { useAuth } from "../context/AuthContext"; // Make sure to import useAuth
 
-const ProtectedRoute = () =>
-  fakeAuth.isAuthenticated ? (
-    <Outlet />
-  ) : (
-    <Navigate to="/login" replace state={{ protectedRoute: true }} />
-  );
+const ProtectedRoute = () => {
+  const { isAuthenticated } = useAuth(); // Get authentication status from context
+
+  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
+};
 
 export default ProtectedRoute;

@@ -1,36 +1,23 @@
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import fakeAuth from "../auth/fakeAuth";
+// Forum.jsx
+
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // Import the Auth context
 import CreateThread from "../components/thread/CreateThread";
 
 const Forum = () => {
-  const location = useLocation();
   const navigate = useNavigate();
+  const { authData, isAuthenticated } = useAuth(); // Access auth data and authentication status
 
-  const [currentUser, setCurrentUser] = useState(
-    location.state?.username || localStorage.getItem("loggedInUsername") || ""
-  );
-  const [token, setToken] = useState(localStorage.getItem("token"));
+  const currentUser = authData.username; // Get the username from the auth context
+  const token = authData.token; // Get the token from the auth context
 
   useEffect(() => {
-    const storedUsername = localStorage.getItem("loggedInUsername");
-    const storedToken = localStorage.getItem("token");
-
-    // Redirect to signin if no token or username is found
-    if (!storedToken || !storedUsername) {
-      navigate("/signin");
-      return;
+    // Redirect to signin if user is not authenticated
+    if (!isAuthenticated) {
+      navigate("/login");
     }
-
-    // If token and username exist, set state
-    setCurrentUser(storedUsername);
-    setToken(storedToken);
-
-    // Set fakeAuth to authenticated
-    if (storedToken && fakeAuth.isAuthenticated !== true) {
-      fakeAuth.isAuthenticated = true; // Ensure fakeAuth reflects actual state
-    }
-  }, [navigate]);
+  }, [isAuthenticated, navigate]);
 
   return (
     <>
