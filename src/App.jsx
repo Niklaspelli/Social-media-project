@@ -19,17 +19,15 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />{" "}
-          {/* Changed case to lowercase */}
+          <Route path="/signup" element={<SignUp />} /> {/* Signup route */}
+          {/* Protected routes start here */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<ThreadList />} />
-            <Route path="/threads/:threadId" element={<ThreadDetail />} />
             <Route path="/forum" element={<Forum />} />
-            <Route path="/profile" element={<Profile />} />
-            {/* Add more protected routes here if needed */}
+            <Route path="/threads/:threadId" element={<ThreadDetail />} />
+            <Route path="/profile/:id" element={<Profile />} /> {/* Pass id */}
           </Route>
-          <Route path="*" element={<NotFound />} />{" "}
-          {/* Catch-all for 404 pages */}
+          {/* Catch-all route for 404 NotFound */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
     </>

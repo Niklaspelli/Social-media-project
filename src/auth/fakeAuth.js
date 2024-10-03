@@ -1,14 +1,14 @@
 const fakeAuth = {
-  isAuthenticated: null,
+  isAuthenticated: false, // Set this to true when a user logs in
 
   signIn(callback) {
-    fakeAuth.isAuthenticated = true;
-    setTimeout(callback, 300);
+    this.isAuthenticated = true;
+    setTimeout(callback, 100); // Simulate an async operation
   },
 
   signOut(callback) {
-    fakeAuth.isAuthenticated = false;
-    setTimeout(callback, 300);
+    this.isAuthenticated = false;
+    setTimeout(callback, 100); // Simulate an async operation
   },
 };
 

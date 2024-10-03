@@ -97,11 +97,9 @@ function ThreadDetail() {
         {responses.length > 0 ? (
           responses.map((res) => (
             <div key={res.id}>
-              <p>
-                <strong>{res.username}</strong> (
-                {new Date(res.created_at).toLocaleString()})
-              </p>
+              <strong>{res.username}</strong> skrev:
               <p>{res.body}</p>
+              <p>({new Date(res.created_at).toLocaleString()})</p>
             </div>
           ))
         ) : (

@@ -1,44 +1,47 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import fakeAuth from "../auth/fakeAuth";
-/* import Blog from "../components/NewBlog/Blog"; */
 import CreateThread from "../components/thread/CreateThread";
 
 const Forum = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { username } = location.state || {};
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentUser, setCurrentUser] = useState(username || "");
-  const [token, setToken] = useState(localStorage.getItem("token")); // Use state for token
+  const [currentUser, setCurrentUser] = useState(
+    location.state?.username || localStorage.getItem("loggedInUsername") || ""
+  );
+  const [token, setToken] = useState(localStorage.getItem("token"));
 
   useEffect(() => {
     const storedUsername = localStorage.getItem("loggedInUsername");
-    const isAuthenticated = location.state?.isAuthenticated;
+    const storedToken = localStorage.getItem("token");
 
-    if (!token || !storedUsername) {
+    // Redirect to signin if no token or username is found
+    if (!storedToken || !storedUsername) {
       navigate("/signin");
       return;
     }
 
-    setIsAuthenticated(fakeAuth.isAuthenticated);
-    setCurrentUser(storedUsername || ""); // Initialize currentUser with an empty string if not available
-    setToken(localStorage.getItem("token")); // Update token state
-  }, [navigate, location.state, token]);
+    // If token and username exist, set state
+    setCurrentUser(storedUsername);
+    setToken(storedToken);
+
+    // Set fakeAuth to authenticated
+    if (storedToken && fakeAuth.isAuthenticated !== true) {
+      fakeAuth.isAuthenticated = true; // Ensure fakeAuth reflects actual state
+    }
+  }, [navigate]);
 
   return (
     <>
-      <h2>
-        {currentUser && (
-          <p>
-            Du är inloggad som:
-            <div className="username"> {currentUser}</div>{" "}
-          </p>
-        )}
-      </h2>
+      {currentUser && (
+        <h2>
+          Du är inloggad som:
+          <div className="username"> {currentUser}</div>
+        </h2>
+      )}
       <p>Ser du det här, då är du inne innanför protectedroute</p>
-      {/* <Blog token={token} currentUser={currentUser} />{" "} */}
+
       {/* Pass token and currentUser as props */}
       <CreateThread token={token} currentUser={currentUser} />
     </>

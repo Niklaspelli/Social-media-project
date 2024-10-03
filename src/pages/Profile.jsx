@@ -1,20 +1,26 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { Button, Modal } from "react-bootstrap";
 import "../index.css";
 
 const Profile = () => {
+  const { id: paramUserId } = useParams(); // Extract userId from URL parameters
   const location = useLocation();
   const navigate = useNavigate();
   const errRef = useRef(null);
 
+  // Get token and userId from state or localStorage
   const stateToken = location.state?.token || "";
-  const stateId = location.state?.id || "";
+  const stateUserId = location.state?.userId || ""; // Use userId from state
 
   const [token, setToken] = useState(
     stateToken || localStorage.getItem("token") || ""
   );
-  const [id, setId] = useState(stateId || localStorage.getItem("Id") || "");
+
+  const [userId, setUserId] = useState(
+    stateUserId || paramUserId || localStorage.getItem("userId") || ""
+  ); // Use userId from state or URL params
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [errMsg, setErrMsg] = useState("");
@@ -27,51 +33,48 @@ const Profile = () => {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
+    console.log("Extracted userId:", userId); // Debugging log
     const checkCredentials = async () => {
-      if (!token || !id) {
+      if (!token || !userId) {
         setError("Token or ID is missing");
+        console.error("Token or ID is missing:", { token, userId });
+      } else {
+        console.log("Token and ID are present:", { token, userId });
       }
       setIsLoading(false);
     };
 
     checkCredentials();
-  }, [token, id]);
+  }, [token, userId]);
 
   const handleDelete = async () => {
-    if (!token || !id) {
+    if (!token || !userId) {
       setError("ID or token is missing");
-      console.error("Error:", { token, id });
+      console.error("Missing token or id:", { token, userId });
       return;
     }
-
     setIsLoading(true);
-
     try {
-      const response = await fetch(`https://chatp/users/${id}`, {
+      console.log("Attempting to DELETE:", userId); // Debugging log
+      const response = await fetch(`http://localhost:3000/profile/${userId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
           errorData.message || `Failed to delete user: ${response.statusText}`
         );
       }
-
       localStorage.removeItem("token");
-      localStorage.removeItem("Id");
+      localStorage.removeItem("userId");
       localStorage.removeItem("profilePicture");
-
       setSuccess(true);
     } catch (error) {
-      console.error("Registration error:", error);
       setErrMsg(`${error.message}`);
-      if (errRef.current) {
-        errRef.current.focus();
-      }
+      if (errRef.current) errRef.current.focus();
     } finally {
       setIsLoading(false);
     }
@@ -105,7 +108,7 @@ const Profile = () => {
     setSelectedPicture(tempPicture);
     localStorage.setItem("profilePicture", tempPicture);
 
-    if (!token || !id) {
+    if (!token || !userId) {
       setError("ID or token is missing");
       return;
     }
@@ -113,21 +116,21 @@ const Profile = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`https://p/user`, {
+      const response = await fetch(`http://localhost:3000/forum/users`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId: id,
+          userId, // Use the userId from state
           updatedData: { avatar: tempPicture },
         }),
       });
 
       if (!response.ok) {
         throw new Error(
-          `Failed to update profile picture: ${response.statusText} for user ${id}`
+          `Failed to update profile picture: ${response.statusText} for user ${userId}`
         );
       }
 
@@ -286,16 +289,13 @@ const Profile = () => {
 
 export default Profile;
 
+// Add your styling constants here
 const ProfileContainerStyle = {
-  marginBottom: "15px",
-  display: "flex",
-  justifyContent: "center",
-  marginTop: "200px",
+  padding: "20px",
 };
 
 const HomeContainerStyle = {
-  marginTop: "50px",
-  marginBottom: "15px",
   display: "flex",
   justifyContent: "center",
+  alignItems: "center",
 };

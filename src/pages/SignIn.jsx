@@ -38,6 +38,13 @@ const SignIn = () => {
 
       const data = await response.json();
 
+      // Log the entire response to see the structure
+      console.log("API Response Data:", data);
+
+      // Extract the user's ID (assuming the API response has 'id' field)
+      const userId = data.id;
+      console.log("User ID:", userId); // <== This will print the user ID to the console
+
       // Check if the response is not ok
       if (!response.ok) {
         throw new Error(data.error || "Login failed");

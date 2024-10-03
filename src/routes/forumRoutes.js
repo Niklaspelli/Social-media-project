@@ -1,6 +1,10 @@
 import express from "express";
 import { authenticateJWT } from "../middleware/authMiddleware.js";
-import { registerUser, loginUser } from "../controllers/authController.js";
+import {
+  registerUser,
+  loginUser,
+  deleteUser,
+} from "../controllers/authController.js";
 import {
   createThread,
   getAllThreads,
@@ -13,6 +17,7 @@ const router = express.Router();
 // Auth routes
 router.post("/register", registerUser);
 router.post("/login", loginUser);
+router.delete("/profile/:id", deleteUser);
 
 // Create a new thread
 router.post("/threads", authenticateJWT, createThread);
