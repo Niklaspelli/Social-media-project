@@ -6,9 +6,9 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Forum from "./pages/Forum";
 import Home from "./pages/Home";
+import Profile from "./pages/profile/Profile.jsx";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./auth/ProtectedRoute";
-import Profile from "./pages/Profile";
 import CreateThread from "./components/thread/CreateThread"; // Adjust the path accordingly
 import ThreadList from "./components/thread/ThreadList"; // Adjust the path accordingly
 import ThreadDetail from "./components/thread/ThreadDetail";
@@ -18,8 +18,8 @@ function App() {
     <AuthProvider>
       <Navbar />
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<SignIn />} />
+        {/* <Route path="/" element={<Home />} /> */}
+        <Route path="/" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/forum" element={<Forum />} />

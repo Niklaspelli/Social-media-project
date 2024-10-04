@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { Container, Row, Col, Form, Button } from "react-bootstrap"; // Importing Bootstrap components
 import "../index.css";
 
 const SignIn = () => {
@@ -8,14 +9,14 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
-  const [success, setSuccess] = useState(false);
+  const [correctCredentials, setCorrectCredentials] = useState(true);
   const errRef = useRef();
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/profile"); // Navigate to profile if already authenticated
+      navigate("/profile");
     }
   }, [isAuthenticated, navigate]);
 
@@ -36,6 +37,7 @@ const SignIn = () => {
       const data = await response.json();
 
       if (!response.ok) {
+        setCorrectCredentials(false);
         throw new Error(data.error || "Login failed");
       }
 
@@ -43,9 +45,8 @@ const SignIn = () => {
       const loggedInUsername = data.username;
       const userId = data.id;
 
-      login(token, loggedInUsername, userId); // Call login function
-      setSuccess(true);
-      navigate("/forum"); // Navigate to profile after successful login
+      login(token, loggedInUsername, userId);
+      navigate("/forum");
     } catch (error) {
       setLoginError(error.message);
       if (errRef.current) errRef.current.focus();
@@ -55,40 +56,86 @@ const SignIn = () => {
   };
 
   return (
-    <div>
-      <h2>Sign in!</h2>
-      {isLoading && <p>Loading...</p>}
-      {loginError && (
-        <p style={{ color: "red" }} ref={errRef} role="alert">
-          {loginError}
-        </p>
-      )}
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="username">Username:</label>
-        <input
-          id="username"
-          type="text"
-          placeholder="username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-        />
-        <label htmlFor="password">Password:</label>
-        <input
-          id="password"
-          type="password"
-          placeholder="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit" disabled={isLoading}>
-          {isLoading ? "Logging in..." : "Sign in"}
-        </button>
-      </form>
-      <Link to="/signup">Sign Up</Link>
+    <div style={LoginContainerStyle}>
+      <Container>
+        <Row className="justify-content-center align-items-center h-100">
+          <Col md={8} lg={4} className="justify-content-center">
+            <h2 className="text-center mb-4">Logga in:</h2>
+
+            {isLoading && <div className="alert alert-info">Loading...</div>}
+            {loginError && (
+              <div className="alert alert-danger" ref={errRef} role="alert">
+                {loginError}
+              </div>
+            )}
+
+            <Form onSubmit={handleSubmit}>
+              <Form.Group className="mb-3">
+                <Form.Label htmlFor="floatingInputCustom1">
+                  Användarnamn:
+                </Form.Label>
+                <Form.Control
+                  id="floatingInputCustom1"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  style={{ backgroundColor: "#185bac", color: "white" }}
+                  placeholder="Ange ditt användarnamn"
+                  aria-label="Username"
+                  aria-required="true"
+                  required
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label htmlFor="floatingInputCustom2">
+                  Lösenord:
+                </Form.Label>
+                <Form.Control
+                  id="floatingInputCustom2"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  style={{ backgroundColor: "#185bac", color: "white" }}
+                  placeholder="Ange ditt lösenord"
+                  aria-label="Password"
+                  aria-required="true"
+                  required
+                />
+              </Form.Group>
+
+              <div className="d-grid">
+                <Button
+                  style={{ backgroundColor: "#185bac" }}
+                  type="submit"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Loggar in..." : "Logga in"}
+                </Button>
+              </div>
+
+              {correctCredentials === false && (
+                <div role="alert" className="alert alert-danger mt-4">
+                  <span>Fel användarnamn eller lösenord. Försök igen!</span>
+                </div>
+              )}
+            </Form>
+
+            <div className="text-center mt-3">
+              <p>Inget konto?</p>
+              <Link to="/signup">Registrera dig</Link>
+            </div>
+          </Col>
+        </Row>
+      </Container>
     </div>
   );
 };
 
 export default SignIn;
+
+const LoginContainerStyle = {
+  marginBottom: "15px",
+  display: "flex",
+  justifyContent: "center",
+};

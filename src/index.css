@@ -14,7 +14,7 @@
   min-height: 125vh;
   color-scheme: rgb(12, 9, 9);
   color: rgba(255, 255, 255, 0.87);
-  background: linear-gradient(#230d55, #0a315e);
+  background: linear-gradient(#2b2b2c, #242525);
   background-size: cover;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -198,7 +198,7 @@ input[type=text],
   top: 0;
   width: 250px;
   height: 100%;
-  background-color: #722781;
+  background-color: #211f22;
   transition: 0.3s;
   padding-top: 60px;
 }
@@ -212,7 +212,7 @@ input[type=text],
   top: -20px;
   right: -40px;
   font-size: 30px;
-  background-color: #281eb4;
+  background-color: #59595f;
   color: white;
   border: none;
   cursor: pointer;

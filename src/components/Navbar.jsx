@@ -27,7 +27,7 @@ const Navbar = () => {
         <ul>
           {!isAuthenticated ? (
             <li>
-              <Link to={"/login"}>Sign In/ Sign Up</Link>
+              <Link to={"/"}>Sign In/ Sign Up</Link>
             </li>
           ) : (
             <>

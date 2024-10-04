@@ -56,20 +56,23 @@ function CreateThread() {
   };
 
   return (
-    <div>
+    <div style={LoginContainerStyle}>
+      <h2>Skapa ny tråd:</h2>
       <form onSubmit={handleSubmit}>
         <input
           type="text"
           placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          style={inputStyle}
         />
         <textarea
           placeholder="Body"
           value={body}
           onChange={(e) => setBody(e.target.value)}
+          style={inputStyle}
         ></textarea>
-        <button type="submit">Create Thread</button>
+        <button type="submit">Skapa tråd</button>
       </form>
       {error && <p style={{ color: "red" }}>{error}</p>}
       {success && (
@@ -81,3 +84,22 @@ function CreateThread() {
 }
 
 export default CreateThread;
+
+const LoginContainerStyle = {
+  marginBottom: "15px",
+  display: "flex",
+  justifyContent: "center",
+  margin: "20px",
+};
+
+const inputStyle = {
+  width: "90%",
+  maxWidth: "400px",
+  padding: "10px",
+  borderRadius: "20px",
+  border: "1px solid #ddd",
+  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+  outline: "none",
+  fontSize: "16px",
+  transition: "border-color 0.3s ease",
+};
