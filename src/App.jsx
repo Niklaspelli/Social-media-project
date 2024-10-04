@@ -13,6 +13,8 @@ import CreateThread from "./components/thread/CreateThread"; // Adjust the path 
 import ThreadList from "./components/thread/ThreadList"; // Adjust the path accordingly
 import ThreadDetail from "./components/thread/ThreadDetail"; // Adjust the path accordingly
 import UserProfile from "./pages/UserProfile"; // Import the UserProfile component
+import EditProfile from "./pages/settings/EditProfile.jsx";
+import CreateProfile from "./pages/settings/CreateProfile.jsx";
 
 function App() {
   return (
@@ -28,6 +30,8 @@ function App() {
           <Route path="/user/:id" element={<UserProfile />} />{" "}
           {/* Ensure UserProfile is imported */}
           <Route path="/settings/:id" element={<Settings />} />
+          <Route path="/create-profile" element={<CreateProfile />} />
+          <Route path="/settings/edit-profile/:id" element={<EditProfile />} />
           <Route path="/threads" element={<ThreadList />} />
           <Route path="/threads/:threadId" element={<ThreadDetail />} />
           <Route path="/create-thread" element={<CreateThread />} />

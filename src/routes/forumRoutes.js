@@ -1,24 +1,24 @@
-// routes/index.js or your main router file
 import express from "express";
 import { authenticateJWT } from "../middleware/authMiddleware.js";
 import {
   registerUser,
   loginUser,
   deleteUser,
-  updateAvatar, // Import the updateAvatar function here
-} from "../controllers/authController.js"; // Ensure the path is correct
+  updateAvatar,
+} from "../controllers/authController.js";
 
 import {
   createThread,
   getAllThreads,
   getThreadWithResponses,
   postResponseToThread,
-} from "../controllers/forumController.js"; // Ensure this function is defined in your controller
+} from "../controllers/forumController.js";
 
 import {
-  createOrUpdateUserProfile, // Import the createOrUpdateUserProfile function
-  getUserProfile, // Import the getUserProfile function
-} from "../controllers/userProfileController.js"; // Ensure this path is correct
+  createOrUpdateUserProfile,
+  updateUserProfile,
+  getUserProfile,
+} from "../controllers/userProfileController.js";
 
 const router = express.Router();
 
@@ -26,11 +26,17 @@ const router = express.Router();
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.delete("/settings/:id", deleteUser);
-router.put("/users/avatar", authenticateJWT, updateAvatar); // Ensure this line is correct
+router.put("/users/avatar", authenticateJWT, updateAvatar);
 
 // User Profile routes
-router.post("/user/profile", authenticateJWT, createOrUpdateUserProfile); // Create or update user profile
-router.get("/user/profile/:userId", getUserProfile); // Get user profile by user ID
+// Route for getting user profile by profileId
+router.get("/users/:id", authenticateJWT, getUserProfile);
+
+// Route for creating or updating user profile
+router.post("/users", authenticateJWT, createOrUpdateUserProfile); // Ensure this matches your POST request
+
+// Route for updating user profile by profileId
+router.put("/users/:id", authenticateJWT, updateUserProfile);
 
 // Create a new thread
 router.post("/threads", authenticateJWT, createThread);

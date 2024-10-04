@@ -13,15 +13,12 @@ function UserProfile() {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:3000/forum/user/profile/${id}`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`, // Include token for authentication
-            },
-          }
-        );
+        const response = await fetch(`http://localhost:3000/users/${id}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`, // Include token for authentication
+          },
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch user profile");

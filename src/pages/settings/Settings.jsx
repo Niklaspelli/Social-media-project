@@ -4,7 +4,10 @@ import { useAuth } from "../../context/AuthContext";
 import { Button, Toast, ToastContainer } from "react-bootstrap";
 import ProfileAvatar from "./ProfileAvatar";
 import DeleteAccount from "./DeleteAccount";
+
 import "../../index.css";
+import EditProfile from "./EditProfile";
+import CreateProfile from "./CreateProfile";
 
 const Settings = () => {
   const { authData, logout } = useAuth();
@@ -99,6 +102,9 @@ const Settings = () => {
             userId={userId} // Pass userId if needed for API calls
             setSelectedPicture={handleSavePicture} // Correct prop name
           />
+          {/*  <CreateProfile /> */}
+
+          <EditProfile />
 
           {!showConfirmation ? (
             <Button
