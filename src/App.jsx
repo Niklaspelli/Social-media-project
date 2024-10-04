@@ -6,28 +6,33 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Forum from "./pages/Forum";
 import Home from "./pages/Home";
-import Settings from "./pages/profile/Settings.jsx";
+import Settings from "./pages/settings/Settings.jsx";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import CreateThread from "./components/thread/CreateThread"; // Adjust the path accordingly
 import ThreadList from "./components/thread/ThreadList"; // Adjust the path accordingly
-import ThreadDetail from "./components/thread/ThreadDetail";
+import ThreadDetail from "./components/thread/ThreadDetail"; // Adjust the path accordingly
+import UserProfile from "./pages/UserProfile"; // Import the UserProfile component
 
 function App() {
   return (
     <AuthProvider>
       <Navbar />
       <Routes>
-        {/* <Route path="/" element={<Home />} /> */}
+        {/* You may want to change this to Home later */}
         <Route path="/" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
+
         <Route element={<ProtectedRoute />}>
           <Route path="/forum" element={<Forum />} />
+          <Route path="/user/:id" element={<UserProfile />} />{" "}
+          {/* Ensure UserProfile is imported */}
           <Route path="/settings/:id" element={<Settings />} />
           <Route path="/threads" element={<ThreadList />} />
           <Route path="/threads/:threadId" element={<ThreadDetail />} />
           <Route path="/create-thread" element={<CreateThread />} />
         </Route>
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AuthProvider>

@@ -117,3 +117,28 @@ export const postResponseToThread = (req, res) => {
     });
   });
 };
+
+// Delete a response
+export const deleteResponse = (req, res) => {
+  const { responseId } = req.params; // Get the response ID from the request parameters
+  const userId = req.user.id; // Get user ID from JWT token
+
+  // SQL query to delete the response
+  const deleteResponseQuery =
+    "DELETE FROM responses WHERE id = ? AND user_id = ?";
+  db.query(deleteResponseQuery, [responseId, userId], (error, result) => {
+    if (error) {
+      console.error("Error deleting response:", error.message);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    // Check if a response was deleted
+    if (result.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ error: "Response not found or unauthorized" });
+    }
+
+    res.status(200).json({ message: "Response deleted successfully." });
+  });
+};

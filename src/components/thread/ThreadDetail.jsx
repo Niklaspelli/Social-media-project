@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom"; // Import Link for navigation
 import { useAuth } from "../../context/AuthContext"; // Adjust the path accordingly
 
 const BackendURL = "http://localhost:3000"; // Backend URL
@@ -69,6 +69,33 @@ function ThreadDetail() {
     }
   };
 
+  // Handle deleting a response
+  const handleDeleteResponse = async (responseId) => {
+    try {
+      const response = await fetch(
+        `${BackendURL}/forum/responses/${responseId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete response");
+      }
+
+      // Remove the deleted response from the state
+      setResponses((prevResponses) =>
+        prevResponses.filter((res) => res.id !== responseId)
+      );
+    } catch (error) {
+      console.error("Failed to delete response:", error.message);
+      setError("Failed to delete response. Please try again later.");
+    }
+  };
+
   if (loading) {
     return <p>Loading thread details...</p>;
   }
@@ -86,6 +113,7 @@ function ThreadDetail() {
         <textarea
           value={responseText}
           onChange={(e) => setResponseText(e.target.value)}
+          style={inputStyle}
           placeholder="Write your response here..."
           required
         ></textarea>
@@ -104,7 +132,7 @@ function ThreadDetail() {
               }}
             >
               <img
-                src={res.avatar} // Use the avatar URL from the response
+                src={res.avatar}
                 alt="avatar"
                 style={{
                   width: 50,
@@ -114,9 +142,24 @@ function ThreadDetail() {
                 }}
               />
               <div>
-                <strong>{res.username}</strong> skrev:
+                {/* Use Link to navigate to the user profile */}
+                <Link to={`/user/${res.user_id}`}>
+                  <strong>{res.username}</strong>
+                </Link>{" "}
+                skrev:
                 <p>{res.body}</p>
-                <p>({new Date(res.created_at).toLocaleString()})</p>
+                <p style={{ fontSize: "0.8em", color: "#999" }}>
+                  ({new Date(res.created_at).toLocaleString()})
+                </p>
+                {/* Add the delete button */}
+                {res.user_id === authData.id && ( // Check if the current user is the author
+                  <button
+                    onClick={() => handleDeleteResponse(res.id)}
+                    style={{ color: "red", cursor: "pointer" }}
+                  >
+                    Delete
+                  </button>
+                )}
               </div>
             </div>
           ))
@@ -129,3 +172,18 @@ function ThreadDetail() {
 }
 
 export default ThreadDetail;
+
+const inputStyle = {
+  width: "90%",
+  maxWidth: "400px",
+  padding: "10px",
+  borderRadius: "20px",
+  border: "1px solid #ddd",
+  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+  outline: "none",
+  fontSize: "16px",
+  transition: "border-color 0.3s ease",
+  backgroundColor: "grey",
+  color: "white",
+  border: "none",
+};

@@ -130,3 +130,87 @@ export const updateAvatar = async (req, res) => {
     return res.status(200).json({ message: "Avatar updated successfully" });
   });
 };
+
+// Create or update user profile
+export const createOrUpdateUserProfile = (req, res) => {
+  const userId = req.user.id; // Get user ID from JWT token
+  const { sex, relationship_status, location, music_taste, interests, bio } =
+    req.body;
+
+  // Validate input
+  if (!sex || !relationship_status || !location) {
+    return res
+      .status(400)
+      .json({ error: "Sex, relationship status, and location are required!" });
+  }
+
+  // Check if the profile already exists
+  const checkProfileQuery = "SELECT * FROM user_profiles WHERE user_id = ?";
+  db.query(checkProfileQuery, [userId], (err, results) => {
+    if (err) {
+      console.error("Error checking user profile:", err.message);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    if (results.length > 0) {
+      // Update the existing profile
+      const updateProfileQuery = `
+        UPDATE user_profiles 
+        SET sex = ?, relationship_status = ?, location = ?, 
+            music_taste = ?, interests = ?, bio = ?, 
+            updated_at = CURRENT_TIMESTAMP 
+        WHERE user_id = ?
+      `;
+      db.query(
+        updateProfileQuery,
+        [
+          sex,
+          relationship_status,
+          location,
+          music_taste,
+          interests,
+          bio,
+          userId,
+        ],
+        (error) => {
+          if (error) {
+            console.error("Error updating user profile:", error.message);
+            return res.status(500).json({ error: "Internal Server Error" });
+          }
+          res.status(200).json({ message: "Profile updated successfully." });
+        }
+      );
+    } else {
+      // Create a new profile
+      const createProfileQuery = `
+        INSERT INTO user_profiles (user_id, sex, relationship_status, location, 
+                                    music_taste, interests, bio) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `;
+      db.query(
+        createProfileQuery,
+        [
+          userId,
+          sex,
+          relationship_status,
+          location,
+          music_taste,
+          interests,
+          bio,
+        ],
+        (error, result) => {
+          if (error) {
+            console.error("Error creating user profile:", error.message);
+            return res.status(500).json({ error: "Internal Server Error" });
+          }
+          res
+            .status(201)
+            .json({
+              message: "Profile created successfully.",
+              profileId: result.insertId,
+            });
+        }
+      );
+    }
+  });
+};
