@@ -104,3 +104,29 @@ export const deleteUser = (req, res) => {
     return res.status(200).json({ message: "User deleted successfully" });
   });
 };
+
+//Update
+export const updateAvatar = async (req, res) => {
+  const { userId } = req.body; // Get userId from request body
+  const { avatar } = req.body.updatedData; // Get avatar from updatedData
+
+  if (!userId || !avatar) {
+    return res
+      .status(400)
+      .json({ error: "User ID and avatar URL are required." });
+  }
+
+  const sql = "UPDATE users SET avatar = ? WHERE id = ?";
+  db.query(sql, [avatar, userId], (err, result) => {
+    if (err) {
+      console.error("Error updating avatar:", err.message);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.status(200).json({ message: "Avatar updated successfully" });
+  });
+};

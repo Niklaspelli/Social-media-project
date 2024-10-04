@@ -6,7 +6,7 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Forum from "./pages/Forum";
 import Home from "./pages/Home";
-import Profile from "./pages/profile/Profile.jsx";
+import Settings from "./pages/profile/Settings.jsx";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import CreateThread from "./components/thread/CreateThread"; // Adjust the path accordingly
@@ -23,7 +23,7 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/forum" element={<Forum />} />
-          <Route path="/profile/:id" element={<Profile />} />
+          <Route path="/settings/:id" element={<Settings />} />
           <Route path="/threads" element={<ThreadList />} />
           <Route path="/threads/:threadId" element={<ThreadDetail />} />
           <Route path="/create-thread" element={<CreateThread />} />

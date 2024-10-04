@@ -36,8 +36,9 @@ export const getAllThreads = (req, res) => {
 };
 
 // Get a specific thread with responses
+// Get a specific thread with responses
 export const getThreadWithResponses = (req, res) => {
-  const { threadId } = req.params; // Get thread ID from request parameters
+  const { threadId } = req.params;
 
   // Query to fetch the specified thread
   const threadQuery = "SELECT * FROM threads WHERE id = ?";
@@ -50,11 +51,11 @@ export const getThreadWithResponses = (req, res) => {
       return res.status(404).json({ error: "Thread not found" });
     }
 
-    const thread = threadResults[0]; // Get the first result (the thread)
+    const thread = threadResults[0];
 
-    // Fetch associated responses along with usernames
+    // Fetch associated responses along with usernames and avatars
     const responsesQuery = `
-      SELECT responses.*, users.username 
+      SELECT responses.*, users.username, users.avatar 
       FROM responses 
       JOIN users ON responses.user_id = users.id 
       WHERE thread_id = ?
@@ -87,14 +88,32 @@ export const postResponseToThread = (req, res) => {
       return res.status(500).json({ error: "Internal Server Error" });
     }
 
-    res.status(201).json({
-      message: "Response posted successfully.",
-      response: {
-        id: result.insertId,
-        body,
-        user_id: userId,
-        created_at: new Date(), // Set the current date for the new response
-      },
+    // Fetch user data including avatar URL
+    const fetchUserQuery = "SELECT username, avatar FROM users WHERE id = ?";
+    db.query(fetchUserQuery, [userId], (err, userResult) => {
+      if (err) {
+        console.error("Error fetching user data:", err.message);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+
+      // Check if user exists
+      if (userResult.length === 0) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const { username, avatar } = userResult[0];
+
+      res.status(201).json({
+        message: "Response posted successfully.",
+        response: {
+          id: result.insertId,
+          body,
+          user_id: userId,
+          username, // Add username
+          avatar, // Add avatar URL
+          created_at: new Date(), // Set the current date for the new response
+        },
+      });
     });
   });
 };

@@ -1,15 +1,18 @@
+// routes/index.js or your main router file
 import express from "express";
 import { authenticateJWT } from "../middleware/authMiddleware.js";
 import {
   registerUser,
   loginUser,
   deleteUser,
-} from "../controllers/authController.js";
+  updateAvatar, // Import the updateAvatar function here
+} from "../controllers/authController.js"; // Ensure the path is correct
+
 import {
   createThread,
   getAllThreads,
   getThreadWithResponses,
-  postResponseToThread, // Import this function from your forumController
+  postResponseToThread,
 } from "../controllers/forumController.js"; // Ensure this function is defined in your controller
 
 const router = express.Router();
@@ -17,7 +20,8 @@ const router = express.Router();
 // Auth routes
 router.post("/register", registerUser);
 router.post("/login", loginUser);
-router.delete("/profile/:id", deleteUser);
+router.delete("/settings/:id", deleteUser);
+router.put("/users/avatar", authenticateJWT, updateAvatar); // Ensure this line is correct
 
 // Create a new thread
 router.post("/threads", authenticateJWT, createThread);

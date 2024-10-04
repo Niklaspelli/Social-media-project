@@ -6,7 +6,7 @@ import ProfileAvatar from "./ProfileAvatar";
 import DeleteAccount from "./DeleteAccount";
 import "../../index.css";
 
-const Profile = () => {
+const Settings = () => {
   const { authData, logout } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -16,7 +16,7 @@ const Profile = () => {
     localStorage.getItem("profilePicture") || ""
   );
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [showSuccessToast, setShowSuccessToast] = useState(false); // New state for success toast
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
   const navigate = useNavigate();
   const errRef = useRef();
 
@@ -31,7 +31,7 @@ const Profile = () => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:3000/forum/profile/${userId}`,
+        `http://localhost:3000/forum/settings/${userId}`,
         {
           method: "DELETE",
           headers: {
@@ -65,7 +65,7 @@ const Profile = () => {
       setShowSuccessToast(true);
       setTimeout(() => {
         navigate("/signup");
-      }, 3000); // Redirect after 3 seconds
+      }, 3000);
     }
   }, [success, navigate]);
 
@@ -95,8 +95,9 @@ const Profile = () => {
           )}
 
           <ProfileAvatar
-            selectedPicture={selectedPicture}
-            onSave={handleSavePicture}
+            token={token} // Pass token if needed for API calls
+            userId={userId} // Pass userId if needed for API calls
+            setSelectedPicture={handleSavePicture} // Correct prop name
           />
 
           {!showConfirmation ? (
@@ -116,7 +117,6 @@ const Profile = () => {
             />
           )}
 
-          {/* Toast Notification for Success */}
           {showSuccessToast && (
             <ToastContainer position="top-end" className="p-3">
               <Toast
@@ -138,7 +138,7 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default Settings;
 
 // Styling constants
 const ProfileContainerStyle = {

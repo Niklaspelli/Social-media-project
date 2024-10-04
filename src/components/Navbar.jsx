@@ -32,7 +32,7 @@ const Navbar = () => {
           ) : (
             <>
               <li>
-                <Link to={`/profile/${authData.userId}`}>Profile</Link>
+                <Link to={`/settings/${authData.userId}`}>Profile</Link>
               </li>
               <li>
                 <Link to={"/forum"}>Forum</Link>

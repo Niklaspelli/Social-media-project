@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Modal } from "react-bootstrap";
+import { Button, Modal, Alert } from "react-bootstrap";
 
 const ProfileAvatar = ({ token, userId, setSelectedPicture }) => {
   const [tempPicture, setTempPicture] = useState("");
@@ -9,6 +9,7 @@ const ProfileAvatar = ({ token, userId, setSelectedPicture }) => {
 
   const openPictureModal = () => {
     setShowPictureModal(true);
+    setTempPicture(""); // Reset tempPicture when opening modal
   };
 
   const handlePictureSelect = () => {
@@ -19,6 +20,11 @@ const ProfileAvatar = ({ token, userId, setSelectedPicture }) => {
   };
 
   const handleSavePicture = async () => {
+    if (!tempPicture) {
+      setError("Please select a picture first.");
+      return;
+    }
+
     setSelectedPicture(tempPicture);
     localStorage.setItem("profilePicture", tempPicture);
 
@@ -30,7 +36,7 @@ const ProfileAvatar = ({ token, userId, setSelectedPicture }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3000/forum/users", {
+      const response = await fetch("http://localhost:3000/forum/users/avatar", {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -47,11 +53,18 @@ const ProfileAvatar = ({ token, userId, setSelectedPicture }) => {
           `Failed to update profile picture: ${response.statusText} for user ${userId}`
         );
       }
+
+      // Optionally handle the success response
+      const data = await response.json();
+      console.log(data.message); // Log success message
+
+      // Close modal and reset temp picture
+      setShowPictureModal(false);
+      setTempPicture(""); // Clear the temporary picture
     } catch (error) {
       setError(`Update request failed: ${error.message}`);
     } finally {
       setIsLoading(false);
-      setShowPictureModal(false);
     }
   };
 
@@ -65,15 +78,21 @@ const ProfileAvatar = ({ token, userId, setSelectedPicture }) => {
       </Button>
       <Modal
         show={showPictureModal}
-        onHide={() => setShowPictureModal(false)}
+        onHide={() => {
+          setShowPictureModal(false);
+          setTempPicture(""); // Clear picture when closing modal
+          setError(""); // Reset error when closing
+        }}
         centered
       >
         <Modal.Header closeButton>
           <Modal.Title>Choose a Profile Picture</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {error && <Alert variant="danger">{error}</Alert>}{" "}
+          {/* Display error message */}
           <img
-            src={tempPicture}
+            src={tempPicture || "https://via.placeholder.com/100"} // Default image if none selected
             alt="Avatar"
             className="picture"
             onClick={handlePictureSelect}

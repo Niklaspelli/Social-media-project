@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext"; // Adjust the path accordingly
 
@@ -45,12 +45,12 @@ function ThreadDetail() {
 
     try {
       const response = await fetch(
-        `${BackendURL}/forum/threads/${threadId}/responses`, // Corrected URL
+        `${BackendURL}/forum/threads/${threadId}/responses`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Use token from context
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ body: responseText }),
         }
@@ -61,7 +61,7 @@ function ThreadDetail() {
       }
 
       const newResponse = await response.json();
-      setResponses((prevResponses) => [newResponse.response, ...prevResponses]); // Prepend the new response
+      setResponses((prevResponses) => [newResponse.response, ...prevResponses]);
       setResponseText("");
     } catch (error) {
       console.error("Failed to post response:", error.message);
@@ -79,11 +79,9 @@ function ThreadDetail() {
 
   return (
     <div>
-      {/* Display thread title and body */}
       <h3>{thread.title}</h3>
       <p>{thread.body}</p>
 
-      {/* Response form */}
       <form onSubmit={handleResponseSubmit}>
         <textarea
           value={responseText}
@@ -94,14 +92,32 @@ function ThreadDetail() {
         <button type="submit">Post Response</button>
       </form>
 
-      {/* Display responses */}
       <div>
         {responses.length > 0 ? (
           responses.map((res) => (
-            <div key={res.id}>
-              <strong>{res.username}</strong> skrev:
-              <p>{res.body}</p>
-              <p>({new Date(res.created_at).toLocaleString()})</p>
+            <div
+              key={res.id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "10px",
+              }}
+            >
+              <img
+                src={res.avatar} // Use the avatar URL from the response
+                alt="avatar"
+                style={{
+                  width: 50,
+                  height: 50,
+                  borderRadius: "50%",
+                  marginRight: "10px",
+                }}
+              />
+              <div>
+                <strong>{res.username}</strong> skrev:
+                <p>{res.body}</p>
+                <p>({new Date(res.created_at).toLocaleString()})</p>
+              </div>
             </div>
           ))
         ) : (
