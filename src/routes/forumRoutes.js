@@ -30,7 +30,7 @@ router.put("/users/avatar", authenticateJWT, updateAvatar);
 
 // User Profile routes
 // Route for getting user profile by profileId
-router.get("/users/:id", authenticateJWT, getUserProfile);
+router.get("/users/:userId", authenticateJWT, getUserProfile);
 
 // Route for creating or updating user profile
 router.post("/users", authenticateJWT, createOrUpdateUserProfile); // Ensure this matches your POST request
