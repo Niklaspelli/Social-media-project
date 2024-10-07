@@ -12,7 +12,7 @@ import ProtectedRoute from "./auth/ProtectedRoute";
 import CreateThread from "./components/thread/CreateThread"; // Adjust the path accordingly
 import ThreadList from "./components/thread/ThreadList"; // Adjust the path accordingly
 import ThreadDetail from "./components/thread/ThreadDetail"; // Adjust the path accordingly
-import UserProfile from "./pages/UserProfile"; // Import the UserProfile component
+import UserProfile from "./pages/userprofile/UserProfile"; // Import the UserProfile component
 import EditProfile from "./pages/settings/EditProfile.jsx";
 import CreateProfile from "./pages/settings/CreateProfile.jsx";
 

@@ -1,0 +1,68 @@
+.thread-list {
+    display: flex;
+    flex-direction: column;
+    /* Stack items vertically */
+    align-items: center;
+    /* Center items */
+    padding: 20px;
+}
+
+.thread-item {
+    width: 100%;
+    /* Take full width */
+    max-width: 600px;
+    /* Limit the width for larger screens */
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.thread-title {
+    font-size: 1.5em;
+    /* Adjust font size */
+    margin: 0;
+    /* Remove default margin */
+}
+
+.thread-link {
+    text-decoration: none;
+    color: #e4a154;
+    /* Bootstrap primary color */
+}
+
+.thread-body {
+    max-width: 100%;
+    /* Prevent overflow */
+    max-height: 100px;
+    /* Fixed height */
+    overflow: hidden;
+    /* Hide overflow text */
+    text-overflow: ellipsis;
+    /* Add ellipsis for overflow */
+    white-space: nowrap;
+    /* Prevent wrapping */
+    margin: 0;
+    /* Remove default margin */
+}
+
+/* Responsive styles */
+@media (max-width: 600px) {
+    .thread-item {
+        padding: 15px;
+        /* Adjust padding for smaller screens */
+    }
+
+    .thread-title {
+        font-size: 1.2em;
+        /* Decrease font size on smaller screens */
+    }
+}
+
+@media (max-width: 400px) {
+    .thread-title {
+        font-size: 1em;
+        /* Further decrease font size */
+    }
+}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom"; // Import useParams to get the userId from the URL
-import { useAuth } from "../context/AuthContext"; // Import the Auth context to get the token
+import { useAuth } from "../../context/AuthContext"; // Import the Auth context to get the token
+import "./UserProfile.css";
 
 function UserProfile() {
   const { id } = useParams(); // Get the user ID from the URL
@@ -50,32 +51,35 @@ function UserProfile() {
 
   // Render user profile information
   return (
-    <div>
-      <h1>Profilsidan</h1>
-      {profile && (
-        <>
+    <div className="profile-container">
+      <h1 className="profile-title">Profilsidan</h1>
+      {profile ? (
+        <div className="profile-details">
           <p>
-            <strong>Username:</strong> {profile.username}
+            <strong>Username:</strong> <span>{profile.username}</span>
           </p>
           <p>
-            <strong>Sex:</strong> {profile.sex}
+            <strong>Sex:</strong> <span>{profile.sex}</span>
           </p>
           <p>
-            <strong>Relationship Status:</strong> {profile.relationship_status}
+            <strong>Relationship Status:</strong>{" "}
+            <span>{profile.relationship_status}</span>
           </p>
           <p>
-            <strong>Location:</strong> {profile.location}
+            <strong>Location:</strong> <span>{profile.location}</span>
           </p>
           <p>
-            <strong>Music Taste:</strong> {profile.music_taste}
+            <strong>Music Taste:</strong> <span>{profile.music_taste}</span>
           </p>
           <p>
-            <strong>Interests:</strong> {profile.interest}
+            <strong>Interests:</strong> <span>{profile.interest}</span>
           </p>
           <p>
-            <strong>Bio:</strong> {profile.bio}
+            <strong>Bio:</strong> <span>{profile.bio}</span>
           </p>
-        </>
+        </div>
+      ) : (
+        <p className="no-profile">No profile available.</p>
       )}
     </div>
   );

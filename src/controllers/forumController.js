@@ -118,21 +118,24 @@ export const postResponseToThread = (req, res) => {
   });
 };
 
-// Delete a response
 export const deleteResponse = (req, res) => {
-  const { responseId } = req.params; // Get the response ID from the request parameters
-  const userId = req.user.id; // Get user ID from JWT token
+  const { responseId } = req.params;
+  const userId = req.user?.id; // Get the authenticated user's ID from the request
 
-  // SQL query to delete the response
-  const deleteResponseQuery =
-    "DELETE FROM responses WHERE id = ? AND user_id = ?";
-  db.query(deleteResponseQuery, [responseId, userId], (error, result) => {
-    if (error) {
-      console.error("Error deleting response:", error.message);
+  if (!userId) {
+    return res.status(401).json({ error: "User not authenticated" });
+  }
+
+  // SQL query to delete the response only if the response belongs to the authenticated user
+  const sql = `DELETE FROM responses WHERE id = ? AND user_id = ?`;
+
+  db.query(sql, [responseId, userId], (err, result) => {
+    if (err) {
+      console.error("Error deleting response:", err.message);
       return res.status(500).json({ error: "Internal Server Error" });
     }
 
-    // Check if a response was deleted
+    // Check if the response was deleted (affectedRows > 0 means a row was deleted)
     if (result.affectedRows === 0) {
       return res
         .status(404)

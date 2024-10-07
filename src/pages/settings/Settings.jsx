@@ -77,7 +77,7 @@ const Settings = () => {
   }
 
   return (
-    <div style={ProfileContainerStyle}>
+    <div>
       {success ? (
         <section>
           <h1>Account deleted! Welcome back!</h1>
@@ -97,14 +97,14 @@ const Settings = () => {
             </div>
           )}
 
+          {/*  <CreateProfile /> */}
+
+          <EditProfile />
           <ProfileAvatar
             token={token} // Pass token if needed for API calls
             userId={userId} // Pass userId if needed for API calls
             setSelectedPicture={handleSavePicture} // Correct prop name
           />
-          {/*  <CreateProfile /> */}
-
-          <EditProfile />
 
           {!showConfirmation ? (
             <Button
@@ -145,8 +145,3 @@ const Settings = () => {
 };
 
 export default Settings;
-
-// Styling constants
-const ProfileContainerStyle = {
-  padding: "20px",
-};

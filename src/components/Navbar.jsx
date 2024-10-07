@@ -8,6 +8,10 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
+  const currentUser = authData.username;
+  const NavbarAvatar = authData.avatar;
+  console.log("Avatar URL:", NavbarAvatar);
+
   const toggleSidenav = () => {
     setIsOpen(!isOpen);
   };
@@ -49,6 +53,29 @@ const Navbar = () => {
                 >
                   Logout
                 </div>
+              </li>
+              <li>
+                {currentUser && (
+                  <li
+                    style={{
+                      marginTop: 80,
+                      marginLeft: "30px",
+                      alignContent: "center",
+                    }}
+                  >
+                    Du är inloggad som:
+                    <p className="username">{currentUser}</p>
+                    <img
+                      src={NavbarAvatar}
+                      style={{
+                        width: 130,
+                        height: 130,
+                        borderRadius: "50%",
+                      }}
+                      alt={`${currentUser}'s avatar`}
+                    />
+                  </li>
+                )}
               </li>
             </>
           )}

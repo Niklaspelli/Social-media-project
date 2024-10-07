@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext"; // Import the Auth context
+import { Container, Row, Col, Form, Button } from "react-bootstrap"; // Importing Bootstrap components
 
 const EditProfile = () => {
   const { authData } = useAuth();
@@ -157,94 +158,163 @@ const EditProfile = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>Sex:</label>
-        <select
-          name="sex"
-          value={formData.sex}
-          onChange={handleChange}
-          disabled={mode === "view"}
-        >
-          <option value="">Select</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-          <option value="Other">Other</option>
-          <option value="Prefer not to say">Prefer not to say</option>
-        </select>
-      </div>
-      <div>
-        <label>Relationship Status:</label>
-        <select
-          name="relationship_status"
-          value={formData.relationship_status}
-          onChange={handleChange}
-          disabled={mode === "view"}
-        >
-          <option value="">Select</option>
-          <option value="Single">Single</option>
-          <option value="In a Relationship">In a Relationship</option>
-          <option value="Married">Married</option>
-          <option value="Divorced">Divorced</option>
-          <option value="Widowed">Widowed</option>
-          <option value="Prefer not to say">Prefer not to say</option>
-        </select>
-      </div>
-      <div>
-        <label>Location:</label>
-        <input
-          type="text"
-          name="location"
-          value={formData.location}
-          onChange={handleChange}
-          disabled={mode === "view"}
-        />
-      </div>
-      <div>
-        <label>Music Taste:</label>
-        <input
-          type="text"
-          name="music_taste"
-          value={formData.music_taste}
-          onChange={handleChange}
-          disabled={mode === "view"}
-        />
-      </div>
-      <div>
-        <label>Interests:</label>
-        <textarea
-          name="interest"
-          value={formData.interest}
-          onChange={handleChange}
-          disabled={mode === "view"}
-        />
-      </div>
-      <div>
-        <label>Bio:</label>
-        <textarea
-          name="bio"
-          value={formData.bio}
-          onChange={handleChange}
-          disabled={mode === "view"}
-        />
-      </div>
+    <>
+      <h1 style={{ textAlign: "center" }}>Inställningar</h1>
 
-      {mode === "view" ? (
-        <div>
-          <button type="button" onClick={handleEdit}>
-            Edit
-          </button>
-        </div>
-      ) : (
-        <div>
-          <button type="submit">Save</button>
-          <button type="button" onClick={handleCancel}>
-            Cancel
-          </button>
-        </div>
-      )}
-    </form>
+      <div style={StyleContainer}>
+        <Container>
+          <Form onSubmit={handleSubmit}>
+            <Row className="justify-content-center align-items-center h-100">
+              <Col md={6} lg={4} className="justify-content-center">
+                <Form.Group as={Col}>
+                  <Form.Label className="mb-10">Sex:</Form.Label>
+                  <Form.Control as="select" custom style={inputStyle}>
+                    <option value="">Select</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                  </Form.Control>
+                </Form.Group>
+
+                <Form.Group as={Col}>
+                  <Form.Label>Relationship Status:</Form.Label>
+                  <Form.Control
+                    as="select"
+                    style={inputStyle} // Specify that this is a select element
+                    name="relationship_status" // Set the name of the control
+                    value={formData.relationship_status} // Bind the value to state
+                    onChange={handleChange} // Handle changes
+                    disabled={mode === "view"} // Disable if in "view" mode
+                  >
+                    <option value="">Select</option>
+                    <option value="Single">Single</option>
+                    <option value="In a Relationship">In a Relationship</option>
+                    <option value="Married">Married</option>
+                    <option value="Divorced">Divorced</option>
+                    <option value="Widowed">Widowed</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                  </Form.Control>
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label>Location:</Form.Label>
+                  <Form.Control
+                    typ="Placeholder"
+                    type="text"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleChange}
+                    disabled={mode === "view"}
+                    style={inputStyle}
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label>Music Taste:</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="music_taste"
+                    value={formData.music_taste}
+                    onChange={handleChange}
+                    disabled={mode === "view"}
+                    style={inputStyle}
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label>Interests:</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    name="interest"
+                    value={formData.interest}
+                    onChange={handleChange}
+                    disabled={mode === "view"}
+                    style={inputStyle}
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Bio:</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    placeholder="Write your Bio here..."
+                    name="bio"
+                    value={formData.bio}
+                    onChange={handleChange}
+                    disabled={mode === "view"}
+                    style={TextareStyle}
+                  />
+                </Form.Group>
+
+                {mode === "view" ? (
+                  <div>
+                    <Button type="button" onClick={handleEdit}>
+                      Edit
+                    </Button>
+                  </div>
+                ) : (
+                  <div>
+                    <Button
+                      type="submit"
+                      style={{ backgroundColor: "black", margin: "20px" }}
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={handleCancel}
+                      style={{ backgroundColor: "black", margin: "20px" }}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                )}
+              </Col>
+            </Row>
+          </Form>
+        </Container>
+      </div>
+    </>
   );
 };
 
 export default EditProfile;
+
+const StyleContainer = {
+  marginBottom: "15px",
+  display: "flex",
+  justifyContent: "center",
+  margin: "20px",
+};
+
+const inputStyle = {
+  width: "500px",
+  maxWidth: "500px",
+  padding: "10px",
+  borderRadius: "20px",
+  border: "1px solid #ddd",
+  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+  outline: "none",
+  fontSize: "16px",
+  transition: "border-color 0.3s ease",
+  backgroundColor: "grey",
+  color: "white",
+  border: "none",
+};
+
+const TextareStyle = {
+  width: "90%",
+  maxWidth: "600px",
+  height: "600px",
+  padding: "10px",
+  borderRadius: "20px",
+  border: "1px solid #ddd",
+  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+  outline: "none",
+  fontSize: "16px",
+  transition: "border-color 0.3s ease",
+  backgroundColor: "grey",
+  color: "white",
+  border: "none",
+};

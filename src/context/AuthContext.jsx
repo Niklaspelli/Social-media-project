@@ -7,17 +7,19 @@ export const AuthProvider = ({ children }) => {
     token: localStorage.getItem("token") || null,
     username: localStorage.getItem("loggedInUsername") || null,
     userId: localStorage.getItem("userId") || null,
+    avatar: localStorage.getItem("avatar") || null, // Added avatarUrl
   });
 
-  const login = (token, username, userId) => {
-    setAuthData({ token, username, userId });
+  const login = (token, username, userId, avatar) => {
+    setAuthData({ token, username, userId, avatar });
     localStorage.setItem("token", token);
     localStorage.setItem("loggedInUsername", username);
     localStorage.setItem("userId", userId);
+    localStorage.setItem("avatar", avatar); // Store avatarUrl
   };
 
   const logout = () => {
-    setAuthData({ token: null, username: null, userId: null });
+    setAuthData({ token: null, username: null, userId: null, avatar: null }); // Reset avatarUrl
     localStorage.removeItem("token");
     localStorage.removeItem("loggedInUsername");
     localStorage.removeItem("userId");

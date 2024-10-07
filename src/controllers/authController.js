@@ -73,6 +73,7 @@ export const loginUser = async (req, res) => {
           token,
           username: userRecord.username,
           id: userRecord.id,
+          avatar: userRecord.avatar,
         });
       } else {
         return res.status(400).json({ error: "Invalid credentials!" });

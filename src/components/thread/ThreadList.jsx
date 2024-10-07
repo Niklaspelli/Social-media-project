@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"; // Importing React, useEffect, useState
 import { Link } from "react-router-dom"; // Importing Link for navigation
 import { useAuth } from "../../context/AuthContext"; // Adjust the path accordingly
+import "./ThreadList.css";
 
 const BackendURL = "http://localhost:3000"; // URL of the backend
 
@@ -45,15 +46,16 @@ function ThreadList() {
   }
 
   return (
-    <div>
+    <div className="thread-list">
       {threads.length > 0 ? (
         threads.map((thread) => (
-          <div key={thread.id}>
-            <h2>
-              <Link to={`/threads/${thread.id}`}>{thread.title}</Link>{" "}
-              {/* Link to thread detail */}
+          <div key={thread.id} className="thread-item">
+            <h2 className="thread-title">
+              <Link to={`/threads/${thread.id}`} className="thread-link">
+                {thread.title}
+              </Link>
             </h2>
-            <p>{thread.body}</p>
+            <p className="thread-body">{thread.body}</p>
           </div>
         ))
       ) : (

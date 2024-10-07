@@ -336,6 +336,56 @@ input[type=text],
 
 }
 
+.heavyforum {
+  font: 400 100px "Poppins";
+  margin-bottom: 30px;
+}
+
+.background-image {
+  height: 100%;
+  /* Full viewport height */
+  background-image: url('keyboard.jpg');
+  /* Path to your background image */
+  background-size: cover;
+  /* Ensure the image covers the entire div */
+  background-position: center;
+  /* Center the background image */
+  background-repeat: no-repeat;
+  /* Prevent the image from repeating */
+  background-attachment: fixed;
+  /* Optional: Keep the image fixed while scrolling */
+
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  padding: 20px;
+
+
+
+
+}
+
+
+.glass-container {
+  height: 700px;
+  width: 500px;
+  padding: 30px 50px;
+  border-radius: 50px;
+
+  background-color: hsla(305, 100%, 52%, 0);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid grey;
+  border-left: 1px solid grey;
+  box-shadow: 3px 3px 3px black;
+  align-items: center;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-size: 18px;
+  text-align: justify;
+  line-height: 185%;
+}
+
 
 @media screen and (min-width: 360px) {
 

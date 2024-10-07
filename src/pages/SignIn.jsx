@@ -35,6 +35,7 @@ const SignIn = () => {
       });
 
       const data = await response.json();
+      console.log("API Response:", data); // Log the entire response
 
       if (!response.ok) {
         setCorrectCredentials(false);
@@ -44,8 +45,9 @@ const SignIn = () => {
       const token = data.token;
       const loggedInUsername = data.username;
       const userId = data.id;
+      const avatar = data.avatar;
 
-      login(token, loggedInUsername, userId);
+      login(token, loggedInUsername, userId, avatar);
       navigate("/forum");
     } catch (error) {
       setLoginError(error.message);
@@ -56,79 +58,93 @@ const SignIn = () => {
   };
 
   return (
-    <div style={LoginContainerStyle}>
-      <Container>
-        <Row className="justify-content-center align-items-center h-100">
-          <Col md={8} lg={4} className="justify-content-center">
-            <h2 className="text-center mb-4">Logga in:</h2>
+    <>
+      <div className="background-image">
+        <h1 className="heavyforum">Heavy Forum</h1>
+        <div style={LoginContainerStyle}>
+          <div className="glass-container">
+            <h2 style={{ textAlign: "center" }}>Logga in:</h2>
+            <Container>
+              <Row className="justify-content-center align-items-center h-100">
+                <Col md={8} lg={4} className="justify-content-center">
+                  {isLoading && (
+                    <div className="alert alert-info">Loading...</div>
+                  )}
+                  {loginError && (
+                    <div
+                      className="alert alert-danger"
+                      ref={errRef}
+                      role="alert"
+                    >
+                      {loginError}
+                    </div>
+                  )}
 
-            {isLoading && <div className="alert alert-info">Loading...</div>}
-            {loginError && (
-              <div className="alert alert-danger" ref={errRef} role="alert">
-                {loginError}
-              </div>
-            )}
+                  <Form onSubmit={handleSubmit}>
+                    <Form.Group className="mb-3">
+                      <Form.Label htmlFor="floatingInputCustom1">
+                        Användarnamn:
+                      </Form.Label>
+                      <Form.Control
+                        id="floatingInputCustom1"
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        style={inputStyle}
+                        placeholder="Ange ditt användarnamn"
+                        aria-label="Username"
+                        aria-required="true"
+                        required
+                      />
+                    </Form.Group>
 
-            <Form onSubmit={handleSubmit}>
-              <Form.Group className="mb-3">
-                <Form.Label htmlFor="floatingInputCustom1">
-                  Användarnamn:
-                </Form.Label>
-                <Form.Control
-                  id="floatingInputCustom1"
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  style={{ backgroundColor: "#185bac", color: "white" }}
-                  placeholder="Ange ditt användarnamn"
-                  aria-label="Username"
-                  aria-required="true"
-                  required
-                />
-              </Form.Group>
+                    <Form.Group className="mb-3">
+                      <Form.Label htmlFor="floatingInputCustom2">
+                        Lösenord:
+                      </Form.Label>
+                      <Form.Control
+                        id="floatingInputCustom2"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        style={inputStyle}
+                        placeholder="Ange ditt lösenord"
+                        aria-label="Password"
+                        aria-required="true"
+                        required
+                      />
+                    </Form.Group>
 
-              <Form.Group className="mb-3">
-                <Form.Label htmlFor="floatingInputCustom2">
-                  Lösenord:
-                </Form.Label>
-                <Form.Control
-                  id="floatingInputCustom2"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  style={{ backgroundColor: "#185bac", color: "white" }}
-                  placeholder="Ange ditt lösenord"
-                  aria-label="Password"
-                  aria-required="true"
-                  required
-                />
-              </Form.Group>
+                    <div className="d-grid">
+                      <Button
+                        style={{ backgroundColor: "black", margin: "20px" }}
+                        type="submit"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? "Loggar in..." : "Logga in"}
+                      </Button>
+                    </div>
 
-              <div className="d-grid">
-                <Button
-                  style={{ backgroundColor: "#185bac" }}
-                  type="submit"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Loggar in..." : "Logga in"}
-                </Button>
-              </div>
+                    {correctCredentials === false && (
+                      <div role="alert" className="alert alert-danger mt-4">
+                        <span>
+                          Fel användarnamn eller lösenord. Försök igen!
+                        </span>
+                      </div>
+                    )}
+                  </Form>
 
-              {correctCredentials === false && (
-                <div role="alert" className="alert alert-danger mt-4">
-                  <span>Fel användarnamn eller lösenord. Försök igen!</span>
-                </div>
-              )}
-            </Form>
-
-            <div className="text-center mt-3">
-              <p>Inget konto?</p>
-              <Link to="/signup">Registrera dig</Link>
-            </div>
-          </Col>
-        </Row>
-      </Container>
-    </div>
+                  <div className="text-center mt-3">
+                    <p>Inget konto?</p>
+                    <Link to="/signup">Registrera dig</Link>
+                  </div>
+                </Col>
+              </Row>
+            </Container>
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 
@@ -138,4 +154,19 @@ const LoginContainerStyle = {
   marginBottom: "15px",
   display: "flex",
   justifyContent: "center",
+};
+
+const inputStyle = {
+  width: "90%",
+  maxWidth: "400px",
+  padding: "10px",
+  borderRadius: "20px",
+  border: "1px solid #ddd",
+  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+  outline: "none",
+  fontSize: "16px",
+  transition: "border-color 0.3s ease",
+  backgroundColor: "grey",
+  color: "white",
+  border: "none",
 };

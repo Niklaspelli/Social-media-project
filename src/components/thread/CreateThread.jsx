@@ -56,30 +56,39 @@ function CreateThread() {
   };
 
   return (
-    <div style={LoginContainerStyle}>
-      <h2>Skapa ny tråd:</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          style={inputStyle}
-        />
-        <textarea
-          placeholder="Body"
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          style={inputStyle}
-        ></textarea>
-        <button type="submit">Skapa tråd</button>
-      </form>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && (
-        <p style={{ color: "green" }}>Thread created successfully!</p>
-      )}
+    <>
       <ThreadList />
-    </div>
+      <h1 style={{ textAlign: "center" }}>Skapa ny tråd:</h1>
+      <div style={LoginContainerStyle}>
+        <form onSubmit={handleSubmit}>
+          <input
+            maxLength="50"
+            type="text"
+            placeholder="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            style={inputStyle}
+          />
+          <textarea
+            maxLength="100"
+            placeholder="Body"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            style={inputStyle}
+          ></textarea>
+          <button
+            type="submit"
+            style={{ backgroundColor: "black", margin: "20px" }}
+          >
+            Skapa tråd
+          </button>
+        </form>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        {success && (
+          <p style={{ color: "green" }}>Thread created successfully!</p>
+        )}
+      </div>
+    </>
   );
 }
 

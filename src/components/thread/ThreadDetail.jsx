@@ -72,30 +72,16 @@ function ThreadDetail() {
   // Handle deleting a response
   const handleDeleteResponse = async (responseId) => {
     try {
-      const response = await fetch(
-        `${BackendURL}/forum/responses/${responseId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      const response = await fetch(`http://localhost:3000/forum/responses/${responseId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`, // Assuming you're using a JWT token for authentication
+        },
+      });
+  
       if (!response.ok) {
-        throw new Error("Failed to delete response");
+        throw new Error('Failed to delete response');
       }
-
-      // Remove the deleted response from the state
-      setResponses((prevResponses) =>
-        prevResponses.filter((res) => res.id !== responseId)
-      );
-    } catch (error) {
-      console.error("Failed to delete response:", error.message);
-      setError("Failed to delete response. Please try again later.");
-    }
-  };
-
   if (loading) {
     return <p>Loading thread details...</p>;
   }
@@ -106,31 +92,14 @@ function ThreadDetail() {
 
   return (
     <div>
-      <h3>{thread.title}</h3>
-      <p>{thread.body}</p>
-
-      <form onSubmit={handleResponseSubmit}>
-        <textarea
-          value={responseText}
-          onChange={(e) => setResponseText(e.target.value)}
-          style={inputStyle}
-          placeholder="Write your response here..."
-          required
-        ></textarea>
-        <button type="submit">Post Response</button>
-      </form>
-
+      <h2 style={{ textAlign: "center" }}>{thread.title}</h2>
+      <p style={{ textAlign: "center", background: "grey", height: "a" }}>
+        {thread.body}
+      </p>
       <div>
         {responses.length > 0 ? (
           responses.map((res) => (
-            <div
-              key={res.id}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginBottom: "10px",
-              }}
-            >
+            <div style={RespContainer} key={res.id}>
               <img
                 src={res.avatar}
                 alt="avatar"
@@ -152,7 +121,7 @@ function ThreadDetail() {
                   ({new Date(res.created_at).toLocaleString()})
                 </p>
                 {/* Add the delete button */}
-                {res.user_id === authData.id && ( // Check if the current user is the author
+                {res.userId === authData.id && ( // Check if the current user is the author
                   <button
                     onClick={() => handleDeleteResponse(res.id)}
                     style={{ color: "red", cursor: "pointer" }}
@@ -166,6 +135,24 @@ function ThreadDetail() {
         ) : (
           <p>No responses yet.</p>
         )}
+      </div>{" "}
+      <div style={StyleContainer}>
+        <form onSubmit={handleResponseSubmit}>
+          <textarea
+            maxLength="200"
+            value={responseText}
+            onChange={(e) => setResponseText(e.target.value)}
+            style={inputStyle}
+            placeholder="Write your response here..."
+            required
+          ></textarea>
+          <button
+            type="submit"
+            style={{ backgroundColor: "black", margin: "20px" }}
+          >
+            Post Response
+          </button>
+        </form>
       </div>
     </div>
   );
@@ -186,4 +173,18 @@ const inputStyle = {
   backgroundColor: "grey",
   color: "white",
   border: "none",
+};
+
+const StyleContainer = {
+  marginBottom: "15px",
+  display: "flex",
+  justifyContent: "center",
+  margin: "20px",
+};
+
+const RespContainer = {
+  marginBottom: "15px",
+  display: "flex",
+  justifyContent: "center",
+  margin: "20px",
 };

@@ -12,6 +12,7 @@ import {
   getAllThreads,
   getThreadWithResponses,
   postResponseToThread,
+  deleteResponse,
 } from "../controllers/forumController.js";
 
 import {
@@ -25,33 +26,24 @@ const router = express.Router();
 // Auth routes
 router.post("/register", registerUser);
 router.post("/login", loginUser);
-router.delete("/settings/:id", deleteUser);
+router.delete("/settings/:userId", deleteUser); // Changed to :userId for consistency
 router.put("/users/avatar", authenticateJWT, updateAvatar);
 
 // User Profile routes
-// Route for getting user profile by profileId
-router.get("/users/:userId", authenticateJWT, getUserProfile);
+router.get("/users/:userId", authenticateJWT, getUserProfile); // Consistent parameter name
+router.post("/users", authenticateJWT, createOrUpdateUserProfile);
+router.put("/users/:userId", authenticateJWT, updateUserProfile); // Changed to :userId
 
-// Route for creating or updating user profile
-router.post("/users", authenticateJWT, createOrUpdateUserProfile); // Ensure this matches your POST request
+// Forum routes
 
-// Route for updating user profile by profileId
-router.put("/users/:id", authenticateJWT, updateUserProfile);
-
-// Create a new thread
 router.post("/threads", authenticateJWT, createThread);
-
-// Get all threads
 router.get("/threads", getAllThreads);
-
-// Get a specific thread with responses
 router.get("/threads/:threadId", getThreadWithResponses);
-
-// Post a response to a specific thread
 router.post(
   "/threads/:threadId/responses",
   authenticateJWT,
   postResponseToThread
 );
 
+router.delete("/responses/:responseId", authenticateJWT, deleteResponse);
 export default router;
