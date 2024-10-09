@@ -52,11 +52,19 @@ function UserProfile() {
   // Render user profile information
   return (
     <div className="profile-container">
-      <h1 className="profile-title">Profilsidan</h1>
+      <h1 className="profile-title">Profile Page</h1>
       {profile ? (
         <div className="profile-details">
           <p>
             <strong>Username:</strong> <span>{profile.username}</span>
+          </p>
+          <p>
+            <strong>Avatar:</strong>{" "}
+            <img
+              src={profile.avatar}
+              alt="User Avatar"
+              className="user-avatar"
+            />
           </p>
           <p>
             <strong>Sex:</strong> <span>{profile.sex}</span>

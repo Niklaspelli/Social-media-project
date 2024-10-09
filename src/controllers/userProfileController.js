@@ -60,29 +60,36 @@ export const updateUserProfile = (req, res) => {
 };
 
 export const getUserProfile = (req, res) => {
-  const { userId } = req.params;
+  const userId = req.params.userId; // Get the user ID from request parameters
 
-  console.log("Fetching profile for user ID:", userId);
+  const sql = `
+    SELECT 
+      u.id,
+      u.username,
+      u.avatar,
+      p.sex,
+      p.relationship_status,
+      p.location,
+      p.music_taste,
+      p.interest,
+      p.bio
+    FROM users u
+    JOIN user_profiles p ON u.id = p.user_id
+    WHERE u.id = ?`;
 
-  const sql = "SELECT * FROM user_profiles WHERE user_id = ?";
-  db.query(sql, [userId], (err, results) => {
+  db.query(sql, [userId], (err, result) => {
     if (err) {
       console.error("Error fetching user profile:", err.message);
-      return res
-        .status(500)
-        .json({ error: "Internal Server Error", details: err.message });
+      return res.status(500).json({ error: "Internal Server Error" });
     }
 
-    if (results.length === 0) {
-      return res.status(404).json({ error: "User profile not found" });
+    if (result.length === 0) {
+      return res.status(404).json({ error: "User not found" });
     }
 
-    console.log("User profile data:", results[0]); // Debug the result
-
-    res.status(200).json(results[0]); // Return the first profile found
+    return res.json(result[0]); // Send back the combined user profile data
   });
 };
-
 export const createOrUpdateUserProfile = (req, res) => {
   const userId = req.user?.id; // Get the user ID from the request
   if (!userId) {
