@@ -151,7 +151,6 @@ const SignIn = () => {
 export default SignIn;
 
 const LoginContainerStyle = {
-  marginBottom: "15px",
   display: "flex",
   justifyContent: "center",
 };

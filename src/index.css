@@ -11,7 +11,6 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  min-height: 125vh;
   color-scheme: rgb(12, 9, 9);
   color: rgba(255, 255, 255, 0.87);
   background: linear-gradient(#2b2b2c, #242525);
@@ -24,7 +23,7 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: #bebfc0;
   text-decoration: inherit;
 }
 
@@ -50,14 +49,6 @@ button {
   transition: border-color 0.25s;
 }
 
-button:hover {
-  border-color: #646cff;
-}
-
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
 
 @media (prefers-color-scheme: light) {
   :root {
@@ -66,7 +57,7 @@ button:focus-visible {
   }
 
   a:hover {
-    color: #747bff;
+    color: #a19310;
   }
 
   button {
@@ -182,7 +173,7 @@ textarea {
 
 input[type=text],
 [type=password] {
-  color: white;
+  color: rgb(32, 32, 32);
   background-color: #185bac;
   border: none;
   width: 90%;
@@ -289,23 +280,6 @@ input[type=text],
   cursor: pointer;
 }
 
-.btn-primary {
-  background-color: #007bff;
-  color: white;
-}
-
-.btn-secondary {
-  background-color: #6c757d;
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: #0056b3;
-}
-
-.btn-secondary:hover {
-  background-color: #5a6268;
-}
 
 .scrollable-list {
   max-height: 300px;
@@ -349,22 +323,6 @@ input[type=text],
   display: inline-flex;
 }
 
-.BackgroundContainer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 70vh;
-}
-
-.homeBackground {
-  background-image: url('../src/assets/chatgroup.png');
-  background-size: cover;
-  background-position: center;
-  justify-content: center;
-  height: 60vh;
-  width: 60vw;
-  border-radius: 50px;
-}
 
 .homeH1 {
   font-size: 70px;
@@ -377,8 +335,12 @@ input[type=text],
 }
 
 .background-image {
-  height: 100%;
+  position: relative;
+  /* Set position to relative to allow positioning of the ::after pseudo-element */
+  height: 100vh;
   /* Full viewport height */
+  width: 100vw;
+  /* Full viewport width */
   background-image: url('keyboard.jpg');
   /* Path to your background image */
   background-size: cover;
@@ -388,18 +350,14 @@ input[type=text],
   background-repeat: no-repeat;
   /* Prevent the image from repeating */
   background-attachment: fixed;
-  /* Optional: Keep the image fixed while scrolling */
+  /* Keep the image fixed while scrolling */
 
-  justify-content: center;
-  align-items: center;
   color: white;
+  /* Text color */
   text-align: center;
+  /* Center text */
   font-family: Arial, sans-serif;
-  padding: 20px;
-
-
-
-
+  /* Font family */
 }
 
 .background-image::after {
@@ -413,20 +371,20 @@ input[type=text],
   background-color: rgba(68, 3, 3, 0.562);
   /* Red filter with 40% opacity */
   pointer-events: none;
-  /* Make sure this filter doesn't block interaction with content */
-
-  /* Ensures it's above the background image */
+  /* Ensure this filter doesn't block interaction with content */
 }
 
 /* Ensure the content inside the background image is above the filter */
 .background-image>* {
   position: relative;
+  /* Set position to relative */
   z-index: 2;
+  /* Ensure content appears above the background */
 }
 
 
 .glass-container {
-  height: 700px;
+  height: 500px;
   width: 500px;
   padding: 30px 50px;
   border-radius: 50px;

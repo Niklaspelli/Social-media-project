@@ -132,6 +132,7 @@ function SignUp() {
                         <Form.Control
                           type="text"
                           id="floatingInputCustom"
+                          placeholder="Användarnamn:"
                           ref={userRef}
                           autoComplete="off"
                           onChange={(e) => setUser(e.target.value)}
@@ -185,6 +186,7 @@ function SignUp() {
                         <Form.Control
                           type="password"
                           id="floatingInputCustom"
+                          placeholder="Lösenord:"
                           onChange={(e) => setPwd(e.target.value)}
                           required
                           aria-invalid={validPwd ? "false" : "true"}
@@ -241,6 +243,7 @@ function SignUp() {
                         <Form.Control
                           type="password"
                           id="confirm_pwd"
+                          placeholder="Upprepa lösenord:"
                           onChange={(e) => setMatchPwd(e.target.value)}
                           required
                           aria-invalid={validMatch ? "false" : "true"}

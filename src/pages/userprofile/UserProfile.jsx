@@ -55,7 +55,7 @@ function UserProfile() {
       <h1 className="profile-title">Profile Page</h1>
       {profile ? (
         <div className="profile-details">
-          <p>
+          <p style={{ color: "green" }}>
             <strong>Username:</strong> <span>{profile.username}</span>
           </p>
           <p>
@@ -83,6 +83,7 @@ function UserProfile() {
             <strong>Interests:</strong> <span>{profile.interest}</span>
           </p>
           <p>
+            <br />
             <strong>Bio:</strong> <span>{profile.bio}</span>
           </p>
         </div>

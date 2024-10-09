@@ -23,6 +23,7 @@
     margin-bottom: 20px;
     /* Space below title */
 
+
     /* Dark color for the title */
 }
 
@@ -31,10 +32,16 @@
     /* Slightly larger text */
     line-height: 1.6;
     /* Improved readability */
+    padding: 15px;
+    box-sizing: border-box;
+    box-shadow: 2px 2px 0px black;
+    background-color: white;
+    background: hsla(0, 1%, 13%, 0.781);
+    border-radius: 20px;
 }
 
 .profile-details strong {
-    color: #007bff;
+    color: #d17c0e;
     /* Bootstrap primary color for labels */
 }
 
