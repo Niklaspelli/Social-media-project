@@ -21,14 +21,14 @@ const Forum = () => {
 
   return (
     <>
-      {currentUser && (
-        <h2>
-          Du är inloggad som:
-          <div className="username"> {currentUser}</div>
-        </h2>
-      )}
-      <p>Ser du det här, då är du inne innanför protectedroute</p>
-
+      <div style={LoginContainerStyle}>
+        {currentUser && (
+          <h2>
+            Du är inloggad som:
+            <div className="username"> {currentUser}</div>
+          </h2>
+        )}
+      </div>
       {/* Pass token and currentUser as props */}
       <CreateThread token={token} currentUser={currentUser} />
     </>
@@ -36,3 +36,9 @@ const Forum = () => {
 };
 
 export default Forum;
+
+const LoginContainerStyle = {
+  marginBottom: "15px",
+  display: "flex",
+  justifyContent: "center",
+};

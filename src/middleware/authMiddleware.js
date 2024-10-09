@@ -1,19 +1,26 @@
 import jwt from "jsonwebtoken";
 
 export const authenticateJWT = (req, res, next) => {
-  const token = req.headers["authorization"]?.split(" ")[1]; // Assuming token is in Bearer format
+  const authHeader = req.headers["authorization"];
 
-  if (!token) {
-    return res.sendStatus(403); // Forbidden
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res
+      .status(401)
+      .json({ error: "Authorization header missing or malformed" }); // 401 Unauthorized
   }
 
-  // Use the secret from the environment variable
+  const token = authHeader.split(" ")[1]; // Extract token part
+
+  if (!token) {
+    return res.status(401).json({ error: "Access token missing" }); // 401 Unauthorized
+  }
+
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) {
-      return res.sendStatus(403); // Forbidden
+      return res.status(403).json({ error: "Invalid or expired token" }); // 403 Forbidden
     }
 
-    req.user = user; // Save the user information to the request
+    req.user = user; // Attach the decoded user to the request
     next();
   });
 };

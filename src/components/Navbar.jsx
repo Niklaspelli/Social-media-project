@@ -1,6 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext"; // Adjust the path accordingly
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faUserEdit,
+  faComments,
+  faSignOutAlt,
+} from "@fortawesome/free-solid-svg-icons";
 import "../index.css";
 
 const Navbar = () => {
@@ -8,9 +14,8 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
-  const currentUser = authData.username;
-  const NavbarAvatar = authData.avatar;
-  console.log("Avatar URL:", NavbarAvatar);
+  const currentUser = authData?.username;
+  const NavbarAvatar = authData?.avatar;
 
   const toggleSidenav = () => {
     setIsOpen(!isOpen);
@@ -31,52 +36,38 @@ const Navbar = () => {
         <ul>
           {!isAuthenticated ? (
             <li>
-              <Link to={"/"}>Sign In/ Sign Up</Link>
+              <Link to={"/"}>Sign In / Sign Up</Link>
             </li>
           ) : (
             <>
               <li>
-                <Link to={`/settings/${authData.userId}`}>Inställningar</Link>
+                <Link to={`/settings/${authData.userId}`}>
+                  <FontAwesomeIcon icon={faUserEdit} /> Profile
+                </Link>
               </li>
               <li>
-                <Link to={"/forum"}>Forum</Link>
+                <Link to={"/forum"}>
+                  <FontAwesomeIcon icon={faComments} /> Forum
+                </Link>
               </li>
               <li>
-                <div
-                  onClick={logout}
-                  style={{
-                    cursor: "pointer",
-                    display: "flex",
-                    position: "relative",
-                    left: "30px",
-                  }}
-                >
-                  Logout
-                </div>
+                <button onClick={logout} className="logout-btn">
+                  <FontAwesomeIcon icon={faSignOutAlt} /> Logout
+                </button>
               </li>
-              <li>
-                {currentUser && (
-                  <li
-                    style={{
-                      marginTop: 80,
-                      marginLeft: "30px",
-                      alignContent: "center",
-                    }}
-                  >
-                    Du är inloggad som:
-                    <p className="username">{currentUser}</p>
+              {currentUser && (
+                <div className="user-info">
+                  <p className="user-greeting">Logged in as:</p>
+                  <p className="username">{currentUser}</p>
+                  {NavbarAvatar && (
                     <img
                       src={NavbarAvatar}
-                      style={{
-                        width: 130,
-                        height: 130,
-                        borderRadius: "50%",
-                      }}
+                      className="user-avatar"
                       alt={`${currentUser}'s avatar`}
                     />
-                  </li>
-                )}
-              </li>
+                  )}
+                </div>
+              )}
             </>
           )}
         </ul>

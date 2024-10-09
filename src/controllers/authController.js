@@ -87,7 +87,7 @@ export const loginUser = async (req, res) => {
 
 // Delete user
 export const deleteUser = (req, res) => {
-  const userId = req.params.id; // Extract the ID from the request params
+  const userId = req.params.userId; // Extract the ID from the request params
   console.log(`Received DELETE request for user ID: ${userId}`); // Log the ID for debugging
 
   const sql = "DELETE FROM users WHERE id = ?";

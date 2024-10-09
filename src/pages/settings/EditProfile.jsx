@@ -15,6 +15,7 @@ const EditProfile = () => {
   const [mode, setMode] = useState("view"); // Modes: 'view', 'edit', or 'create'
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   const userId = authData.userId; // Assuming userId is set correctly
   const token = authData.token; // Assuming token is set correctly
@@ -123,7 +124,8 @@ const EditProfile = () => {
 
       const data = await response.json();
       console.log("Profile saved successfully:", data);
-      alert("Profile saved successfully!");
+      setSuccess(true);
+
       setMode("view"); // Switch to view mode after saving
     } catch (err) {
       console.error("Error saving profile:", err);
@@ -168,7 +170,15 @@ const EditProfile = () => {
               <Col md={6} lg={4} className="justify-content-center">
                 <Form.Group as={Col}>
                   <Form.Label className="mb-10">Sex:</Form.Label>
-                  <Form.Control as="select" custom style={inputStyle}>
+                  <Form.Control
+                    as="select"
+                    custom
+                    style={inputStyle}
+                    value={formData.sex}
+                    name="sex"
+                    onChange={handleChange}
+                    disabled={mode === "view"}
+                  >
                     <option value="">Select</option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
@@ -247,32 +257,44 @@ const EditProfile = () => {
                   />
                 </Form.Group>
 
-                {mode === "view" ? (
-                  <div>
-                    <Button type="button" onClick={handleEdit}>
-                      Edit
-                    </Button>
-                  </div>
-                ) : (
-                  <div>
-                    <Button
-                      type="submit"
-                      style={{ backgroundColor: "black", margin: "20px" }}
-                    >
-                      Save
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={handleCancel}
-                      style={{ backgroundColor: "black", margin: "20px" }}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
+                {/* Save button inside the form */}
+                {mode !== "view" && (
+                  <Button
+                    type="submit" // Ensure this is the Save button
+                    style={{ backgroundColor: "black", marginTop: "10px" }}
+                  >
+                    Save
+                  </Button>
+                )}
+                {error && <p style={{ color: "red" }}>{error}</p>}
+                {success && (
+                  <p style={{ color: "green" }}>
+                    Profile updated successfully!
+                  </p>
                 )}
               </Col>
             </Row>
           </Form>
+          {/* Edit and Cancel buttons outside the form */}
+          <div style={{ marginTop: "10px", textAlign: "center" }}>
+            {mode === "view" ? (
+              <Button
+                type="button"
+                onClick={handleEdit}
+                style={{ backgroundColor: "black", marginRight: "10px" }}
+              >
+                Edit
+              </Button>
+            ) : (
+              <Button
+                type="button" // Ensure this is the Cancel button
+                onClick={handleCancel}
+                style={{ backgroundColor: "black" }}
+              >
+                Cancel
+              </Button>
+            )}
+          </div>
         </Container>
       </div>
     </>

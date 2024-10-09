@@ -122,11 +122,12 @@ export const deleteResponse = (req, res) => {
   const { responseId } = req.params;
   const userId = req.user?.id; // Get the authenticated user's ID from the request
 
+  // Check for user authentication
   if (!userId) {
     return res.status(401).json({ error: "User not authenticated" });
   }
 
-  // SQL query to delete the response only if the response belongs to the authenticated user
+  // SQL query to delete the response only if it belongs to the authenticated user
   const sql = `DELETE FROM responses WHERE id = ? AND user_id = ?`;
 
   db.query(sql, [responseId, userId], (err, result) => {
@@ -135,12 +136,15 @@ export const deleteResponse = (req, res) => {
       return res.status(500).json({ error: "Internal Server Error" });
     }
 
-    // Check if the response was deleted (affectedRows > 0 means a row was deleted)
+    // Check if the response was deleted
     if (result.affectedRows === 0) {
       return res
         .status(404)
         .json({ error: "Response not found or unauthorized" });
     }
+
+    // Optional: Log successful deletion
+    console.log(`Response with ID ${responseId} deleted by user ${userId}.`);
 
     res.status(200).json({ message: "Response deleted successfully." });
   });

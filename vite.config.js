@@ -3,6 +3,11 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
+  server: {
+    open: true, // Ensure this is true to automatically open the browser
+    // Optional: Customize the starting page if needed
+    // open: '/login'
+  },
   plugins: [react()],
   resolve: {
     alias: {

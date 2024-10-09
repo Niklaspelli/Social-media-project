@@ -34,7 +34,7 @@ const Settings = () => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:3000/forum/settings/${userId}`,
+        `http://localhost:3000/forum/users/${userId}`,
         {
           method: "DELETE",
           headers: {
@@ -79,7 +79,7 @@ const Settings = () => {
   return (
     <div>
       {success ? (
-        <section>
+        <section style={StyleContainer}>
           <h1>Account deleted! Welcome back!</h1>
         </section>
       ) : (
@@ -105,39 +105,44 @@ const Settings = () => {
             userId={userId} // Pass userId if needed for API calls
             setSelectedPicture={handleSavePicture} // Correct prop name
           />
-
-          {!showConfirmation ? (
-            <Button
-              style={{ backgroundColor: "red", margin: "20px", border: "none" }}
-              onClick={() => setShowConfirmation(true)}
-              disabled={isLoading}
-              aria-busy={isLoading}
-            >
-              Delete Account
-            </Button>
-          ) : (
-            <DeleteAccount
-              isLoading={isLoading}
-              onConfirm={handleDelete}
-              onCancel={() => setShowConfirmation(false)}
-            />
-          )}
-
-          {showSuccessToast && (
-            <ToastContainer position="top-end" className="p-3">
-              <Toast
-                onClose={() => setShowSuccessToast(false)}
-                show={showSuccessToast}
-                delay={3000}
-                autohide
+          <div style={StyleContainer}>
+            {!showConfirmation ? (
+              <Button
+                style={{
+                  backgroundColor: "red",
+                  margin: "20px",
+                  border: "none",
+                }}
+                onClick={() => setShowConfirmation(true)}
+                disabled={isLoading}
+                aria-busy={isLoading}
               >
-                <Toast.Header>
-                  <strong className="me-auto">Success</strong>
-                </Toast.Header>
-                <Toast.Body>Account deleted successfully!</Toast.Body>
-              </Toast>
-            </ToastContainer>
-          )}
+                Delete Account
+              </Button>
+            ) : (
+              <DeleteAccount
+                isLoading={isLoading}
+                onConfirm={handleDelete}
+                onCancel={() => setShowConfirmation(false)}
+              />
+            )}
+
+            {showSuccessToast && (
+              <ToastContainer position="top-end" className="p-3">
+                <Toast
+                  onClose={() => setShowSuccessToast(false)}
+                  show={showSuccessToast}
+                  delay={3000}
+                  autohide
+                >
+                  <Toast.Header>
+                    <strong className="me-auto">Success</strong>
+                  </Toast.Header>
+                  <Toast.Body>Account deleted successfully!</Toast.Body>
+                </Toast>
+              </ToastContainer>
+            )}
+          </div>
         </section>
       )}
     </div>
@@ -145,3 +150,10 @@ const Settings = () => {
 };
 
 export default Settings;
+
+const StyleContainer = {
+  marginBottom: "15px",
+  display: "flex",
+  justifyContent: "center",
+  margin: "20px",
+};

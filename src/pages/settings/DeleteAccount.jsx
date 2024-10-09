@@ -10,7 +10,7 @@ const DeleteAccount = ({ isLoading, onConfirm, onCancel }) => {
       <div className="d-flex justify-content-center mt-2">
         <Button
           style={{
-            backgroundColor: "red",
+            backgroundColor: "black",
             marginRight: "10px",
             border: "none",
           }}

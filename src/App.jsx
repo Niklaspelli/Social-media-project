@@ -1,7 +1,7 @@
 import React from "react";
 import { AuthProvider } from "./context/AuthContext"; // Import the context
 import Navbar from "./components/Navbar";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom"; // Add Navigate for redirection
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Forum from "./pages/Forum";
@@ -21,10 +21,14 @@ function App() {
     <AuthProvider>
       <Navbar />
       <Routes>
-        {/* You may want to change this to Home later */}
-        <Route path="/" element={<SignIn />} />
+        {/* Redirect the root route to the login page */}
+        <Route path="/" element={<Navigate to="/login" />} />
+
+        {/* Public routes */}
+        <Route path="/login" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
 
+        {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/forum" element={<Forum />} />
           <Route path="/user/:id" element={<UserProfile />} />{" "}
@@ -37,6 +41,7 @@ function App() {
           <Route path="/create-thread" element={<CreateThread />} />
         </Route>
 
+        {/* Fallback for undefined routes */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AuthProvider>

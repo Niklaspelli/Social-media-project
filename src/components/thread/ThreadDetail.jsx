@@ -1,18 +1,22 @@
-import React, { useState, useEffect, useContext } from "react";
-import { useParams, Link } from "react-router-dom"; // Import Link for navigation
+import React, { useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext"; // Adjust the path accordingly
 
-const BackendURL = "http://localhost:3000"; // Backend URL
+const BackendURL = "http://localhost:3000";
 
 function ThreadDetail() {
   const { threadId } = useParams();
-  const { authData } = useAuth(); // Get auth data from context
-  const { token } = authData; // Extract token from authData
+  const { authData } = useAuth();
+  const { token } = authData;
   const [thread, setThread] = useState({});
   const [responses, setResponses] = useState([]);
   const [responseText, setResponseText] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+
+  // State to store deletion errors for specific responses
+  const [deleteErrors, setDeleteErrors] = useState({});
 
   // Fetch thread details and responses
   useEffect(() => {
@@ -63,6 +67,7 @@ function ThreadDetail() {
       const newResponse = await response.json();
       setResponses((prevResponses) => [newResponse.response, ...prevResponses]);
       setResponseText("");
+      setSuccess(true);
     } catch (error) {
       console.error("Failed to post response:", error.message);
       setError("Failed to post response. Please try again later.");
@@ -72,16 +77,40 @@ function ThreadDetail() {
   // Handle deleting a response
   const handleDeleteResponse = async (responseId) => {
     try {
-      const response = await fetch(`http://localhost:3000/forum/responses/${responseId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`, // Assuming you're using a JWT token for authentication
-        },
-      });
-  
+      const response = await fetch(
+        `${BackendURL}/forum/responses/${responseId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       if (!response.ok) {
-        throw new Error('Failed to delete response');
+        throw new Error("Failed to delete response");
       }
+
+      // Update the responses state to remove the deleted response
+      setResponses((prevResponses) =>
+        prevResponses.filter((res) => res.id !== responseId)
+      );
+
+      // Clear the error for this response if deletion was successful
+      setDeleteErrors((prevErrors) => ({
+        ...prevErrors,
+        [responseId]: null,
+      }));
+    } catch (error) {
+      console.error("Failed to delete response:", error.message);
+      // Set the error for this specific response
+      setDeleteErrors((prevErrors) => ({
+        ...prevErrors,
+        [responseId]: "Failed to delete response. Please try again later.",
+      }));
+    }
+  };
+
   if (loading) {
     return <p>Loading thread details...</p>;
   }
@@ -92,43 +121,51 @@ function ThreadDetail() {
 
   return (
     <div>
-      <h2 style={{ textAlign: "center" }}>{thread.title}</h2>
-      <p style={{ textAlign: "center", background: "grey", height: "a" }}>
+      <h1 style={{ textAlign: "center" }}>{thread.title}</h1>
+      <p style={{ textAlign: "center", background: "grey", padding: "10px" }}>
         {thread.body}
       </p>
       <div>
         {responses.length > 0 ? (
           responses.map((res) => (
-            <div style={RespContainer} key={res.id}>
-              <img
-                src={res.avatar}
-                alt="avatar"
-                style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: "50%",
-                  marginRight: "10px",
-                }}
-              />
-              <div>
-                {/* Use Link to navigate to the user profile */}
-                <Link to={`/user/${res.user_id}`}>
-                  <strong>{res.username}</strong>
-                </Link>{" "}
-                skrev:
-                <p>{res.body}</p>
-                <p style={{ fontSize: "0.8em", color: "#999" }}>
-                  ({new Date(res.created_at).toLocaleString()})
-                </p>
-                {/* Add the delete button */}
-                {res.userId === authData.id && ( // Check if the current user is the author
-                  <button
-                    onClick={() => handleDeleteResponse(res.id)}
-                    style={{ color: "red", cursor: "pointer" }}
-                  >
-                    Delete
-                  </button>
-                )}
+            <div style={StyleContainer}>
+              <div style={RespContainer} key={res.id}>
+                <img
+                  src={res.avatar}
+                  alt="avatar"
+                  style={{
+                    width: 50,
+                    height: 50,
+                    borderRadius: "50%",
+                    marginRight: "10px",
+                  }}
+                />
+                <div style={textContent}>
+                  {/* Use Link to navigate to the user profile */}
+                  <Link to={`/user/${res.user_id}`}>
+                    <strong>{res.username}</strong>
+                  </Link>{" "}
+                  wrote:
+                  <p>{res.body}</p>
+                  <p style={{ fontSize: "0.8em", color: "#999" }}>
+                    ({new Date(res.created_at).toLocaleString()})
+                  </p>
+                  {/* Add the delete button */}
+                  {res.userId === authData.id && (
+                    <div>
+                      <button
+                        onClick={() => handleDeleteResponse(res.id)}
+                        style={{ color: "red", cursor: "pointer" }}
+                      >
+                        Delete
+                      </button>
+                      {/* Show deletion error for this specific response if it exists */}
+                      {deleteErrors[res.id] && (
+                        <p style={{ color: "red" }}>{deleteErrors[res.id]}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))
@@ -139,7 +176,6 @@ function ThreadDetail() {
       <div style={StyleContainer}>
         <form onSubmit={handleResponseSubmit}>
           <textarea
-            maxLength="200"
             value={responseText}
             onChange={(e) => setResponseText(e.target.value)}
             style={inputStyle}
@@ -152,6 +188,10 @@ function ThreadDetail() {
           >
             Post Response
           </button>
+          {error && <p style={{ color: "red" }}>{error}</p>}
+          {success && (
+            <p style={{ color: "green" }}>Response posted successfully!</p>
+          )}
         </form>
       </div>
     </div>
@@ -183,8 +223,29 @@ const StyleContainer = {
 };
 
 const RespContainer = {
-  marginBottom: "15px",
   display: "flex",
+  flexDirection: "column",
+  alignItems: "flex-start",
   justifyContent: "center",
-  margin: "20px",
+  marginBottom: "15px",
+  margin: "5px",
+
+  width: "100%", // Full width of the parent
+  maxWidth: "500px", // Limit the max width
+  borderRadius: "20px",
+  padding: "15px",
+  boxSizing: "border-box",
+  boxShadow: "2px 2px 0px black",
+  backgroundColor: "white",
+  background: "hsla(0, 1%, 13%, 0.781)", // Fully transparent background
+
+  backdropFilter: "blur(8px)", // Blur the background content behind the element
+  overflowWrap: "break-word", // Ensure long words break
+};
+
+// Example of how the text container could look
+const textContent = {
+  width: "100%",
+  wordWrap: "break-word",
+  marginBottom: "10px",
 };

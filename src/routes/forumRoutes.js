@@ -26,7 +26,7 @@ const router = express.Router();
 // Auth routes
 router.post("/register", registerUser);
 router.post("/login", loginUser);
-router.delete("/settings/:userId", deleteUser); // Changed to :userId for consistency
+router.delete("/users/:userId", authenticateJWT, deleteUser); // Changed to :userId for consistency
 router.put("/users/avatar", authenticateJWT, updateAvatar);
 
 // User Profile routes
