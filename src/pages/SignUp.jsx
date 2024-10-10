@@ -271,14 +271,15 @@ function SignUp() {
                     </Col>{" "}
                   </Row>
                   <Button
-                    style={{ backgroundColor: "black" }}
+                    /* style={{ backgroundColor: "black" }} */
+                    className="bn31"
                     disabled={
                       !validName || !validPwd || !validMatch ? true : false
                     }
                     type="submit"
                     onClick={(e) => handleSubmit(e)}
                   >
-                    Registrera
+                    <span className="bn31span">Registrera</span>
                   </Button>
                 </section>
               )}

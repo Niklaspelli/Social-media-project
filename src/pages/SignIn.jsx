@@ -117,11 +117,14 @@ const SignIn = () => {
 
                     <div className="d-grid">
                       <Button
-                        style={{ backgroundColor: "black", margin: "20px" }}
+                        className="bn31"
+                        /* style={{ backgroundColor: "black", margin: "20px" }} */
                         type="submit"
                         disabled={isLoading}
                       >
-                        {isLoading ? "Loggar in..." : "Logga in"}
+                        <span className="bn31span">
+                          {isLoading ? "Loggar in..." : "Logga in"}
+                        </span>
                       </Button>
                     </div>
 

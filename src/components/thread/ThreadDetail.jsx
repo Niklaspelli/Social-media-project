@@ -155,7 +155,11 @@ function ThreadDetail() {
                     <div>
                       <button
                         onClick={() => handleDeleteResponse(res.id)}
-                        style={{ color: "red", cursor: "pointer" }}
+                        style={{
+                          color: "white",
+                          cursor: "pointer",
+                          backgroundColor: "red",
+                        }}
                       >
                         Delete
                       </button>
@@ -201,9 +205,9 @@ function ThreadDetail() {
 export default ThreadDetail;
 
 const inputStyle = {
-  width: "90%",
-  maxWidth: "400px",
-  padding: "10px",
+  width: "500px",
+  height: "200px",
+
   borderRadius: "20px",
   border: "1px solid #ddd",
   boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
