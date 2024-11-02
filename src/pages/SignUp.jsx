@@ -19,11 +19,11 @@ function SignUp() {
   const userRef = useRef();
   const errRef = useRef();
 
-  const [user, setUser] = useState("");
+  const [username, setUsername] = useState(""); // Changed from user to username
   const [validName, setValidName] = useState(false);
   const [userFocus, setUserFocus] = useState(false);
 
-  const [pwd, setPwd] = useState("");
+  const [password, setPassword] = useState(""); // Changed from pwd to password
   const [validPwd, setValidPwd] = useState(false);
   const [pwdFocus, setPwdFocus] = useState(false);
 
@@ -39,37 +39,37 @@ function SignUp() {
   }, []);
 
   useEffect(() => {
-    const result = USER_REGEX.test(user);
+    const result = USER_REGEX.test(username); // Updated to username
     console.log(result);
-    console.log(user);
+    console.log(username);
     setValidName(result);
-  }, [user]);
+  }, [username]);
 
   useEffect(() => {
-    const result = PWD_REGEX.test(pwd);
+    const result = PWD_REGEX.test(password); // Updated to password
     console.log(result);
-    console.log(pwd);
+    console.log(password);
     setValidPwd(result);
-    const match = pwd === matchPwd;
+    const match = password === matchPwd; // Updated to password
     setValidMatch(match);
-  }, [pwd, matchPwd]);
+  }, [password, matchPwd]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    //om knappen är eneblad med JS hackning
-    const v1 = USER_REGEX.test(user);
-    const v2 = PWD_REGEX.test(pwd);
+    // Validate inputs before submitting
+    const v1 = USER_REGEX.test(username); // Updated to username
+    const v2 = PWD_REGEX.test(password); // Updated to password
     if (!v1 || !v2) {
       setErrMsg("Invalid Entry");
       return;
     }
     try {
-      const response = await fetch("http://localhost:3000/forum/register", {
+      const response = await fetch("http://localhost:5000/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ user, pwd }),
+        body: JSON.stringify({ username, password }), // Updated to username and password
       });
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -116,7 +116,9 @@ function SignUp() {
                           <FontAwesomeIcon icon={faCheck} />
                         </span>
                         <span
-                          className={validName || !user ? "hide" : "invalid"}
+                          className={
+                            validName || !username ? "hide" : "invalid"
+                          } // Updated to username
                         >
                           <FontAwesomeIcon icon={faTimes} />
                         </span>
@@ -135,7 +137,7 @@ function SignUp() {
                           placeholder="Användarnamn:"
                           ref={userRef}
                           autoComplete="off"
-                          onChange={(e) => setUser(e.target.value)}
+                          onChange={(e) => setUsername(e.target.value)} // Updated to setUsername
                           required
                           aria-invalid={validName ? "false" : "true"}
                           aria-describedby="uidnote"
@@ -151,7 +153,7 @@ function SignUp() {
                       <p
                         id="uidnote"
                         className={
-                          userFocus && user && !validName
+                          userFocus && username && !validName // Updated to username
                             ? "instructions"
                             : "offscreen"
                         }
@@ -187,7 +189,7 @@ function SignUp() {
                           type="password"
                           id="floatingInputCustom"
                           placeholder="Lösenord:"
-                          onChange={(e) => setPwd(e.target.value)}
+                          onChange={(e) => setPassword(e.target.value)} // Updated to setPassword
                           required
                           aria-invalid={validPwd ? "false" : "true"}
                           aria-describedby="pwdnote"
@@ -271,7 +273,6 @@ function SignUp() {
                     </Col>{" "}
                   </Row>
                   <Button
-                    /* style={{ backgroundColor: "black" }} */
                     className="bn31"
                     disabled={
                       !validName || !validPwd || !validMatch ? true : false

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Container, Row, Col, Form, Button } from "react-bootstrap"; // Importing Bootstrap components
+import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import "../index.css";
 
 const SignIn = () => {
@@ -9,7 +9,8 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
-  const [correctCredentials, setCorrectCredentials] = useState(true);
+  const [userId, setUserId] = useState(null); // Define userId state
+  const [error, setError] = useState(null); // Define error state
   const errRef = useRef();
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
@@ -26,29 +27,30 @@ const SignIn = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3000/forum/login", {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ user: username, pwd: password }),
+        body: JSON.stringify({
+          username: username, // Ensure username is defined
+          password: password,
+        }),
+        credentials: "include",
       });
 
-      const data = await response.json();
-      console.log("API Response:", data); // Log the entire response
-
-      if (!response.ok) {
-        setCorrectCredentials(false);
-        throw new Error(data.error || "Login failed");
+      if (response.ok) {
+        const data = await response.json();
+        const userIdFromResponse = data.userId; // Get userId from response
+        setUserId(userIdFromResponse);
+        setError(null);
+        // Assuming you might want to update context
+        login(userIdFromResponse); // Or however you want to handle it
+        navigate("/forum"); // Redirecting to forum
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message || "Invalid username or password");
       }
-
-      const token = data.token;
-      const loggedInUsername = data.username;
-      const userId = data.id;
-      const avatar = data.avatar;
-
-      login(token, loggedInUsername, userId, avatar);
-      navigate("/forum");
     } catch (error) {
       setLoginError(error.message);
       if (errRef.current) errRef.current.focus();
@@ -77,6 +79,11 @@ const SignIn = () => {
                       role="alert"
                     >
                       {loginError}
+                    </div>
+                  )}
+                  {error && (
+                    <div className="alert alert-danger" role="alert">
+                      {error}
                     </div>
                   )}
 
@@ -118,7 +125,6 @@ const SignIn = () => {
                     <div className="d-grid">
                       <Button
                         className="bn31"
-                        /* style={{ backgroundColor: "black", margin: "20px" }} */
                         type="submit"
                         disabled={isLoading}
                       >
@@ -127,14 +133,6 @@ const SignIn = () => {
                         </span>
                       </Button>
                     </div>
-
-                    {correctCredentials === false && (
-                      <div role="alert" className="alert alert-danger mt-4">
-                        <span>
-                          Fel användarnamn eller lösenord. Försök igen!
-                        </span>
-                      </div>
-                    )}
                   </Form>
 
                   <div className="text-center mt-3">

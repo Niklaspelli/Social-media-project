@@ -1,94 +1,122 @@
 import bcrypt from "bcryptjs";
-import { db } from "../config/db.js"; // Adjust this import according to your project structure
+import { db } from "../config/db.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { SECURE, HTTP_ONLY, SAME_SITE } from "../config.js";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  generateCsrfToken,
+} from "../domain/auth_handler.js";
 
-dotenv.config(); // Load .env variables
-
-const JWT_SECRET = process.env.JWT_SECRET; // Make sure this is defined in your .env file
+dotenv.config();
 
 // Register user
 export const registerUser = async (req, res) => {
-  const { user, pwd } = req.body; // Destructure username and password
+  const { username, password } = req.body;
 
-  // Input validation
-  if (!user || !pwd) {
+  if (!username || !password) {
     return res
       .status(400)
       .json({ error: "Username and password are required!" });
   }
 
   try {
-    const hashedPassword = await bcrypt.hash(pwd, 10); // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
     const addUser = "INSERT INTO users (username, password) VALUES (?, ?)";
 
-    db.query(addUser, [user, hashedPassword], (err, result) => {
+    db.query(addUser, [username, hashedPassword], (err, result) => {
       if (err) {
-        console.error("Error inserting data:", err.message); // Log the error for debugging
+        console.error("Error inserting data:", err.message);
         return res.status(500).json({ error: "Internal Server Error" });
       }
-      res.status(201).json({ id: result.insertId, user });
+      res.status(201).json({ id: result.insertId, username });
     });
   } catch (error) {
-    console.error("Error hashing password:", error.message); // Log the error
+    console.error("Error hashing password:", error.message);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-// Login user
 export const loginUser = async (req, res) => {
-  const { user, pwd } = req.body; // Destructure username and password
+  console.log("Login request received:", req.body);
 
-  // Input validation
-  if (!user || !pwd) {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
     return res
       .status(400)
-      .json({ error: "Username and password are required!" });
+      .json({ message: "Username and password are required." });
   }
 
   const sql = "SELECT * FROM users WHERE username = ?";
-
-  db.query(sql, [user], async (err, result) => {
+  db.query(sql, [username], async (err, result) => {
     if (err) {
-      console.error("Error fetching data:", err.message); // Log the error
+      console.error("Error fetching user data:", err.message);
       return res.status(500).json({ error: "Internal Server Error" });
     }
 
     if (result.length === 0) {
-      return res.status(400).json({ error: "Invalid credentials!" });
+      console.log("Login attempt with non-existent username:", username);
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const userRecord = result[0];
+    console.log("User found:", userRecord);
 
     try {
-      // Compare the hashed password with the user input password
-      const match = await bcrypt.compare(pwd, userRecord.password);
+      const match = await bcrypt.compare(password, userRecord.password);
+      console.log("Password comparison result:", match);
+
       if (match) {
-        // Create JWT token if credentials are valid
-        const payload = { id: userRecord.id, username: userRecord.username }; // Include user ID in payload
-        const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
-        return res.status(200).json({
-          success: true,
-          message: "Authenticated",
-          token,
-          username: userRecord.username,
-          id: userRecord.id,
-          avatar: userRecord.avatar,
+        const payload = { id: userRecord.id, username: userRecord.username };
+        const accessToken = generateAccessToken(payload);
+        const refreshToken = generateRefreshToken(payload);
+        const csrfToken = generateCsrfToken();
+
+        // Set cookies with appropriate attributes
+        res.cookie("accessToken", accessToken, {
+          httpOnly: HTTP_ONLY,
+          secure: process.env.NODE_ENV === "production", // Set to true in production only
+          maxAge: 15 * 60 * 1000, // 15 minutes
+          sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // Set to "None" in production
         });
+
+        res.cookie("refreshToken", refreshToken, {
+          httpOnly: HTTP_ONLY,
+          secure: process.env.NODE_ENV === "production", // Set to true in production only
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+          sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // Set to "None" in production
+        });
+
+        return res.json({ csrfToken, userId: userRecord.id }); // Return CSRF token and userId
       } else {
-        return res.status(400).json({ error: "Invalid credentials!" });
+        console.log("Password mismatch for user:", username);
+        return res.status(401).json({ message: "Invalid credentials" });
       }
     } catch (err) {
-      console.error("Error during password comparison:", err.message); // Log the error
+      console.error("Error during password comparison:", err.message);
       return res.status(500).json({ error: "Internal Server Error" });
     }
   });
 };
 
-// Delete user
+export const logout = (req, res) => {
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    sameSite: "Strict",
+    secure: process.env.NODE_ENV === "production", // Change based on environment
+  });
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    sameSite: "Strict",
+    secure: process.env.NODE_ENV === "production", // Change based on environment
+  });
+  return res.status(200).json({ message: "Logout successful" });
+};
+
 export const deleteUser = (req, res) => {
-  const userId = req.params.userId; // Extract the ID from the request params
-  console.log(`Received DELETE request for user ID: ${userId}`); // Log the ID for debugging
+  const userId = req.params.userId;
+  console.log(`Received DELETE request for user ID: ${userId}`);
 
   const sql = "DELETE FROM users WHERE id = ?";
   db.query(sql, [userId], (err, result) => {
@@ -97,7 +125,6 @@ export const deleteUser = (req, res) => {
       return res.status(500).json({ error: "Internal Server Error" });
     }
 
-    // Check if the user was deleted
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -106,10 +133,8 @@ export const deleteUser = (req, res) => {
   });
 };
 
-//Update
 export const updateAvatar = async (req, res) => {
-  const { userId } = req.body; // Get userId from request body
-  const { avatar } = req.body.updatedData; // Get avatar from updatedData
+  const { userId, avatar } = req.body.updatedData;
 
   if (!userId || !avatar) {
     return res
