@@ -3,11 +3,11 @@ import { Link } from "react-router-dom"; // Importing Link for navigation
 import { useAuth } from "../../context/AuthContext"; // Adjust the path accordingly
 import "./ThreadList.css";
 
-const BackendURL = "http://localhost:3000"; // URL of the backend
+const BackendURL = "http://localhost:5000"; // URL of the backend
 
 function ThreadList() {
   const { authData } = useAuth(); // Get auth data from context
-  const { token } = authData; // Extract token from authData (if needed in the future)
+  // Removed token extraction since it's no longer used
   const [threads, setThreads] = useState([]); // State to hold threads
   const [loading, setLoading] = useState(true); // Loading state
   const [error, setError] = useState(null); // Error state
@@ -16,10 +16,8 @@ function ThreadList() {
     const fetchThreads = async () => {
       setLoading(true); // Start loading
       try {
-        const response = await fetch(`${BackendURL}/forum/threads`, {
-          headers: {
-            Authorization: `Bearer ${token}`, // Include token if needed
-          },
+        const response = await fetch(`${BackendURL}/api/auth/threads`, {
+          credentials: "include", // Include cookies in the request
         }); // Fetch threads
         if (!response.ok) {
           throw new Error("Failed to fetch threads"); // Error handling
@@ -35,7 +33,7 @@ function ThreadList() {
     };
 
     fetchThreads(); // Call the fetch function
-  }, [token]); // Add token to dependencies in case it changes
+  }, []); // Removed token from dependencies, it’s no longer needed
 
   if (loading) {
     return <p>Loading threads...</p>; // Show loading message

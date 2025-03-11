@@ -1,5 +1,3 @@
-// Forum.jsx
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext"; // Import the Auth context
@@ -10,7 +8,6 @@ const Forum = () => {
   const { authData, isAuthenticated } = useAuth(); // Access auth data and authentication status
 
   const currentUser = authData.username; // Get the username from the auth context
-  const token = authData.token; // Get the token from the auth context
 
   useEffect(() => {
     // Redirect to signin if user is not authenticated
@@ -29,8 +26,8 @@ const Forum = () => {
           </h2>
         )}
       </div>
-      {/* Pass token and currentUser as props */}
-      <CreateThread token={token} currentUser={currentUser} />
+      {/* Pass only currentUser as props */}
+      <CreateThread currentUser={currentUser} />
     </>
   );
 };

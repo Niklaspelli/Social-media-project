@@ -4,41 +4,22 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [authData, setAuthData] = useState({
-    token: localStorage.getItem("token") || null,
-    username: localStorage.getItem("loggedInUsername") || null,
-    userId: localStorage.getItem("userId") || null,
-    avatar: localStorage.getItem("avatar") || null, // Added avatarUrl
+    username: null,
+    userId: null,
+    avatar: null,
   });
 
-  const login = (token, username, userId, avatar) => {
-    setAuthData({ token, username, userId, avatar });
-    localStorage.setItem("token", token);
-    localStorage.setItem("loggedInUsername", username);
-    localStorage.setItem("userId", userId);
-    localStorage.setItem("avatar", avatar); // Store avatarUrl
+  const login = (username, userId, avatar) => {
+    setAuthData({ username, userId, avatar });
+    // No need to store the token in localStorage anymore
   };
 
   const logout = () => {
-    setAuthData({ token: null, username: null, userId: null, avatar: null }); // Reset avatarUrl
-    localStorage.removeItem("token");
-    localStorage.removeItem("loggedInUsername");
-    localStorage.removeItem("userId");
+    setAuthData({ username: null, userId: null, avatar: null });
+    // Optionally clear any client-side state or perform additional logout actions
   };
 
-  const isAuthenticated = Boolean(authData.token);
-
-  useEffect(() => {
-    const handleStorageChange = (event) => {
-      if (event.key === "token" && !event.newValue) {
-        logout();
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, []);
+  const isAuthenticated = Boolean(authData.username); // Adjusted to check if the username exists
 
   return (
     <AuthContext.Provider value={{ authData, login, logout, isAuthenticated }}>

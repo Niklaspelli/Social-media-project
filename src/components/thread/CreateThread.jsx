@@ -1,12 +1,12 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext"; // Make sure the path is correct
 import ThreadList from "./ThreadList";
 
-const BackendURL = "http://localhost:3000";
+const BackendURL = "http://localhost:5000";
 
 function CreateThread() {
   const { authData } = useAuth(); // Use the custom hook
-  const { token, username } = authData; // Destructure token and username from authData
+  const { username } = authData; // Destructure username from authData
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [error, setError] = useState(null);
@@ -23,12 +23,12 @@ function CreateThread() {
     }
 
     try {
-      const response = await fetch(`${BackendURL}/forum/threads`, {
+      const response = await fetch(`${BackendURL}/api/auth/threads`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Use the token here
         },
+        credentials: "include", // Include cookies in the request
         body: JSON.stringify({
           title: title,
           body: body,

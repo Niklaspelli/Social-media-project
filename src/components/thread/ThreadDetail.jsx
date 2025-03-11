@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext"; // Adjust the path accordingly
 
-const BackendURL = "http://localhost:3000";
+const BackendURL = "http://localhost:5000";
 
 function ThreadDetail() {
   const { threadId } = useParams();
@@ -25,7 +25,9 @@ function ThreadDetail() {
 
       setLoading(true);
       try {
-        const response = await fetch(`${BackendURL}/forum/threads/${threadId}`);
+        const response = await fetch(
+          `${BackendURL}/api/auth/threads/${threadId}`
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch thread");
         }

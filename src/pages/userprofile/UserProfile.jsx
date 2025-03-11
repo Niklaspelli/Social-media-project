@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom"; // Import useParams to get the userId from the URL
-import { useAuth } from "../../context/AuthContext"; // Import the Auth context to get the token
+import { useAuth } from "../../context/AuthContext"; // Import the Auth context
 import "./UserProfile.css";
 
 function UserProfile() {
   const { id } = useParams(); // Get the user ID from the URL
-  const { authData } = useAuth(); // Get auth data from context
-  const { token } = authData; // Extract token from authData
+  const { isAuthenticated } = useAuth(); // Get authentication status from context
   const [profile, setProfile] = useState(null); // State to store user profile data
   const [loading, setLoading] = useState(true); // State for loading state
   const [error, setError] = useState(null); // State for error handling
@@ -15,12 +14,10 @@ function UserProfile() {
     const fetchUserProfile = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/forum/users/${id}`,
+          `http://localhost:5000/api/auth/users/${id}`,
           {
             method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`, // Include token for authentication
-            },
+            credentials: "include", // Include cookies in the request
           }
         );
 
@@ -38,8 +35,14 @@ function UserProfile() {
       }
     };
 
-    fetchUserProfile(); // Call the fetch function
-  }, [id, token]); // Dependencies array
+    if (isAuthenticated) {
+      // Only fetch the profile if the user is authenticated
+      fetchUserProfile(); // Call the fetch function
+    } else {
+      setError("You must be logged in to view this profile.");
+      setLoading(false);
+    }
+  }, [id, isAuthenticated]); // Dependencies array
 
   if (loading) {
     return <p>Loading user profile...</p>; // Show loading message
