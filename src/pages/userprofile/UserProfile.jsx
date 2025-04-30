@@ -1,23 +1,29 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom"; // Import useParams to get the userId from the URL
-import { useAuth } from "../../context/AuthContext"; // Import the Auth context
+import { useParams } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import "./UserProfile.css";
 
 function UserProfile() {
-  const { id } = useParams(); // Get the user ID from the URL
-  const { isAuthenticated } = useAuth(); // Get authentication status from context
-  const [profile, setProfile] = useState(null); // State to store user profile data
-  const [loading, setLoading] = useState(true); // State for loading state
-  const [error, setError] = useState(null); // State for error handling
+  const { id } = useParams();
+  const { isAuthenticated } = useAuth();
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+
     const fetchUserProfile = async () => {
       try {
         const response = await fetch(
           `http://localhost:5000/api/auth/users/${id}`,
           {
             method: "GET",
-            credentials: "include", // Include cookies in the request
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`, // ✅ Include token
+            },
           }
         );
 
@@ -26,33 +32,26 @@ function UserProfile() {
         }
 
         const data = await response.json();
-        setProfile(data); // Store the fetched profile data
+        setProfile(data);
       } catch (err) {
         console.error("Error fetching user profile:", err);
-        setError(err.message); // Set error message if fetch fails
+        setError(err.message);
       } finally {
-        setLoading(false); // Set loading to false after fetching data
+        setLoading(false);
       }
     };
 
-    if (isAuthenticated) {
-      // Only fetch the profile if the user is authenticated
-      fetchUserProfile(); // Call the fetch function
+    if (isAuthenticated && token) {
+      fetchUserProfile();
     } else {
       setError("You must be logged in to view this profile.");
       setLoading(false);
     }
-  }, [id, isAuthenticated]); // Dependencies array
+  }, [id, isAuthenticated]);
 
-  if (loading) {
-    return <p>Loading user profile...</p>; // Show loading message
-  }
+  if (loading) return <p>Loading user profile...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
 
-  if (error) {
-    return <p style={{ color: "red" }}>{error}</p>; // Show error message
-  }
-
-  // Render user profile information
   return (
     <div className="profile-container">
       <h1 className="profile-title">Profile Page</h1>

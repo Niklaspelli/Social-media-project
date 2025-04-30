@@ -4,7 +4,6 @@ import { ACCESS_TOKEN_SECRET } from "../config.js"; // ✅ import the correct se
 
 export const authenticateJWT = (req, res, next) => {
   const authHeader = req.headers["authorization"];
-  console.log("Authorization Header:", authHeader); // Debug log
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res
@@ -32,24 +31,3 @@ export const authenticateJWT = (req, res, next) => {
     next();
   });
 };
-
-/* NY KOD:
-import jwt from "jsonwebtoken";
-
-export const authenticateJWT = (req, res, next) => {
-  // Get the token from cookies instead of the Authorization header
-  const token = req.cookies.token;
-
-  if (!token) {
-    return res.status(401).json({ error: "Access token missing" }); // 401 Unauthorized
-  }
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) {
-      return res.status(403).json({ error: "Invalid or expired token" }); // 403 Forbidden
-    }
-
-    req.user = user; // Attach the decoded user to the request
-    next();
-  });
-}; */
