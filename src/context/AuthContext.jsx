@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
+// AuthContext stores authentication data and handles login/logout
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -7,19 +8,39 @@ export const AuthProvider = ({ children }) => {
     username: null,
     userId: null,
     avatar: null,
+    accessToken: null, // New state for accessToken
   });
 
-  const login = (username, userId, avatar) => {
-    setAuthData({ username, userId, avatar });
-    // No need to store the token in localStorage anymore
+  // Check for saved access token on startup
+  useEffect(() => {
+    const savedToken = localStorage.getItem("accessToken");
+    if (savedToken) {
+      setAuthData((prevState) => ({
+        ...prevState,
+        accessToken: savedToken,
+      }));
+    }
+  }, []);
+
+  // Login function stores user data and the access token in the state and localStorage
+  const login = (username, userId, avatar, accessToken) => {
+    setAuthData({ username, userId, avatar, accessToken });
+    localStorage.setItem("accessToken", accessToken);
   };
 
+  // Logout function clears the state and removes access token from localStorage
   const logout = () => {
-    setAuthData({ username: null, userId: null, avatar: null });
-    // Optionally clear any client-side state or perform additional logout actions
+    setAuthData({
+      username: null,
+      userId: null,
+      avatar: null,
+      accessToken: null,
+    });
+    localStorage.removeItem("accessToken"); // Clear the token from localStorage
   };
 
-  const isAuthenticated = Boolean(authData.username); // Adjusted to check if the username exists
+  // isAuthenticated is true if username exists (logged in state)
+  const isAuthenticated = Boolean(authData.username);
 
   return (
     <AuthContext.Provider value={{ authData, login, logout, isAuthenticated }}>

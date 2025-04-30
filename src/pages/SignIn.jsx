@@ -9,53 +9,89 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
-  const [userId, setUserId] = useState(null); // Define userId state
   const [error, setError] = useState(null); // Define error state
+  const [csrfToken, setCsrfToken] = useState(""); // New state for CSRF token
   const errRef = useRef();
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
 
+  // Fetch CSRF token once when the component is mounted
   useEffect(() => {
+    // Redirect if already authenticated
     if (isAuthenticated) {
-      navigate("/");
+      navigate("/forum");
     }
+
+    const fetchCsrfToken = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/auth/csrf-token",
+          {
+            method: "GET",
+            credentials: "include", // Include cookies for session management
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          setCsrfToken(data.csrfToken); // Store CSRF token in state
+        } else {
+          setError("Failed to fetch CSRF token.");
+        }
+      } catch (error) {
+        setError("Error fetching CSRF token.");
+      }
+    };
+
+    fetchCsrfToken();
   }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoginError("");
     setIsLoading(true);
+    setError(null);
+
+    // Ensure CSRF token is available before sending the request
+    if (!csrfToken) {
+      setError("CSRF Token is missing!");
+      return;
+    }
 
     try {
       const response = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "CSRF-TOKEN": csrfToken, // Send CSRF token in the headers
         },
         body: JSON.stringify({
-          username: username, // Ensure username is defined
+          username: username,
           password: password,
         }),
-        credentials: "include",
+        credentials: "include", // Include cookies for session management
       });
 
       if (response.ok) {
         const data = await response.json();
-        const userIdFromResponse = data.userId; // Get userId from response
-        setUserId(userIdFromResponse);
-        setError(null);
-        // Assuming you might want to update context
-        login(userIdFromResponse); // Or however you want to handle it
-        navigate("/forum"); // Redirecting to forum
+        const { userId, avatar, accessToken } = data;
+
+        if (accessToken) {
+          // Successful login
+          login(username, userId, avatar, accessToken);
+          localStorage.setItem("accessToken", accessToken); // Store access token
+          navigate("/forum"); // Navigate to the forum page
+        } else {
+          setError("Authentication failed. Please try again.");
+        }
       } else {
         const errorData = await response.json();
         setError(errorData.message || "Invalid username or password");
       }
-    } catch (error) {
-      setLoginError(error.message);
+    } catch (err) {
+      setError(err.message);
       if (errRef.current) errRef.current.focus();
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Reset loading state
     }
   };
 

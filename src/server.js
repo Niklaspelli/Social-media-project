@@ -36,6 +36,7 @@ app.listen(port, () => {
  */
 import { db } from "./config/db.js";
 import forumRoutes from "./routes/forumRoutes.js";
+
 import {
   PORT,
   AUTH,
@@ -46,8 +47,6 @@ import {
 } from "./config.js";
 
 import app from "./service.js";
-
-app.use("/forum", forumRoutes);
 
 // Connect to MySQL
 db.connect((error) => {

@@ -69,7 +69,7 @@ export const loginUser = async (req, res) => {
         const payload = { id: userRecord.id, username: userRecord.username };
         const accessToken = generateAccessToken(payload);
         const refreshToken = generateRefreshToken(payload);
-        const csrfToken = generateCsrfToken();
+        const csrfToken = generateCsrfToken(payload);
 
         // Set cookies with appropriate attributes
         res.cookie("accessToken", accessToken, {
@@ -86,7 +86,20 @@ export const loginUser = async (req, res) => {
           sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // Set to "None" in production
         });
 
-        return res.json({ csrfToken, userId: userRecord.id }); // Return CSRF token and userId
+        res.cookie("csrfToken", csrfToken, {
+          httpOnly: false, // Must be false if you want to access it from JavaScript!
+
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "Strict",
+          maxAge: 15 * 60 * 1000,
+        });
+
+        return res.json({
+          userId: userRecord.id,
+          username: userRecord.username,
+          avatar: userRecord.avatar,
+          accessToken, // ✅ include this
+        });
       } else {
         console.log("Password mismatch for user:", username);
         return res.status(401).json({ message: "Invalid credentials" });
@@ -96,6 +109,11 @@ export const loginUser = async (req, res) => {
       return res.status(500).json({ error: "Internal Server Error" });
     }
   });
+};
+
+export const getCsrfToken = (req, res) => {
+  const csrfToken = req.cookies.csrfToken;
+  res.json({ csrfToken });
 };
 
 export const logout = (req, res) => {
@@ -108,6 +126,11 @@ export const logout = (req, res) => {
     httpOnly: true,
     sameSite: "Strict",
     secure: process.env.NODE_ENV === "production", // Change based on environment
+  });
+  res.clearCookie("csrfToken", {
+    httpOnly: false, // If it's not an HTTP-only cookie
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "Strict",
   });
   return res.status(200).json({ message: "Logout successful" });
 };

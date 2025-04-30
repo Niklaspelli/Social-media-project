@@ -6,11 +6,17 @@ const BackendURL = "http://localhost:5000";
 
 function CreateThread() {
   const { authData } = useAuth(); // Use the custom hook
-  const { username } = authData; // Destructure username from authData
+  const { username, csrfToken, accessToken } = authData; // Destructure username from authData
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,10 +29,15 @@ function CreateThread() {
     }
 
     try {
+      const csrfToken = getCookie("csrfToken"); // You need to implement getCookie
+
       const response = await fetch(`${BackendURL}/api/auth/threads`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`, // ✅ Include this
+
+          "CSRF-TOKEN": csrfToken,
         },
         credentials: "include", // Include cookies in the request
         body: JSON.stringify({
@@ -38,9 +49,12 @@ function CreateThread() {
 
       if (!response.ok) {
         if (response.status === 400) {
+          console.log("Access Token:", accessToken); // Check if the token is there
+
           throw new Error("Title and content are required");
         }
-        throw new Error("Failed to create thread");
+        const errorMsg = await response.text();
+        throw new Error(`Failed to create thread: ${errorMsg}`);
       }
 
       const createdThread = await response.json();

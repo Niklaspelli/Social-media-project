@@ -7,7 +7,7 @@ const BackendURL = "http://localhost:5000";
 function ThreadDetail() {
   const { threadId } = useParams();
   const { authData } = useAuth();
-  const { token } = authData;
+  const { accessToken, csrfToken } = authData;
   const [thread, setThread] = useState({});
   const [responses, setResponses] = useState([]);
   const [responseText, setResponseText] = useState("");
@@ -17,6 +17,12 @@ function ThreadDetail() {
 
   // State to store deletion errors for specific responses
   const [deleteErrors, setDeleteErrors] = useState({});
+
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+  }
 
   // Fetch thread details and responses
   useEffect(() => {
@@ -47,17 +53,23 @@ function ThreadDetail() {
 
   // Handle submitting a new response
   const handleResponseSubmit = async (e) => {
+    const csrfToken = getCookie("csrfToken"); // You need to implement getCookie
+
     e.preventDefault();
 
     try {
       const response = await fetch(
-        `${BackendURL}/forum/threads/${threadId}/responses`,
+        `${BackendURL}/api/auth/threads/${threadId}/responses`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
+
+            "CSRF-TOKEN": csrfToken,
           },
+          credentials: "include", // Include cookies in the request
+
           body: JSON.stringify({ body: responseText }),
         }
       );
@@ -80,7 +92,7 @@ function ThreadDetail() {
   const handleDeleteResponse = async (responseId) => {
     try {
       const response = await fetch(
-        `${BackendURL}/forum/responses/${responseId}`,
+        `${BackendURL}/api/forum/responses/${responseId}`,
         {
           method: "DELETE",
           headers: {

@@ -1,15 +1,14 @@
-import express from "express"; // Use import statement
+import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-
 import rateLimit from "express-rate-limit";
-import { AUTH, AUTH_TYPES } from "./config.js"; // Ensure to add .js if using ES modules
+import cookieParser from "cookie-parser";
+import csrf from "csurf";
+
+import { AUTH, AUTH_TYPES } from "./config.js";
 
 const app = express();
-
-const forumRoutes = {
-  [AUTH_TYPES.BASIC]: (await import("./routes/forumRoutes.js")).default, // Dynamically import the forum routes
-};
+const csrfProtection = csrf({ cookie: true });
 
 const allowedOrigins = ["http://localhost:5173", "http://localhost:5000"];
 
@@ -17,7 +16,6 @@ app.use(
   cors({
     origin: function (origin, callback) {
       if (allowedOrigins.includes(origin) || !origin) {
-        // Allow requests with no origin (e.g., mobile apps or server-side calls)
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
@@ -29,15 +27,23 @@ app.use(
 );
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // Use 'windowMs' instead of 'windows'
+  windowMs: 15 * 60 * 1000,
   max: 100,
 });
 
 app.use(limiter);
 app.use(express.json());
 app.use(helmet());
+app.use(cookieParser());
 
-app.use("/api/auth", forumRoutes[AUTH_TYPES.BASIC]);
+// CSRF token endpoint (must match what your frontend is requesting)
+app.get("/api/auth/csrf-token", csrfProtection, (req, res) => {
+  res.json({ csrfToken: req.csrfToken() });
+});
+
+const forumRoutes = (await import("./routes/forumRoutes.js")).default;
+app.use("/api/auth", forumRoutes);
+
 app.use((req, res) => res.status(404).send("Not found"));
 
-export default app; // Default export of app
+export default app;
