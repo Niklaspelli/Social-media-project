@@ -66,7 +66,11 @@ export const loginUser = async (req, res) => {
       console.log("Password comparison result:", match);
 
       if (match) {
-        const payload = { id: userRecord.id, username: userRecord.username };
+        const payload = {
+          id: userRecord.id,
+          username: userRecord.username,
+          avatar: userRecord.avatar, // Add the avatar here
+        };
         const accessToken = generateAccessToken(payload);
         const refreshToken = generateRefreshToken(payload);
         const csrfToken = generateCsrfToken(payload);

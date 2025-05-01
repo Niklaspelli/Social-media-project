@@ -7,7 +7,7 @@ const BackendURL = "http://localhost:5000";
 function ThreadDetail() {
   const { threadId } = useParams();
   const { authData } = useAuth();
-  const { accessToken, csrfToken } = authData;
+  const { username, avatar, accessToken, csrfToken } = authData;
   const [thread, setThread] = useState({});
   const [responses, setResponses] = useState([]);
   const [responseText, setResponseText] = useState("");
@@ -65,7 +65,6 @@ function ThreadDetail() {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
-
             "CSRF-TOKEN": csrfToken,
           },
           credentials: "include", // Include cookies in the request
@@ -92,7 +91,7 @@ function ThreadDetail() {
   const handleDeleteResponse = async (responseId) => {
     try {
       const response = await fetch(
-        `${BackendURL}/api/forum/responses/${responseId}`,
+        `${BackendURL}/api/auth/responses/${responseId}`,
         {
           method: "DELETE",
           headers: {
@@ -135,17 +134,40 @@ function ThreadDetail() {
 
   return (
     <div>
+      {/* Thread Title and Body with Username */}
       <h1 style={{ textAlign: "center" }}>{thread.title}</h1>
-      <p style={{ textAlign: "center", background: "grey", padding: "10px" }}>
-        {thread.body}
-      </p>
+      <div style={StyleContainer}>
+        <div style={RespContainer}>
+          <img
+            src={thread.avatar || "default-avatar.jpg"} // Avatar of the thread creator
+            alt="avatar"
+            style={{
+              width: 50,
+              height: 50,
+              borderRadius: "50%",
+              marginRight: "10px",
+            }}
+          />
+          <div style={textContent}>
+            <Link to={`/user/${thread.user_id}`}>
+              <strong>{thread.username}</strong>
+            </Link>
+            <p>{thread.body}</p>
+            <p style={{ fontSize: "0.8em", color: "#999" }}>
+              ({new Date(thread.created_at).toLocaleString()})
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Responses */}
       <div>
         {responses.length > 0 ? (
           responses.map((res) => (
-            <div style={StyleContainer}>
-              <div style={RespContainer} key={res.id}>
+            <div style={StyleContainer} key={res.id}>
+              <div style={threadCreator}>
                 <img
-                  src={res.avatar}
+                  src={res.avatar || "default-avatar.jpg"} // Avatar for the response poster
                   alt="avatar"
                   style={{
                     width: 50,
@@ -155,7 +177,6 @@ function ThreadDetail() {
                   }}
                 />
                 <div style={textContent}>
-                  {/* Use Link to navigate to the user profile */}
                   <Link to={`/user/${res.user_id}`}>
                     <strong>{res.username}</strong>
                   </Link>{" "}
@@ -164,7 +185,6 @@ function ThreadDetail() {
                   <p style={{ fontSize: "0.8em", color: "#999" }}>
                     ({new Date(res.created_at).toLocaleString()})
                   </p>
-                  {/* Add the delete button */}
                   {res.userId === authData.id && (
                     <div>
                       <button
@@ -177,7 +197,6 @@ function ThreadDetail() {
                       >
                         Delete
                       </button>
-                      {/* Show deletion error for this specific response if it exists */}
                       {deleteErrors[res.id] && (
                         <p style={{ color: "red" }}>{deleteErrors[res.id]}</p>
                       )}
@@ -190,7 +209,9 @@ function ThreadDetail() {
         ) : (
           <p>No responses yet.</p>
         )}
-      </div>{" "}
+      </div>
+
+      {/* Response Form */}
       <div style={StyleContainer}>
         <form onSubmit={handleResponseSubmit}>
           <textarea
@@ -240,6 +261,27 @@ const StyleContainer = {
   margin: "20px",
 };
 
+const threadCreator = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "flex-start",
+  justifyContent: "center",
+  marginBottom: "15px",
+  margin: "5px",
+
+  width: "100%", // Full width of the parent
+  maxWidth: "500px", // Limit the max width
+  borderRadius: "20px",
+  padding: "15px",
+  boxSizing: "border-box",
+  boxShadow: "2px 2px 0px black",
+  backgroundColor: "white",
+  background: "hsla(0, 2.70%, 50.00%, 0.78)", // Fully transparent background
+
+  backdropFilter: "blur(8px)", // Blur the background content behind the element
+  overflowWrap: "break-word", // Ensure long words break
+};
+
 const RespContainer = {
   display: "flex",
   flexDirection: "column",
@@ -255,7 +297,7 @@ const RespContainer = {
   boxSizing: "border-box",
   boxShadow: "2px 2px 0px black",
   backgroundColor: "white",
-  background: "hsla(0, 1%, 13%, 0.781)", // Fully transparent background
+  background: "hsla(0, 0.90%, 22.50%, 0.78)", // Fully transparent background
 
   backdropFilter: "blur(8px)", // Blur the background content behind the element
   overflowWrap: "break-word", // Ensure long words break

@@ -6,7 +6,7 @@ const BackendURL = "http://localhost:5000";
 
 function CreateThread() {
   const { authData } = useAuth(); // Use the custom hook
-  const { username, csrfToken, accessToken } = authData; // Destructure username from authData
+  const { username, csrfToken, accessToken, avatar } = authData; // Destructure username from authData
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [error, setError] = useState(null);

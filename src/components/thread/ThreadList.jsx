@@ -54,6 +54,10 @@ function ThreadList() {
               </Link>
             </h2>
             <p className="thread-body">{thread.body}</p>
+            <p>
+              <strong>Author:</strong> {thread.author}{" "}
+              {/* Display the author */}
+            </p>
           </div>
         ))
       ) : (

@@ -3,7 +3,7 @@ import { db } from "../config/db.js"; // Adjust this path based on your project 
 // Create a new thread
 export const createThread = (req, res) => {
   const { title, body } = req.body;
-  const userId = req.user.id; // Assuming user ID is stored in the token
+  const { id: userId, username, avatar } = req.user; // 👈 get everything from req.user
 
   // Validate input
   if (!title || !body) {
@@ -11,14 +11,22 @@ export const createThread = (req, res) => {
   }
 
   // SQL query to insert a new thread
-  const sql = "INSERT INTO threads (title, body, user_id) VALUES (?, ?, ?)";
-  db.query(sql, [title, body, userId], (err, result) => {
+  const sql =
+    "INSERT INTO threads (title, body, user_id, avatar, username) VALUES (?, ?, ?, ?, ?)";
+  db.query(sql, [title, body, userId, avatar, username], (err, result) => {
     if (err) {
       console.error("Error inserting thread:", err.message);
       return res.status(500).json({ error: "Internal Server Error" });
     }
     // Respond with the newly created thread data
-    res.status(201).json({ id: result.insertId, title, body });
+    res.status(201).json({
+      id: result.insertId,
+      title,
+      body,
+      user_id: userId,
+      avatar,
+      username,
+    });
   });
 };
 

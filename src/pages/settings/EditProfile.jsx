@@ -17,11 +17,19 @@ const EditProfile = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
+  const { username, csrfToken, accessToken } = authData; // Destructure username from authData
   const userId = authData.userId; // Assuming userId is set correctly
-  const token = authData.token; // Assuming token is set correctly
+
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+  }
 
   // Fetch user profile on component mount
   useEffect(() => {
+    const token = authData.accessToken || localStorage.getItem("accessToken");
+    console.log("Using token:", token);
     const fetchUserProfile = async () => {
       if (!token) {
         setError("Authentication token is missing.");
@@ -38,7 +46,7 @@ const EditProfile = () => {
       try {
         console.log("Fetching profile for userId:", userId); // Log for debugging
         const response = await fetch(
-          `http://localhost:3000/forum/users/${userId}`,
+          `http://localhost:5000/api/auth/users/${userId}`,
           {
             method: "GET",
             headers: {
@@ -73,7 +81,7 @@ const EditProfile = () => {
     };
 
     fetchUserProfile();
-  }, [token, userId]);
+  }, [authData.token, userId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -97,20 +105,22 @@ const EditProfile = () => {
       const method = mode === "edit" ? "PUT" : "POST"; // Method based on mode
       const url =
         mode === "edit"
-          ? `http://localhost:3000/forum/users/${userId}`
-          : `http://localhost:3000/forum/users`;
+          ? `http://localhost:5000/api/auth/users/${userId}`
+          : `http://localhost:5000/api/auth/users`;
 
       const body = {
         user_id: userId, // Ensure this matches what your API expects
         ...formData,
       };
+      const csrfToken = getCookie("csrfToken"); // Retrieve CSRF token
 
       console.log("Submitting data to:", url);
       const response = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          "CSRF-TOKEN": csrfToken, // Add CSRF token
+          Authorization: `Bearer ${authData.accessToken}`,
         },
         body: JSON.stringify(body),
       });
@@ -191,11 +201,11 @@ const EditProfile = () => {
                   <Form.Label>Relationship Status:</Form.Label>
                   <Form.Control
                     as="select"
-                    style={inputStyle} // Specify that this is a select element
-                    name="relationship_status" // Set the name of the control
-                    value={formData.relationship_status} // Bind the value to state
-                    onChange={handleChange} // Handle changes
-                    disabled={mode === "view"} // Disable if in "view" mode
+                    style={inputStyle}
+                    name="relationship_status"
+                    value={formData.relationship_status}
+                    onChange={handleChange}
+                    disabled={mode === "view"}
                   >
                     <option value="">Select</option>
                     <option value="Single">Single</option>
@@ -210,7 +220,6 @@ const EditProfile = () => {
                 <Form.Group className="mb-3">
                   <Form.Label>Location:</Form.Label>
                   <Form.Control
-                    typ="Placeholder"
                     type="text"
                     name="location"
                     value={formData.location}
@@ -243,6 +252,7 @@ const EditProfile = () => {
                     style={inputStyle}
                   />
                 </Form.Group>
+
                 <Form.Group className="mb-3">
                   <Form.Label>Bio:</Form.Label>
                   <Form.Control
@@ -257,10 +267,9 @@ const EditProfile = () => {
                   />
                 </Form.Group>
 
-                {/* Save button inside the form */}
                 {mode !== "view" && (
                   <Button
-                    type="submit" // Ensure this is the Save button
+                    type="submit"
                     style={{ backgroundColor: "black", marginTop: "10px" }}
                   >
                     Save
@@ -275,7 +284,6 @@ const EditProfile = () => {
               </Col>
             </Row>
           </Form>
-          {/* Edit and Cancel buttons outside the form */}
           <div style={{ marginTop: "10px", textAlign: "center" }}>
             {mode === "view" ? (
               <Button
@@ -287,7 +295,7 @@ const EditProfile = () => {
               </Button>
             ) : (
               <Button
-                type="button" // Ensure this is the Cancel button
+                type="button"
                 onClick={handleCancel}
                 style={{ backgroundColor: "black" }}
               >
@@ -322,13 +330,12 @@ const inputStyle = {
   transition: "border-color 0.3s ease",
   backgroundColor: "grey",
   color: "white",
-  border: "none",
 };
 
 const TextareStyle = {
   width: "90%",
   maxWidth: "600px",
-  height: "600px",
+  height: "150px", // Adjust height for textarea
   padding: "10px",
   borderRadius: "20px",
   border: "1px solid #ddd",
@@ -338,5 +345,4 @@ const TextareStyle = {
   transition: "border-color 0.3s ease",
   backgroundColor: "grey",
   color: "white",
-  border: "none",
 };
