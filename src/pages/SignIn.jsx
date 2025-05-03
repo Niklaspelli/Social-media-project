@@ -13,13 +13,13 @@ const SignIn = () => {
   const [csrfToken, setCsrfToken] = useState(""); // New state for CSRF token
   const errRef = useRef();
   const navigate = useNavigate();
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, authData } = useAuth();
 
   // Fetch CSRF token once when the component is mounted
   useEffect(() => {
     // Redirect if already authenticated
     if (isAuthenticated) {
-      navigate("/forum");
+      navigate(`/user/${authData.id}`);
     }
 
     const fetchCsrfToken = async () => {
@@ -79,7 +79,7 @@ const SignIn = () => {
           // Successful login
           login(username, userId, avatar, accessToken);
           localStorage.setItem("accessToken", accessToken); // Store access token
-          navigate("/forum"); // Navigate to the forum page
+          navigate(`/user/${userId}`);
         } else {
           setError("Authentication failed. Please try again.");
         }

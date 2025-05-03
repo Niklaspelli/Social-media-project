@@ -30,8 +30,8 @@ function App() {
 
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/forum" element={<Forum />} />
           <Route path="/user/:id" element={<UserProfile />} />{" "}
+          <Route path="/forum" element={<Forum />} />
           {/* Ensure UserProfile is imported */}
           <Route path="/settings/:id" element={<Settings />} />
           <Route path="/create-profile" element={<CreateProfile />} />

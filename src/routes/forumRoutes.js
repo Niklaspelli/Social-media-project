@@ -1,7 +1,6 @@
 import express from "express";
 import { authenticateJWT } from "../middleware/authMiddleware.js";
 import { verifyCsrfToken } from "../middleware/csrf.js";
-import { generateCsrfToken } from "../domain/auth_handler.js"; // Make sure you have this import
 
 import {
   registerUser,
@@ -17,6 +16,9 @@ import {
   getThreadWithResponses,
   postResponseToThread,
   deleteResponse,
+  likeResponse,
+  unlikeResponse,
+  getLikeCountForResponse,
 } from "../controllers/forumController.js";
 
 import {
@@ -56,7 +58,22 @@ router.post(
   verifyCsrfToken,
   postResponseToThread
 );
-
+//response routes
 router.delete("/responses/:responseId", authenticateJWT, deleteResponse); // Protected
+
+router.post(
+  "/responses/:responseId/like", // Use :responseId to make it dynamic
+  authenticateJWT,
+  verifyCsrfToken,
+  likeResponse
+);
+
+router.delete(
+  "/responses/:responseId/like", // Use :responseId to make it dynamic
+  authenticateJWT,
+  verifyCsrfToken,
+  unlikeResponse
+);
+router.get("/responses/:responseId/like-count", getLikeCountForResponse);
 
 export default router;

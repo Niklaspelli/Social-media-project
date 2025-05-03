@@ -55,8 +55,10 @@ function ThreadList() {
             </h2>
             <p className="thread-body">{thread.body}</p>
             <p>
-              <strong>Author:</strong> {thread.author}{" "}
-              {/* Display the author */}
+              <strong>Author:</strong> {thread.username}{" "}
+            </p>
+            <p style={{ fontSize: "0.8em", color: "#999" }}>
+              ({new Date(thread.created_at).toLocaleString()})
             </p>
           </div>
         ))

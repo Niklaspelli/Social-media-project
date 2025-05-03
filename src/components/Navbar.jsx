@@ -41,8 +41,11 @@ const Navbar = () => {
           ) : (
             <>
               <li>
+                <Link to={`/user/${authData.userId}`}>Profile</Link>
+              </li>
+              <li>
                 <Link to={`/settings/${authData.userId}`}>
-                  <FontAwesomeIcon icon={faUserEdit} /> Profile
+                  <FontAwesomeIcon icon={faUserEdit} /> Settings
                 </Link>
               </li>
               <li>

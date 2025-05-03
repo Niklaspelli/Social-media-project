@@ -157,3 +157,113 @@ export const deleteResponse = (req, res) => {
     res.status(200).json({ message: "Response deleted successfully." });
   });
 };
+
+// Like a response
+export const likeResponse = (req, res) => {
+  const { responseId } = req.params;
+  const userId = req.user?.id;
+
+  if (!responseId) {
+    return res.status(400).json({ error: "Response ID is required!" });
+  }
+
+  const checkLikeSql =
+    "SELECT * FROM response_likes WHERE response_id = ? AND user_id = ?";
+  db.query(checkLikeSql, [responseId, userId], (err, result) => {
+    if (err) {
+      console.error("Error checking like:", err.message);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    if (result.length > 0) {
+      return res
+        .status(400)
+        .json({ error: "You have already liked this response." });
+    }
+
+    const insertLikeSql =
+      "INSERT INTO response_likes (response_id, user_id) VALUES (?, ?)";
+    db.query(insertLikeSql, [responseId, userId], (err) => {
+      if (err) {
+        console.error("Error inserting like:", err.message);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+
+      // Fetch updated like count
+      const countSql =
+        "SELECT COUNT(*) AS likeCount FROM response_likes WHERE response_id = ?";
+      db.query(countSql, [responseId], (err, countResult) => {
+        if (err) {
+          console.error("Error fetching like count:", err.message);
+          return res.status(500).json({ error: "Internal Server Error" });
+        }
+
+        return res.status(201).json({
+          message: "Like added successfully!",
+          likeCount: countResult[0].likeCount,
+        });
+      });
+    });
+  });
+};
+
+// Unlike a response
+export const unlikeResponse = (req, res) => {
+  const { responseId } = req.params;
+  const userId = req.user?.id;
+
+  if (!responseId) {
+    return res.status(400).json({ error: "Response ID is required!" });
+  }
+
+  const deleteLikeSql =
+    "DELETE FROM response_likes WHERE response_id = ? AND user_id = ?";
+  db.query(deleteLikeSql, [responseId, userId], (err, result) => {
+    if (err) {
+      console.error("Error deleting like:", err.message);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ error: "Like not found." });
+    }
+
+    // Fetch updated like count
+    const countSql =
+      "SELECT COUNT(*) AS likeCount FROM response_likes WHERE response_id = ?";
+    db.query(countSql, [responseId], (err, countResult) => {
+      if (err) {
+        console.error("Error fetching like count:", err.message);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+
+      return res
+        .status(200)
+        .json({
+          message: "Like removed successfully!",
+          likeCount: countResult[0].likeCount,
+        });
+    });
+  });
+};
+
+// Get the like count for a response
+export const getLikeCountForResponse = (req, res) => {
+  const { responseId } = req.params; // Get responseId from the URL parameter
+
+  // Query to count likes for the specific response
+  const sql =
+    "SELECT COUNT(*) AS likeCount FROM response_likes WHERE response_id = ?";
+  db.query(sql, [responseId], (err, result) => {
+    if (err) {
+      console.error("Error fetching like count:", err.message);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    // If result is empty, assume 0 likes
+    const likeCount = result[0]?.likeCount || 0;
+
+    // Return the like count
+    res.status(200).json({ likeCount });
+  });
+};

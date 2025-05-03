@@ -84,7 +84,7 @@ function CreateThread() {
             style={inputStyle}
           />
           <textarea
-            maxLength="100"
+            maxLength="500"
             placeholder="Body"
             value={body}
             onChange={(e) => setBody(e.target.value)}

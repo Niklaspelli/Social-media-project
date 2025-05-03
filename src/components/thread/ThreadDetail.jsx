@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext"; // Adjust the path accordingly
+import LikeButton from "./LikeButton";
 
 const BackendURL = "http://localhost:5000";
 
@@ -203,6 +204,12 @@ function ThreadDetail() {
                     </div>
                   )}
                 </div>
+                <LikeButton
+                  threadId={res.id} // Pass the thread id
+                  responseId={res.id} // You could also use res.id for responseId
+                  initialLikeStatus={res.userHasLiked} // Assuming this is the "liked" state
+                  initialLikeCount={res.likeCount} // Pass the initial like count
+                />
               </div>
             </div>
           ))
