@@ -18,7 +18,7 @@
 .profile-title {
     text-align: center;
     /* Center the title */
-    font-size: 2.5em;
+    font-size: 1.5em;
     /* Larger font size */
     margin-bottom: 20px;
     /* Space below title */
@@ -28,7 +28,7 @@
 }
 
 .profile-details {
-    font-size: 1.2em;
+    font-size: 1em;
     /* Slightly larger text */
     line-height: 1.6;
     /* Improved readability */

@@ -37,5 +37,6 @@ export default Forum;
 const LoginContainerStyle = {
   marginBottom: "15px",
   display: "flex",
+  color: "white",
   justifyContent: "center",
 };

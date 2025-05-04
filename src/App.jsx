@@ -2,10 +2,10 @@ import React from "react";
 import { AuthProvider } from "./context/AuthContext"; // Import the context
 import Navbar from "./components/Navbar";
 import { Routes, Route, Navigate } from "react-router-dom"; // Add Navigate for redirection
-import SignIn from "./pages/SignIn";
-import SignUp from "./pages/SignUp";
+import SignIn from "./pages/Login.jsx";
+import SignUp from "./pages/Register.jsx";
 import Forum from "./pages/Forum";
-import Home from "./pages/Home";
+import AuthPage from "./pages/AuthPage.jsx";
 import Settings from "./pages/settings/Settings.jsx";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./auth/ProtectedRoute";
@@ -22,11 +22,12 @@ function App() {
       <Navbar />
       <Routes>
         {/* Redirect the root route to the login page */}
-        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/" element={<Navigate to="/auth" />} />
+        <Route path="/auth" element={<AuthPage />} />
 
         {/* Public routes */}
-        <Route path="/login" element={<SignIn />} />
-        <Route path="/signup" element={<SignUp />} />
+        {/*  <Route path="/login" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} /> */}
 
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>

@@ -125,7 +125,6 @@ const inputStyle = {
   outline: "none",
   fontSize: "16px",
   transition: "border-color 0.3s ease",
-  backgroundColor: "grey",
   color: "white",
   border: "none",
 };

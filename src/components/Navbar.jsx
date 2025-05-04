@@ -6,6 +6,7 @@ import {
   faUserEdit,
   faComments,
   faSignOutAlt,
+  faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import "../index.css";
 
@@ -41,7 +42,10 @@ const Navbar = () => {
           ) : (
             <>
               <li>
-                <Link to={`/user/${authData.userId}`}>Profile</Link>
+                <Link to={`/user/${authData.userId}`}>
+                  {" "}
+                  <FontAwesomeIcon icon={faUser} /> Profile
+                </Link>
               </li>
               <li>
                 <Link to={`/settings/${authData.userId}`}>

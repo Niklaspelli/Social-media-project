@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import "./UserProfile.css";
+import { Container, Row, Col, Image, Button } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLocationDot, faMusic } from "@fortawesome/free-solid-svg-icons";
 
 function UserProfile() {
   const { id } = useParams();
@@ -53,46 +55,55 @@ function UserProfile() {
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
-    <div className="profile-container">
+    <>
       <h1 className="profile-title">Profile Page</h1>
-      {profile ? (
-        <div className="profile-details">
-          <p style={{ color: "green" }}>
-            <strong>Username:</strong> <span>{profile.username}</span>
-          </p>
-          <p>
-            <strong>Avatar:</strong>{" "}
-            <img
-              src={profile.avatar}
-              alt="User Avatar"
-              className="user-avatar"
-            />
-          </p>
-          <p>
-            <strong>Sex:</strong> <span>{profile.sex}</span>
-          </p>
-          <p>
-            <strong>Relationship Status:</strong>{" "}
-            <span>{profile.relationship_status}</span>
-          </p>
-          <p>
-            <strong>Location:</strong> <span>{profile.location}</span>
-          </p>
-          <p>
-            <strong>Music Taste:</strong> <span>{profile.music_taste}</span>
-          </p>
-          <p>
-            <strong>Interests:</strong> <span>{profile.interest}</span>
-          </p>
-          <p>
-            <br />
-            <strong>Bio:</strong> <span>{profile.bio}</span>
-          </p>
-        </div>
-      ) : (
-        <p className="no-profile">No profile available.</p>
-      )}
-    </div>
+      <Container>
+        {profile ? (
+          <Row className="align-items-start">
+            <Col xs={12} md={4} className="text-center mb-3">
+              <Image
+                src={profile.avatar}
+                alt="User Avatar"
+                roundedCircle
+                width={200}
+                height={200}
+              />{" "}
+              <p style={{ color: "green" }}>
+                <strong>{profile.username}</strong>
+              </p>
+              <Button variant="outline-dark">Edit profile</Button>
+              <div className="mb-2">
+                <strong>Sex:</strong> <span>{profile.sex}</span>
+              </div>
+              <div className="mb-2">
+                <strong>Relationship Status:</strong>{" "}
+                <span>{profile.relationship_status}</span>
+              </div>
+              <Row>
+                <div className="mb-2">
+                  <FontAwesomeIcon icon={faLocationDot} />
+                  <span>{profile.location}</span>
+                </div>
+                <div className="mb-2">
+                  <FontAwesomeIcon icon={faMusic} />
+                  <span>{profile.music_taste}</span>
+                </div>
+              </Row>
+              <div className="mb-2">
+                <strong>Interests:</strong> <span>{profile.interest}</span>
+              </div>
+            </Col>{" "}
+            <Col xs={12} md={5}>
+              <div>
+                <strong>Bio:</strong> <span>{profile.bio}</span>
+              </div>
+            </Col>
+          </Row>
+        ) : (
+          <p className="no-profile">No profile available.</p>
+        )}
+      </Container>
+    </>
   );
 }
 
