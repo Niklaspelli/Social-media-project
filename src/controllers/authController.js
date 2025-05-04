@@ -159,8 +159,8 @@ export const deleteUser = (req, res) => {
 };
 
 export const updateAvatar = async (req, res) => {
-  const { userId, avatar } = req.body.updatedData;
-
+  const userId = req.user.id; // ✅ Comes from verified JWT
+  const { avatar } = req.body;
   if (!userId || !avatar) {
     return res
       .status(400)

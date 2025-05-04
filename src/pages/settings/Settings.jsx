@@ -24,9 +24,19 @@ const Settings = () => {
   const errRef = useRef();
 
   const userId = authData.userId;
-  const token = authData.token;
+  const token = authData.accessToken;
 
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+  }
+  console.log("authData:", authData);
+  console.log("userId:", userId);
+  console.log("token:", token);
   const handleDelete = async () => {
+    const csrfToken = getCookie("csrfToken");
+
     if (!token || !userId) {
       setError("ID or token is missing");
       return;
@@ -34,12 +44,14 @@ const Settings = () => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:3000/forum/users/${userId}`,
+        `http://localhost:5000/api/auth/users/${userId}`,
         {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
+            "CSRF-TOKEN": csrfToken,
           },
+          credentials: "include", // Include cookies in the request
         }
       );
       if (!response.ok) {
@@ -48,7 +60,7 @@ const Settings = () => {
           errorData.message || `Failed to delete user: ${response.statusText}`
         );
       }
-      localStorage.clear();
+      localStorage.removeItem("profilePicture"); // Clear only the profile picture from local storage
       setSuccess(true);
     } catch (error) {
       setErrMsg(error.message);
@@ -67,7 +79,7 @@ const Settings = () => {
     if (success) {
       setShowSuccessToast(true);
       setTimeout(() => {
-        navigate("/signup");
+        navigate("/auth");
       }, 3000);
     }
   }, [success, navigate]);
@@ -97,12 +109,8 @@ const Settings = () => {
             </div>
           )}
 
-          {/*  <CreateProfile /> */}
-
           <EditProfile />
           <ProfileAvatar
-            token={token} // Pass token if needed for API calls
-            userId={userId} // Pass userId if needed for API calls
             setSelectedPicture={handleSavePicture} // Correct prop name
           />
           <div style={StyleContainer}>

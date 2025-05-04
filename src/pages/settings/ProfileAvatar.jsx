@@ -1,15 +1,27 @@
 import React, { useState } from "react";
 import { Button, Modal, Alert } from "react-bootstrap";
+import { useAuth } from "../../context/AuthContext";
 
-const ProfileAvatar = ({ token, userId, setSelectedPicture }) => {
+const ProfileAvatar = ({ setSelectedPicture }) => {
   const [tempPicture, setTempPicture] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPictureModal, setShowPictureModal] = useState(false);
+  const { authData } = useAuth();
+
+  const userId = authData?.userId;
+  const token = authData?.accessToken;
 
   const openPictureModal = () => {
     setShowPictureModal(true);
     setTempPicture(""); // Reset tempPicture when opening modal
+  };
+
+  const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+    return null;
   };
 
   const handlePictureSelect = () => {
@@ -36,17 +48,23 @@ const ProfileAvatar = ({ token, userId, setSelectedPicture }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3000/forum/users/avatar", {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId, // Use the userId from state
-          updatedData: { avatar: tempPicture },
-        }),
-      });
+      const csrfToken = getCookie("csrfToken"); // Retrieve CSRF token
+      console.log("csrfToken:", csrfToken);
+      const response = await fetch(
+        "http://localhost:5000/api/auth/users/avatar",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "CSRF-Token": csrfToken,
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            avatar: tempPicture,
+          }),
+          credentials: "include",
+        }
+      );
 
       if (!response.ok) {
         throw new Error(
@@ -94,7 +112,7 @@ const ProfileAvatar = ({ token, userId, setSelectedPicture }) => {
               {error && <Alert variant="danger">{error}</Alert>}{" "}
               {/* Display error message */}
               <img
-                src={tempPicture || "https://via.placeholder.com/100"} // Default image if none selected
+                src={tempPicture || "https://i.pravatar.cc/100"} // pravatar works for placeholders
                 alt="Avatar"
                 className="picture"
                 onClick={handlePictureSelect}

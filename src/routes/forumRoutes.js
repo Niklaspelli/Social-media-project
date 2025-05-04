@@ -40,8 +40,8 @@ console.log("forumRoutes.js loaded");
 // 🛡️ Authentication routes
 router.post("/register", registerUser);
 router.post("/login", loginUser);
-router.delete("/users/:userId", authenticateJWT, deleteUser);
-router.put("/users/avatar", authenticateJWT, updateAvatar);
+router.delete("/users/:userId", authenticateJWT, verifyCsrfToken, deleteUser);
+router.put("/users/avatar", authenticateJWT, verifyCsrfToken, updateAvatar);
 
 // 👤 User Profile routes
 router.get("/users/:userId", authenticateJWT, getUserProfile);
