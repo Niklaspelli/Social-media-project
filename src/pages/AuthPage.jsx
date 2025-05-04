@@ -41,12 +41,12 @@ const AuthPage = () => {
 
   return (
     <Container fluid>
-      <Row style={{ height: "100vh" }}>
+      <Row>
         {/* Column: Form Section */}
         <Col
           md={6}
           className="d-flex align-items-center justify-content-center"
-          // Ensures form takes up full height
+          style={{ height: "100vh" }}
         >
           <div style={formContainerStyle}>
             {showSignUp ? (
@@ -70,9 +70,13 @@ const AuthPage = () => {
         {/* Column: Background Image */}
         <Col
           md={6}
-          style={backgroundImage}
           className="d-flex align-items-center justify-content-center"
-        ></Col>
+          style={{ height: "100vh" }}
+        >
+          <div style={logoMaskContainer}>
+            <h1 style={logoMaskedText}>Heavy Forum</h1>
+          </div>
+        </Col>
       </Row>
     </Container>
   );
@@ -82,21 +86,43 @@ export default AuthPage;
 
 const formContainerStyle = {
   width: "100%",
-  padding: "20px",
-  background: "linear-gradient(rgb(0, 0, 0), rgb(54, 54, 54))",
   backgroundSize: "cover",
   alignItems: "center",
   color: "white",
-  height: "100%", // Ensure the image takes up the full height
 };
 
 const backgroundImage = {
-  backgroundImage: "url('keyboard.jpg')", // Adjust the path to your image file
+  backgroundColor: "rgba(0, 0, 0, 0.7)", // Blur/dark overlay
+  backdropFilter: "blur(10px)",
+  WebkitBackdropFilter: "blur(10px)",
+  height: "100vh",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+};
+const logoMaskContainer = {
+  width: "100%",
+  height: "100vh",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  backgroundColor: "rgba(0, 0, 0, 0.6)",
+  backdropFilter: "blur(10px)",
+  WebkitBackdropFilter: "blur(10px)",
+};
+
+const logoMaskedText = {
+  fontSize: "10vw", // responsive, scales with screen width
+  fontWeight: "bold",
+  textTransform: "uppercase",
+  textAlign: "center",
+  width: "100%",
+  backgroundImage: "url('keyboard.jpg')",
   backgroundSize: "cover",
   backgroundPosition: "center",
   backgroundRepeat: "no-repeat",
-  height: "100%", // Ensure the image takes up the full height
-
-  backgroundColor: " hsla(0, 0%, 13%, 0.336)",
-  backdropFilter: "blur(8px)",
+  WebkitBackgroundClip: "text",
+  WebkitTextFillColor: "transparent",
+  color: "transparent",
+  margin: 0,
 };

@@ -56,8 +56,7 @@ function UserProfile() {
 
   return (
     <>
-      <h1 className="profile-title">Profile Page</h1>
-      <Container>
+      <Container style={{ color: "white" }}>
         {profile ? (
           <Row className="align-items-start">
             <Col xs={12} md={4} className="text-center mb-3">
@@ -71,7 +70,7 @@ function UserProfile() {
               <p style={{ color: "green" }}>
                 <strong>{profile.username}</strong>
               </p>
-              <Button variant="outline-dark">Edit profile</Button>
+              <Button variant="dark">Edit profile</Button>
               <div className="mb-2">
                 <strong>Sex:</strong> <span>{profile.sex}</span>
               </div>
