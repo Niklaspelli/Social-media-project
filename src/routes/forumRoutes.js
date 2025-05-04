@@ -27,6 +27,13 @@ import {
   getUserProfile,
 } from "../controllers/userProfileController.js";
 
+import {
+  sendFriendRequest,
+  acceptFriendRequest,
+  rejectFriendRequest,
+  getFriendshipStatus,
+} from "../controllers/friendController.js";
+
 const router = express.Router();
 
 router.get("/csrf-token", getCsrfToken); // ⬅️ Add this line
@@ -75,5 +82,10 @@ router.delete(
   unlikeResponse
 );
 router.get("/responses/:responseId/like-count", getLikeCountForResponse);
+
+router.post("/request", authenticateJWT, verifyCsrfToken, sendFriendRequest);
+router.post("/accept", authenticateJWT, verifyCsrfToken, acceptFriendRequest);
+router.post("/reject", authenticateJWT, verifyCsrfToken, rejectFriendRequest);
+router.get("/status/:userId1/:userId2", getFriendshipStatus);
 
 export default router;

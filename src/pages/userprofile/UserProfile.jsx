@@ -4,21 +4,31 @@ import { useAuth } from "../../context/AuthContext";
 import { Container, Row, Col, Image, Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot, faMusic } from "@fortawesome/free-solid-svg-icons";
+import FriendRequest from "./FriendRequest";
 
 function UserProfile() {
-  const { id } = useParams();
+  const { id: profileUserId } = useParams(); // Using `useParams` to get the profileUserId
+
   const { isAuthenticated } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [incomingRequest, setIncomingRequest] = useState(false);
 
+  const { authData } = useAuth();
+  const loggedInUserId = authData?.userId;
+
+  const [isFriend, setIsFriend] = useState(false);
+  const [isPending, setIsPending] = useState(false);
+
+  // Fetching the user profile only if the user is authenticated
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
 
     const fetchUserProfile = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/auth/users/${id}`,
+          `http://localhost:5000/api/auth/users/${profileUserId}`, // Profile of user fetched
           {
             method: "GET",
             credentials: "include",
@@ -34,75 +44,95 @@ function UserProfile() {
         }
 
         const data = await response.json();
-        setProfile(data);
+        setProfile(data); // Set the profile data
       } catch (err) {
         console.error("Error fetching user profile:", err);
-        setError(err.message);
+        setError(err.message); // Handle error
       } finally {
-        setLoading(false);
+        setLoading(false); // Loading is false once the request is completed
       }
     };
 
     if (isAuthenticated && token) {
-      fetchUserProfile();
+      fetchUserProfile(); // Fetch the profile only if the user is authenticated
     } else {
       setError("You must be logged in to view this profile.");
-      setLoading(false);
+      setLoading(false); // Loading is false if not authenticated
     }
-  }, [id, isAuthenticated]);
+  }, [profileUserId, isAuthenticated]); // Hook dependencies are profileUserId and isAuthenticated
+
+  useEffect(() => {
+    const fetchFriendshipStatus = async () => {
+      const response = await fetch(
+        `http://localhost:5000/api/auth/status/${loggedInUserId}/${profileUserId}`
+      );
+      const data = await response.json();
+      setIsFriend(data.isFriend);
+      setIsPending(data.isPending);
+      setIncomingRequest(data.incomingRequest); // <-- You’ll pass this to <FriendRequest />
+    };
+
+    if (loggedInUserId && profileUserId) {
+      fetchFriendshipStatus();
+    }
+  }, [loggedInUserId, profileUserId]);
 
   if (loading) return <p>Loading user profile...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
-    <>
-      <Container style={{ color: "white" }}>
-        {profile ? (
-          <Row className="align-items-start">
-            <Col xs={12} md={4} className="text-center mb-3">
-              <Image
-                src={profile.avatar}
-                alt="User Avatar"
-                roundedCircle
-                width={200}
-                height={200}
-              />{" "}
-              <p style={{ color: "green" }}>
-                <strong>{profile.username}</strong>
-              </p>
-              <Button variant="dark">Edit profile</Button>
+    <Container style={{ color: "white" }}>
+      {profile ? (
+        <Row className="align-items-start">
+          <Col xs={12} md={4} className="text-center mb-3">
+            <Image
+              src={profile.avatar}
+              alt="User Avatar"
+              roundedCircle
+              width={200}
+              height={200}
+            />
+            <p style={{ color: "green" }}>
+              <strong>{profile.username}</strong>
+            </p>
+            <FriendRequest
+              profileUserId={profileUserId}
+              loggedInUserId={loggedInUserId}
+              isFriend={isFriend}
+              isPending={isPending}
+              incomingRequest={incomingRequest}
+            />
+            <div className="mb-2">
+              <strong>Sex:</strong> <span>{profile.sex}</span>
+            </div>
+            <div className="mb-2">
+              <strong>Relationship Status:</strong>{" "}
+              <span>{profile.relationship_status}</span>
+            </div>
+            <Row>
               <div className="mb-2">
-                <strong>Sex:</strong> <span>{profile.sex}</span>
+                <FontAwesomeIcon icon={faLocationDot} />
+                <span>{profile.location}</span>
               </div>
               <div className="mb-2">
-                <strong>Relationship Status:</strong>{" "}
-                <span>{profile.relationship_status}</span>
+                <FontAwesomeIcon icon={faMusic} />
+                <span>{profile.music_taste}</span>
               </div>
-              <Row>
-                <div className="mb-2">
-                  <FontAwesomeIcon icon={faLocationDot} />
-                  <span>{profile.location}</span>
-                </div>
-                <div className="mb-2">
-                  <FontAwesomeIcon icon={faMusic} />
-                  <span>{profile.music_taste}</span>
-                </div>
-              </Row>
-              <div className="mb-2">
-                <strong>Interests:</strong> <span>{profile.interest}</span>
-              </div>
-            </Col>{" "}
-            <Col xs={12} md={5}>
-              <div>
-                <strong>Bio:</strong> <span>{profile.bio}</span>
-              </div>
-            </Col>
-          </Row>
-        ) : (
-          <p className="no-profile">No profile available.</p>
-        )}
-      </Container>
-    </>
+            </Row>
+            <div className="mb-2">
+              <strong>Interests:</strong> <span>{profile.interest}</span>
+            </div>
+          </Col>
+          <Col xs={12} md={5}>
+            <div>
+              <strong>Bio:</strong> <span>{profile.bio}</span>
+            </div>
+          </Col>
+        </Row>
+      ) : (
+        <p className="no-profile">No profile available.</p>
+      )}
+    </Container>
   );
 }
 
