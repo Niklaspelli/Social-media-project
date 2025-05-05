@@ -17,8 +17,8 @@ Deployment	Vite for fast development builds
 🔐 Security Measures
 Password Hashing: All user passwords are securely hashed using bcrypt before storing in the database.
 
-JWT Authentication: Secure login flow using access tokens, stored in HTTPOnly cookies to prevent XSS attacks.
-
+JWT Authentication: Secure login flow using access tokens. Store tokens in HTTPOnly cookies to prevent access via 
+JavaScript (mitigating XSS risks). Use CSRF tokens to protect state-changing requests from CSRF attacks
 Authorization Middleware: Custom middleware checks token validity and protects API routes from unauthorized access.
 
 CORS Config: Backend uses CORS with credentials enabled, allowing only trusted origins.
