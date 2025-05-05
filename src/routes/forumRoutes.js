@@ -32,6 +32,7 @@ import {
   acceptFriendRequest,
   rejectFriendRequest,
   getFriendshipStatus,
+  getFriendsList,
 } from "../controllers/friendController.js";
 
 const router = express.Router();
@@ -87,5 +88,6 @@ router.post("/request", authenticateJWT, verifyCsrfToken, sendFriendRequest);
 router.post("/accept", authenticateJWT, verifyCsrfToken, acceptFriendRequest);
 router.post("/reject", authenticateJWT, verifyCsrfToken, rejectFriendRequest);
 router.get("/status/:userId1/:userId2", getFriendshipStatus);
+router.get("/friends/:userId", authenticateJWT, getFriendsList);
 
 export default router;

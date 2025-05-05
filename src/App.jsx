@@ -13,6 +13,8 @@ import CreateThread from "./components/thread/CreateThread"; // Adjust the path 
 import ThreadList from "./components/thread/ThreadList"; // Adjust the path accordingly
 import ThreadDetail from "./components/thread/ThreadDetail"; // Adjust the path accordingly
 import UserProfile from "./pages/userprofile/UserProfile"; // Import the UserProfile component
+import FriendList from "./pages/userprofile/FriendList"; // Import the UserProfile component
+
 import EditProfile from "./pages/settings/EditProfile.jsx";
 import CreateProfile from "./pages/settings/CreateProfile.jsx";
 
@@ -31,7 +33,8 @@ function App() {
 
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/user/:id" element={<UserProfile />} />{" "}
+          <Route path="/user/:id" element={<UserProfile />} />
+          <Route path="/friends/:id" element={<FriendList />} />
           <Route path="/forum" element={<Forum />} />
           {/* Ensure UserProfile is imported */}
           <Route path="/settings/:id" element={<Settings />} />

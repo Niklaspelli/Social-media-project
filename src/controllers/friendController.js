@@ -113,3 +113,24 @@ export const getFriendshipStatus = (req, res) => {
     return res.json({ isFriend, isPending, incomingRequest });
   });
 };
+
+// Example route: GET /api/friends/:userId
+export const getFriendsList = (req, res) => {
+  const userId = req.user?.id; // Safely access user ID
+
+  const sql = `
+    SELECT u.id, u.username, u.avatar
+    FROM friend_requests fr
+    JOIN users u ON (u.id = fr.sender_id OR u.id = fr.receiver_id)
+    WHERE (fr.sender_id = ? OR fr.receiver_id = ?)
+      AND fr.status = 'accepted'
+      AND u.id != ?
+  `;
+
+  db.query(sql, [userId, userId, userId], (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: "Database error." });
+    }
+    res.status(200).json(results);
+  });
+};
