@@ -3,6 +3,11 @@ import { authenticateJWT } from "../middleware/authMiddleware.js";
 import { verifyCsrfToken } from "../middleware/csrf.js";
 
 import {
+  getCompleteUserProfile,
+  getUserById,
+} from "../controllers/userController.js";
+
+import {
   registerUser,
   loginUser,
   getCsrfToken,
@@ -33,6 +38,7 @@ import {
   rejectFriendRequest,
   getFriendshipStatus,
   getFriendsList,
+  getFriendCount,
 } from "../controllers/friendController.js";
 
 const router = express.Router();
@@ -52,6 +58,15 @@ router.delete("/users/:userId", authenticateJWT, verifyCsrfToken, deleteUser);
 router.put("/users/avatar", authenticateJWT, verifyCsrfToken, updateAvatar);
 
 // 👤 User Profile routes
+router.get(
+  "/profile",
+  authenticateJWT,
+  verifyCsrfToken,
+  getCompleteUserProfile
+);
+
+router.get("/profile/:userId", authenticateJWT, verifyCsrfToken, getUserById);
+
 router.get("/users/:userId", authenticateJWT, getUserProfile);
 router.post("/users", authenticateJWT, createOrUpdateUserProfile);
 router.put("/users/:userId", authenticateJWT, updateUserProfile);
@@ -89,5 +104,6 @@ router.post("/accept", authenticateJWT, verifyCsrfToken, acceptFriendRequest);
 router.post("/reject", authenticateJWT, verifyCsrfToken, rejectFriendRequest);
 router.get("/status/:userId1/:userId2", getFriendshipStatus);
 router.get("/friends/:userId", authenticateJWT, getFriendsList);
+router.get("/friends/count/:userId", authenticateJWT, getFriendCount);
 
 export default router;

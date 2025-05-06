@@ -31,9 +31,7 @@ const Settings = () => {
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(";").shift();
   }
-  console.log("authData:", authData);
-  console.log("userId:", userId);
-  console.log("token:", token);
+
   const handleDelete = async () => {
     const csrfToken = getCookie("csrfToken");
 

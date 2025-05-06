@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { Container, Row, Col, Image, Spinner, Alert } from "react-bootstrap";
+import { useParams } from "react-router-dom"; // Import useParams to get the profileUserId
+import FriendRequest from "./FriendRequest"; // Import FriendRequest component
+import { Container, Row, Col, Image } from "react-bootstrap";
 
 function FriendList() {
-  const { id: profileUserId } = useParams(); // Profile being viewed
   const { authData } = useAuth();
   const token = authData?.accessToken;
+  const loggedInUserId = authData?.userId; // Assuming logged-in user ID is available in authData
+
+  const { id: profileUserId } = useParams(); // Get the profileUserId from the URL
 
   const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -20,55 +22,49 @@ function FriendList() {
           {
             headers: {
               Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
             },
           }
         );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch friends list");
-        }
-
         const data = await response.json();
         setFriends(data);
-      } catch (err) {
-        setError(err.message);
+      } catch (error) {
+        console.error("Error fetching friends:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    if (profileUserId && token) {
-      fetchFriends();
-    }
+    fetchFriends();
   }, [profileUserId, token]);
 
-  if (loading) return <Spinner animation="border" variant="light" />;
-  if (error) return <Alert variant="danger">{error}</Alert>;
+  if (loading) return <div>Loading...</div>;
 
   return (
-    <Container style={{ color: "white" }}>
-      <h2 className="mb-4">Friends</h2>
-      {friends.length === 0 ? (
-        <p>This user has no friends yet.</p>
-      ) : (
-        <Row>
-          {friends.map((friend) => (
-            <Col key={friend.id} xs={12} md={2} className="mb-4 text-center">
-              <Image
-                src={friend.avatar}
-                alt={friend.username}
-                roundedCircle
-                width={100}
-                height={100}
-              />
-              <Link to={`/user/${friend.id}`}>
-                <strong>{friend.username}</strong>
-              </Link>
-            </Col>
-          ))}
-        </Row>
-      )}
+    <Container>
+      <h2>Friends List</h2>
+      <Row>
+        {friends.map((friend) => (
+          <Col key={friend.id} xs={12} md={4} className="mb-4 text-center">
+            <Image
+              src={friend.avatar}
+              alt={friend.username}
+              roundedCircle
+              width={100}
+              height={100}
+            />
+            <p>{friend.username}</p>
+
+            {/* FriendRequest component being passed the necessary props */}
+            <FriendRequest
+              profileUserId={friend.id} // Use profileUserId from useParams
+              loggedInUserId={loggedInUserId}
+              isFriend={false}
+              isPending={friend.isPending}
+              incomingRequest={friend.incomingRequest}
+            />
+          </Col>
+        ))}
+      </Row>
     </Container>
   );
 }

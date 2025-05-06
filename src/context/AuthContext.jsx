@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-// AuthContext stores authentication data and handles login/logout
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -8,42 +7,91 @@ export const AuthProvider = ({ children }) => {
     username: null,
     userId: null,
     avatar: null,
-    accessToken: null, // New state for accessToken
+    accessToken: null,
+    numberOfFriends: null,
+    profile: null,
   });
 
-  // Check for saved access token on startup
+  const [loading, setLoading] = useState(true); // Loading state for async operations
+
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+  }
+
+  // 1. Load access token from localStorage on initial mount
   useEffect(() => {
     const savedToken = localStorage.getItem("accessToken");
     if (savedToken) {
-      setAuthData((prevState) => ({
-        ...prevState,
-        accessToken: savedToken,
-      }));
+      setAuthData((prev) => ({ ...prev, accessToken: savedToken }));
+    } else {
+      setLoading(false);
     }
   }, []);
 
-  // Login function stores user data and the access token in the state and localStorage
+  // 2. Fetch full profile once token is available
+  useEffect(() => {
+    const csrfToken = getCookie("csrfToken"); // Retrieve CSRF token from cookies
+    const fetchCompleteUserProfile = async () => {
+      if (!authData.accessToken || !csrfToken) return; // Ensure both token and csrf are present
+
+      try {
+        const res = await fetch(`http://localhost:5000/api/auth/profile`, {
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authData.accessToken}`,
+            "CSRF-TOKEN": csrfToken,
+          },
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          setAuthData((prev) => ({
+            ...prev,
+            data,
+          }));
+        } else {
+          console.error("Failed to fetch full profile:", data.error);
+        }
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+      } finally {
+        setLoading(false); // Once data is fetched, stop loading
+      }
+    };
+
+    fetchCompleteUserProfile();
+  }, [authData.accessToken]); // Runs again when accessToken changes
+
+  // 3. Login function
   const login = (username, userId, avatar, accessToken) => {
     setAuthData({ username, userId, avatar, accessToken });
     localStorage.setItem("accessToken", accessToken);
   };
 
-  // Logout function clears the state and removes access token from localStorage
+  // 4. Logout function
   const logout = () => {
     setAuthData({
       username: null,
       userId: null,
       avatar: null,
       accessToken: null,
+      numberOfFriends: null,
+      profile: null,
     });
-    localStorage.removeItem("accessToken"); // Clear the token from localStorage
+    localStorage.removeItem("accessToken");
   };
 
-  // isAuthenticated is true if username exists (logged in state)
   const isAuthenticated = Boolean(authData.username);
+  const isLoading = loading; // Check if data is still being loaded
 
   return (
-    <AuthContext.Provider value={{ authData, login, logout, isAuthenticated }}>
+    <AuthContext.Provider
+      value={{ authData, login, logout, isAuthenticated, isLoading }}
+    >
       {children}
     </AuthContext.Provider>
   );

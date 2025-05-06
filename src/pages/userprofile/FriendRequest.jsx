@@ -20,7 +20,14 @@ function FriendRequest({
     if (parts.length === 2) return parts.pop().split(";").shift();
   };
 
-  // Send friend request
+  // Prevent showing the "Add as friend" button for the logged-in user
+  if (profileUserId === loggedInUserId) {
+    return <div>You cannot send a friend request to yourself.</div>;
+  }
+
+  console.log("profileuserid:", profileUserId);
+
+  console.log("loggedinuserid:", loggedInUserId); // Send friend request
   const sendFriendRequest = async () => {
     const csrfToken = getCookie("csrfToken");
 
@@ -101,11 +108,15 @@ function FriendRequest({
   return (
     <div>
       {/* Already Friends */}
-      {isFriend && <p>You are friends with this user!</p>}
+      {isFriend && (
+        <div style={inputStyle}>You are friends with this user!</div>
+      )}
 
       {/* Incoming Friend Request (receiver sees Accept/Reject) */}
-      {loggedInUserId === profileUserId && isPending && (
+      {isPending && incomingRequest && (
         <div>
+          {" "}
+          <p>{profileUserId} wants to be your friend</p>
           <Button variant="dark" onClick={acceptFriendRequest}>
             Accept
           </Button>
@@ -116,14 +127,29 @@ function FriendRequest({
       )}
 
       {/* Outgoing Friend Request (sender sees pending text) */}
-      {isPending && !incomingRequest && <p>Friend request pending...</p>}
+      {isPending && !incomingRequest && profileUserId && (
+        <p>Friend request pending...</p>
+      )}
 
       {/* Not Friends and No Request Yet */}
-      {!isFriend && !isPending && (
-        <Button onClick={sendFriendRequest}>Send Friend Request</Button>
-      )}
+      {!isFriend &&
+        !isPending &&
+        loggedInUserId !==
+        <Button onClick={sendFriendRequest}>Send Friend Request</Button>}
     </div>
   );
 }
 
 export default FriendRequest;
+
+const inputStyle = {
+  borderRadius: "20px",
+  border: "1px solid #ddd",
+  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+  outline: "none",
+  fontSize: "16px",
+  transition: "border-color 0.3s ease",
+  backgroundColor: "grey",
+  color: "white",
+  border: "none",
+};

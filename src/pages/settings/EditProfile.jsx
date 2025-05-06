@@ -29,7 +29,6 @@ const EditProfile = () => {
   // Fetch user profile on component mount
   useEffect(() => {
     const token = authData.accessToken || localStorage.getItem("accessToken");
-    console.log("Using token:", token);
     const fetchUserProfile = async () => {
       if (!token) {
         setError("Authentication token is missing.");
@@ -44,7 +43,6 @@ const EditProfile = () => {
       }
 
       try {
-        console.log("Fetching profile for userId:", userId); // Log for debugging
         const response = await fetch(
           `http://localhost:5000/api/auth/users/${userId}`,
           {
@@ -81,7 +79,7 @@ const EditProfile = () => {
     };
 
     fetchUserProfile();
-  }, [authData.token, userId]);
+  }, [accessToken, userId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

@@ -4,7 +4,6 @@ import { useAuth } from "../../context/AuthContext";
 import { Container, Row, Col, Image, Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot, faMusic } from "@fortawesome/free-solid-svg-icons";
-import FriendRequest from "./FriendRequest";
 
 function UserProfile() {
   const { id: profileUserId } = useParams(); // Using `useParams` to get the profileUserId
@@ -16,7 +15,6 @@ function UserProfile() {
   const [incomingRequest, setIncomingRequest] = useState(false);
 
   const { authData } = useAuth();
-  const loggedInUserId = authData?.userId;
 
   const [isFriend, setIsFriend] = useState(false);
   const [isPending, setIsPending] = useState(false);
@@ -28,7 +26,7 @@ function UserProfile() {
     const fetchUserProfile = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/auth/users/${profileUserId}`, // Profile of user fetched
+          `http://localhost:5000/api/auth/profile/${profileUserId}`, // Profile of user fetched
           {
             method: "GET",
             credentials: "include",
@@ -61,22 +59,6 @@ function UserProfile() {
     }
   }, [profileUserId, isAuthenticated]); // Hook dependencies are profileUserId and isAuthenticated
 
-  useEffect(() => {
-    const fetchFriendshipStatus = async () => {
-      const response = await fetch(
-        `http://localhost:5000/api/auth/status/${loggedInUserId}/${profileUserId}`
-      );
-      const data = await response.json();
-      setIsFriend(data.isFriend);
-      setIsPending(data.isPending);
-      setIncomingRequest(data.incomingRequest); // <-- You’ll pass this to <FriendRequest />
-    };
-
-    if (loggedInUserId && profileUserId) {
-      fetchFriendshipStatus();
-    }
-  }, [loggedInUserId, profileUserId]);
-
   if (loading) return <p>Loading user profile...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
@@ -95,13 +77,11 @@ function UserProfile() {
             <p style={{ color: "green" }}>
               <strong>{profile.username}</strong>
             </p>
-            <FriendRequest
-              profileUserId={profileUserId}
-              loggedInUserId={loggedInUserId}
-              isFriend={isFriend}
-              isPending={isPending}
-              incomingRequest={incomingRequest}
-            />
+            <p>
+              <strong>
+                Followers: <span>{profile.numberOfFriends}</span>
+              </strong>
+            </p>
             <div className="mb-2">
               <strong>Sex:</strong> <span>{profile.sex}</span>
             </div>

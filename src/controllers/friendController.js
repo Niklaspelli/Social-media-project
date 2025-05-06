@@ -2,10 +2,18 @@ import { db } from "../config/db.js";
 
 export const sendFriendRequest = (req, res) => {
   const senderId = req.user.id; // Logged-in user
-  const { receiverId } = req.body; // Target user
+  const { receiverId } = req.body;
 
+  // Validate required fields first
   if (!receiverId) {
     return res.status(400).json({ error: "Receiver ID is required." });
+  }
+
+  // Prevent sending a friend request to yourself
+  if (Number(senderId) === Number(receiverId)) {
+    return res
+      .status(400)
+      .json({ error: "You cannot send a friend request to yourself." });
   }
 
   const sql = `
@@ -19,7 +27,7 @@ export const sendFriendRequest = (req, res) => {
       return res.status(500).json({ error: "Internal Server Error" });
     }
 
-    res.status(201).json({ message: "Friend request sent!" });
+    return res.status(201).json({ message: "Friend request sent!" });
   });
 };
 
@@ -116,21 +124,68 @@ export const getFriendshipStatus = (req, res) => {
 
 // Example route: GET /api/friends/:userId
 export const getFriendsList = (req, res) => {
-  const userId = req.user?.id; // Safely access user ID
+  const loggedInUserId = req.user?.id;
+
+  if (!loggedInUserId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
 
   const sql = `
-    SELECT u.id, u.username, u.avatar
-    FROM friend_requests fr
-    JOIN users u ON (u.id = fr.sender_id OR u.id = fr.receiver_id)
-    WHERE (fr.sender_id = ? OR fr.receiver_id = ?)
-      AND fr.status = 'accepted'
-      AND u.id != ?
+    SELECT 
+      u.id, u.username, u.avatar,
+      CASE 
+        WHEN fr.status = 'accepted' THEN 'friend'
+        WHEN fr.status = 'pending' AND fr.receiver_id = ? THEN 'incoming'
+        WHEN fr.status = 'pending' AND fr.sender_id = ? THEN 'outgoing'
+        ELSE 'none'
+      END AS friendship_status
+    FROM users u
+    LEFT JOIN friend_requests fr ON (
+      (fr.sender_id = ? AND fr.receiver_id = u.id)
+      OR
+      (fr.receiver_id = ? AND fr.sender_id = u.id)
+    )
+    WHERE u.id != ?
   `;
 
-  db.query(sql, [userId, userId, userId], (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: "Database error." });
+  db.query(
+    sql,
+    [
+      loggedInUserId,
+      loggedInUserId,
+      loggedInUserId,
+      loggedInUserId,
+      loggedInUserId,
+    ],
+    (err, results) => {
+      if (err) {
+        console.error("Error fetching friends list:", err.message);
+        return res.status(500).json({ error: "Database error." });
+      }
+
+      return res.status(200).json(results);
     }
-    res.status(200).json(results);
+  );
+};
+
+export const getFriendCount = (req, res) => {
+  const { userId } = req.params;
+
+  const sql = `
+    SELECT COUNT(*) AS friendCount
+    FROM friend_requests
+    WHERE 
+      (sender_id = ? OR receiver_id = ?)
+      AND status = 'accepted'
+  `;
+
+  db.query(sql, [userId, userId], (err, results) => {
+    if (err) {
+      console.error("Error getting friend count:", err.message);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    const friendCount = results[0].friendCount || 0;
+    res.json({ numberOfFriends: friendCount });
   });
 };
