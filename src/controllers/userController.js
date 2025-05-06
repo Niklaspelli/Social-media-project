@@ -50,7 +50,7 @@ export const getCompleteUserProfile = (req, res) => {
 };
 
 export const getUserById = (req, res) => {
-  const userId = req.params;
+  const { userId } = req.params;
 
   const sql = `
       SELECT 

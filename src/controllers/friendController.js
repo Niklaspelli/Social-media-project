@@ -122,7 +122,6 @@ export const getFriendshipStatus = (req, res) => {
   });
 };
 
-// Example route: GET /api/friends/:userId
 export const getFriendsList = (req, res) => {
   const loggedInUserId = req.user?.id;
 
@@ -132,31 +131,18 @@ export const getFriendsList = (req, res) => {
 
   const sql = `
     SELECT 
-      u.id, u.username, u.avatar,
-      CASE 
-        WHEN fr.status = 'accepted' THEN 'friend'
-        WHEN fr.status = 'pending' AND fr.receiver_id = ? THEN 'incoming'
-        WHEN fr.status = 'pending' AND fr.sender_id = ? THEN 'outgoing'
-        ELSE 'none'
-      END AS friendship_status
+      u.id, u.username, u.avatar
     FROM users u
-    LEFT JOIN friend_requests fr ON (
-      (fr.sender_id = ? AND fr.receiver_id = u.id)
-      OR
-      (fr.receiver_id = ? AND fr.sender_id = u.id)
+    JOIN friend_requests fr ON (
+      (fr.sender_id = u.id AND fr.receiver_id = ?) OR
+      (fr.receiver_id = u.id AND fr.sender_id = ?)
     )
-    WHERE u.id != ?
+    WHERE fr.status = 'accepted' AND u.id != ?
   `;
 
   db.query(
     sql,
-    [
-      loggedInUserId,
-      loggedInUserId,
-      loggedInUserId,
-      loggedInUserId,
-      loggedInUserId,
-    ],
+    [loggedInUserId, loggedInUserId, loggedInUserId],
     (err, results) => {
       if (err) {
         console.error("Error fetching friends list:", err.message);

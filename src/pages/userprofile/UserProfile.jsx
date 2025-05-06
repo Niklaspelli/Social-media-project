@@ -19,21 +19,30 @@ function UserProfile() {
   const [isFriend, setIsFriend] = useState(false);
   const [isPending, setIsPending] = useState(false);
 
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+  }
+
   // Fetching the user profile only if the user is authenticated
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
 
     const fetchUserProfile = async () => {
       try {
+        const csrfToken = getCookie("csrfToken"); // You need to implement getCookie
+
         const response = await fetch(
           `http://localhost:5000/api/auth/profile/${profileUserId}`, // Profile of user fetched
           {
             method: "GET",
-            credentials: "include",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`, // ✅ Include token
+              Authorization: `Bearer ${token}`,
+              "CSRF-TOKEN": csrfToken, // ✅ Include token
             },
+            credentials: "include",
           }
         );
 
@@ -42,6 +51,8 @@ function UserProfile() {
         }
 
         const data = await response.json();
+        console.log("Fetched user profile:", data); // ✅ log entire user object
+
         setProfile(data); // Set the profile data
       } catch (err) {
         console.error("Error fetching user profile:", err);

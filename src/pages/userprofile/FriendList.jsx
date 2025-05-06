@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { useParams } from "react-router-dom"; // Import useParams to get the profileUserId
-import FriendRequest from "./FriendRequest"; // Import FriendRequest component
+import { useParams } from "react-router-dom";
 import { Container, Row, Col, Image } from "react-bootstrap";
 
 function FriendList() {
   const { authData } = useAuth();
   const token = authData?.accessToken;
-  const loggedInUserId = authData?.userId; // Assuming logged-in user ID is available in authData
-
-  const { id: profileUserId } = useParams(); // Get the profileUserId from the URL
+  const { id: profileUserId } = useParams();
 
   const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,15 +50,6 @@ function FriendList() {
               height={100}
             />
             <p>{friend.username}</p>
-
-            {/* FriendRequest component being passed the necessary props */}
-            <FriendRequest
-              profileUserId={friend.id} // Use profileUserId from useParams
-              loggedInUserId={loggedInUserId}
-              isFriend={false}
-              isPending={friend.isPending}
-              incomingRequest={friend.incomingRequest}
-            />
           </Col>
         ))}
       </Row>
