@@ -4,20 +4,17 @@ import { useAuth } from "../../context/AuthContext";
 import { Container, Row, Col, Image, Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot, faMusic } from "@fortawesome/free-solid-svg-icons";
+import AddFriendButton from "./AddFriendButton";
 
 function UserProfile() {
-  const { id: profileUserId } = useParams(); // Using `useParams` to get the profileUserId
+  const { id: receiverId } = useParams(); // Using `useParams` to get the profileUserId
 
-  const { isAuthenticated } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [incomingRequest, setIncomingRequest] = useState(false);
-
-  const { authData } = useAuth();
-
-  const [isFriend, setIsFriend] = useState(false);
-  const [isPending, setIsPending] = useState(false);
+  const { isAuthenticated, authData } = useAuth();
+  const token = authData?.accessToken;
+  const senderId = authData?.userId;
 
   function getCookie(name) {
     const value = `; ${document.cookie}`;
@@ -34,7 +31,7 @@ function UserProfile() {
         const csrfToken = getCookie("csrfToken"); // You need to implement getCookie
 
         const response = await fetch(
-          `http://localhost:5000/api/auth/profile/${profileUserId}`, // Profile of user fetched
+          `http://localhost:5000/api/auth/profile/${receiverId}`, // Profile of user fetched
           {
             method: "GET",
             headers: {
@@ -68,7 +65,7 @@ function UserProfile() {
       setError("You must be logged in to view this profile.");
       setLoading(false); // Loading is false if not authenticated
     }
-  }, [profileUserId, isAuthenticated]); // Hook dependencies are profileUserId and isAuthenticated
+  }, [receiverId, isAuthenticated]); // Hook dependencies are profileUserId and isAuthenticated
 
   if (loading) return <p>Loading user profile...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
@@ -88,6 +85,14 @@ function UserProfile() {
             <p style={{ color: "green" }}>
               <strong>{profile.username}</strong>
             </p>
+
+            {/* Add Friend Button */}
+            <AddFriendButton
+              senderId={senderId}
+              receiverId={receiverId}
+              token={token}
+            />
+
             <p>
               <strong>
                 Followers: <span>{profile.numberOfFriends}</span>

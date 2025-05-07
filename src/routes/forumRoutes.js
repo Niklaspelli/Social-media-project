@@ -36,6 +36,7 @@ import {
   sendFriendRequest,
   acceptFriendRequest,
   rejectFriendRequest,
+  getIncomingFriendRequests,
   getFriendshipStatus,
   getFriendsList,
   getFriendCount,
@@ -105,5 +106,6 @@ router.post("/reject", authenticateJWT, verifyCsrfToken, rejectFriendRequest);
 router.get("/status/:userId1/:userId2", getFriendshipStatus);
 router.get("/friends/:userId", authenticateJWT, getFriendsList);
 router.get("/friends/count/:userId", authenticateJWT, getFriendCount);
+router.get("/received-requests", authenticateJWT, getIncomingFriendRequests);
 
 export default router;

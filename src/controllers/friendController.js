@@ -39,7 +39,7 @@ export const acceptFriendRequest = (req, res) => {
   const sql = `
     UPDATE friend_requests
     SET status = 'accepted'
-    WHERE sender_id = ? AND receiver_id = ?
+    WHERE sender_id = ? AND receiver_id = ? AND status = 'pending'
   `;
 
   db.query(sql, [senderId, receiverId], (err, result) => {
@@ -68,7 +68,7 @@ export const rejectFriendRequest = (req, res) => {
   const sql = `
     UPDATE friend_requests
     SET status = 'rejected'
-    WHERE sender_id = ? AND receiver_id = ? AND status = 'pending'
+    WHERE sender_id = ? AND receiver_id = ? 
   `;
 
   db.query(sql, [senderId, receiverId], (err, result) => {
@@ -85,8 +85,9 @@ export const rejectFriendRequest = (req, res) => {
   });
 };
 
+// GET /api/auth/status/:senderId/:receiverId
 export const getFriendshipStatus = (req, res) => {
-  const { userId1, userId2 } = req.params;
+  const { senderId, receiverId } = req.params;
 
   const sql = `
     SELECT sender_id, receiver_id, status
@@ -98,28 +99,27 @@ export const getFriendshipStatus = (req, res) => {
     LIMIT 1
   `;
 
-  db.query(sql, [userId1, userId2, userId2, userId1], (err, results) => {
-    if (err) {
-      console.error("Error checking friendship status:", err.message);
-      return res.status(500).json({ error: "Internal Server Error" });
+  db.query(
+    sql,
+    [senderId, receiverId, receiverId, senderId],
+    (err, results) => {
+      if (err) {
+        console.error("Error fetching friendship status:", err.message);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+
+      if (results.length === 0) {
+        return res.status(200).json({ status: "none", incomingRequest: false });
+      }
+
+      const request = results[0];
+      console.log("sql querry:", sql);
+      const status = request.status;
+      const incomingRequest = request.sender_id === parseInt(receiverId); // they sent to you
+
+      return res.status(200).json({ status, incomingRequest });
     }
-
-    if (results.length === 0) {
-      return res.json({
-        isFriend: false,
-        isPending: false,
-        incomingRequest: false,
-      });
-    }
-
-    const request = results[0];
-    const isFriend = request.status === "accepted";
-    const isPending = request.status === "pending";
-    const incomingRequest =
-      request.status === "pending" && request.receiver_id == userId1;
-
-    return res.json({ isFriend, isPending, incomingRequest });
-  });
+  );
 };
 
 export const getFriendsList = (req, res) => {
@@ -173,5 +173,26 @@ export const getFriendCount = (req, res) => {
 
     const friendCount = results[0].friendCount || 0;
     res.json({ numberOfFriends: friendCount });
+  });
+};
+
+export const getIncomingFriendRequests = (req, res) => {
+  const userId = req.user.id;
+
+  // Fetch only the sender_id of pending friend requests
+  const sql = `
+    SELECT sender_id
+    FROM friend_requests
+    WHERE receiver_id = ? AND status = 'pending'
+  `;
+
+  db.query(sql, [userId], (err, results) => {
+    if (err) {
+      console.error("Error fetching incoming friend requests:", err.message);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    // Returning the sender_id(s) of pending requests
+    res.status(200).json(results);
   });
 };
