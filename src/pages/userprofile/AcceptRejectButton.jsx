@@ -8,6 +8,8 @@ function AcceptRejectButton({
   senderId,
   receiverId,
   loggedInUserId,
+  username,
+  avatar,
   isFriend: propIsFriend,
   isPending: propIsPending,
   incomingRequest: propIncomingRequest,
@@ -90,7 +92,8 @@ function AcceptRejectButton({
       )}
       {isPending && incomingRequest && receiverId === loggedInUserId && (
         <>
-          <p>{senderId} wants to be your friend</p>
+          <strong>{username}</strong>
+          <p> wants to be your friend</p>
           <Button variant="dark" onClick={acceptFriendRequest}>
             Accept
           </Button>{" "}

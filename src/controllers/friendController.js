@@ -85,9 +85,16 @@ export const rejectFriendRequest = (req, res) => {
   });
 };
 
-// GET /api/auth/status/:senderId/:receiverId
 export const getFriendshipStatus = (req, res) => {
   const { senderId, receiverId } = req.params;
+  console.log("Raw params:", req.params);
+
+  if (isNaN(senderId) || isNaN(receiverId)) {
+    return res.status(400).json({ error: "Invalid senderId or receiverId" });
+  }
+
+  const sId = parseInt(senderId, 10);
+  const rId = parseInt(receiverId, 10);
 
   const sql = `
     SELECT sender_id, receiver_id, status
@@ -99,25 +106,50 @@ export const getFriendshipStatus = (req, res) => {
     LIMIT 1
   `;
 
+  console.log("Querying with:", [sId, rId, rId, sId]);
+
+  db.query(sql, [sId, rId, rId, sId], (err, results) => {
+    if (err) {
+      console.error("Error fetching friendship status:", err.message);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    console.log("Results from DB:", results);
+
+    if (results.length === 0) {
+      return res.status(200).json({ status: "none", incomingRequest: false });
+    }
+
+    const request = results[0];
+    const status = request.status;
+    const incomingRequest = request.sender_id === rId;
+
+    return res.status(200).json({ status, incomingRequest });
+  });
+};
+
+// PUT /api/auth/unfollow
+export const unfollowFriend = (req, res) => {
+  const { senderId, receiverId } = req.body; // Assuming these are passed in the request body
+
+  const sql = `
+    UPDATE friend_requests
+    SET status = 'none'  -- Or 'unfollowed', depending on your schema
+    WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)
+  `;
+
   db.query(
     sql,
     [senderId, receiverId, receiverId, senderId],
     (err, results) => {
       if (err) {
-        console.error("Error fetching friendship status:", err.message);
+        console.error("Error ending friendship:", err.message);
         return res.status(500).json({ error: "Internal Server Error" });
       }
 
-      if (results.length === 0) {
-        return res.status(200).json({ status: "none", incomingRequest: false });
-      }
-
-      const request = results[0];
-      console.log("sql querry:", sql);
-      const status = request.status;
-      const incomingRequest = request.sender_id === parseInt(receiverId); // they sent to you
-
-      return res.status(200).json({ status, incomingRequest });
+      return res
+        .status(200)
+        .json({ message: "Friendship ended successfully." });
     }
   );
 };

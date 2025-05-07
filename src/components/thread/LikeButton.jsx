@@ -37,7 +37,6 @@ function LikeButton({
         }
 
         const data = await response.json();
-        console.log("Fetched Like Count:", data); // Log the fetched like count
         setLikeCount(data.likeCount); // Set the like count state
       } catch (error) {
         setError(error.message);

@@ -1,5 +1,7 @@
 import React from "react";
 import { AuthProvider } from "./context/AuthContext"; // Import the context
+import { UserProvider } from "./context/UserContext"; // Import the context
+
 import Navbar from "./components/Navbar";
 import { Routes, Route, Navigate } from "react-router-dom"; // Add Navigate for redirection
 import SignIn from "./pages/Login.jsx";
@@ -17,37 +19,44 @@ import FriendList from "./pages/userprofile/FriendList"; // Import the UserProfi
 
 import EditProfile from "./pages/settings/EditProfile.jsx";
 import CreateProfile from "./pages/settings/CreateProfile.jsx";
+import Header from "./components/Header.jsx";
 
 function App() {
   return (
     <AuthProvider>
-      <Navbar />
-      <Routes>
-        {/* Redirect the root route to the login page */}
-        <Route path="/" element={<Navigate to="/auth" />} />
-        <Route path="/auth" element={<AuthPage />} />
+      <UserProvider>
+        <Header />
+        <Navbar />
+        <Routes>
+          {/* Redirect the root route to the login page */}
+          <Route path="/" element={<Navigate to="/auth" />} />
+          <Route path="/auth" element={<AuthPage />} />
 
-        {/* Public routes */}
-        {/*  <Route path="/login" element={<SignIn />} />
+          {/* Public routes */}
+          {/*  <Route path="/login" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} /> */}
 
-        {/* Protected routes */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="/user/:id" element={<UserProfile />} />
-          <Route path="/friends/:id" element={<FriendList />} />
-          <Route path="/forum" element={<Forum />} />
-          {/* Ensure UserProfile is imported */}
-          <Route path="/settings/:id" element={<Settings />} />
-          <Route path="/create-profile" element={<CreateProfile />} />
-          <Route path="/settings/edit-profile/:id" element={<EditProfile />} />
-          <Route path="/threads" element={<ThreadList />} />
-          <Route path="/threads/:threadId" element={<ThreadDetail />} />
-          <Route path="/create-thread" element={<CreateThread />} />
-        </Route>
+          {/* Protected routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/user/:id" element={<UserProfile />} />
+            <Route path="/friends/:id" element={<FriendList />} />
+            <Route path="/forum" element={<Forum />} />
+            {/* Ensure UserProfile is imported */}
+            <Route path="/settings/:id" element={<Settings />} />
+            <Route path="/create-profile" element={<CreateProfile />} />
+            <Route
+              path="/settings/edit-profile/:id"
+              element={<EditProfile />}
+            />
+            <Route path="/threads" element={<ThreadList />} />
+            <Route path="/threads/:threadId" element={<ThreadDetail />} />
+            <Route path="/create-thread" element={<CreateThread />} />
+          </Route>
 
-        {/* Fallback for undefined routes */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+          {/* Fallback for undefined routes */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </UserProvider>
     </AuthProvider>
   );
 }

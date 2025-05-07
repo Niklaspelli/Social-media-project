@@ -19,6 +19,7 @@ const Login = ({ onSwitchToSignUp }) => {
     // Redirect if already authenticated
     if (isAuthenticated) {
       navigate(`/user/${authData.id}`);
+      return; // 🛑 Stop here, don't fetch CSRF token
     }
 
     const fetchCsrfToken = async () => {
@@ -48,11 +49,20 @@ const Login = ({ onSwitchToSignUp }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setError(null);
+    setLoginError(null); // Reset any previous login error
+    setError(null); // Reset general error state
+
+    // Basic form validation
+    if (!username || !password) {
+      setError("Username and password are required.");
+      setIsLoading(false);
+      return;
+    }
 
     // Ensure CSRF token is available before sending the request
     if (!csrfToken) {
       setError("CSRF Token is missing!");
+      setIsLoading(false);
       return;
     }
 
@@ -87,7 +97,7 @@ const Login = ({ onSwitchToSignUp }) => {
         setError(errorData.message || "Invalid username or password");
       }
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "An unexpected error occurred.");
       if (errRef.current) errRef.current.focus();
     } finally {
       setIsLoading(false); // Reset loading state
@@ -98,7 +108,7 @@ const Login = ({ onSwitchToSignUp }) => {
     <Container className="mt-5">
       <Row className="justify-content-center">
         <Col md={6} lg={7}>
-          {isLoading && <div className="alert alert-info">Loading...</div>}
+          {isLoading && <div className="alert alert-info">Logging in...</div>}
           {loginError && (
             <div className="alert alert-danger" ref={errRef} role="alert">
               {loginError}
@@ -117,7 +127,6 @@ const Login = ({ onSwitchToSignUp }) => {
                 id="floatingInputCustom1"
                 type="text"
                 value={username}
-                place
                 onChange={(e) => setUsername(e.target.value)}
                 aria-label="Username"
                 aria-required="true"

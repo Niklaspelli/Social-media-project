@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { Link } from "react-router-dom";
 import { Container, Row, Col, Image } from "react-bootstrap";
 import AcceptRejectButton from "./AcceptRejectButton";
 
@@ -11,8 +12,6 @@ function FriendList() {
   const [incomingRequests, setIncomingRequests] = useState([]);
   const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  console.log("loggedin:", loggedInUserId);
 
   // Fetch friend requests sent TO this user
   useEffect(() => {
@@ -54,6 +53,7 @@ function FriendList() {
 
         const data = await response.json();
         setFriends(data);
+        console.log("innehåll:", data);
       } catch (err) {
         console.error("Error fetching friends:", err);
       } finally {
@@ -90,6 +90,8 @@ function FriendList() {
                   isFriend={false}
                   isPending={true}
                   incomingRequest={true}
+                  avatar={request.avatar}
+                  username={request.username}
                 />
               </div>
             </div>
@@ -101,14 +103,19 @@ function FriendList() {
       <Row>
         {friends.map((friend) => (
           <Col key={friend.id} xs={12} md={4} className="mb-4 text-center">
-            <Image
-              src={friend.avatar}
-              alt={friend.username}
-              roundedCircle
-              width={100}
-              height={100}
-            />
-            <p>{friend.username}</p>
+            <Link
+              to={`/user/${friend.id}`}
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              <Image
+                src={friend.avatar}
+                alt={friend.username}
+                roundedCircle
+                width={100}
+                height={100}
+              />
+              <p>{friend.username}</p>
+            </Link>
           </Col>
         ))}
       </Row>

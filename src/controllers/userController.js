@@ -49,6 +49,53 @@ export const getCompleteUserProfile = (req, res) => {
   });
 };
 
+// Get another user's profile
+export const getOtherUserProfile = (req, res) => {
+  const userId = req.params.id;
+
+  if (!userId) {
+    return res.status(400).json({ error: "User ID is required" });
+  }
+
+  const sql = `
+    SELECT 
+      u.id,
+      u.username, 
+      u.avatar,     
+      p.sex,
+      p.relationship_status,
+      p.location,
+      p.music_taste,
+      p.interest,
+      p.bio,
+      (
+        SELECT COUNT(*) 
+        FROM friend_requests 
+        WHERE (sender_id = u.id OR receiver_id = u.id) AND status = 'accepted'
+      ) AS numberOfFriends
+    FROM users u
+    LEFT JOIN user_profiles p ON u.id = p.user_id
+    WHERE u.id = ?
+  `;
+
+  console.log("Running getOtherUserProfile for ID:", userId);
+
+  db.query(sql, [userId], (err, result) => {
+    if (err) {
+      console.error("Database error in getOtherUserProfile:", err.message);
+      return res
+        .status(500)
+        .json({ error: "Database error", details: err.message });
+    }
+
+    if (result.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json(result[0]);
+  });
+};
+
 export const getUserById = (req, res) => {
   const { userId } = req.params;
 
