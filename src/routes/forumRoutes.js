@@ -6,6 +6,7 @@ import {
   getCompleteUserProfile,
   getUserById,
   getOtherUserProfile,
+  searchUser,
 } from "../controllers/userController.js";
 
 import {
@@ -68,10 +69,15 @@ router.get(
   getCompleteUserProfile
 );
 router.get("/users/:id", authenticateJWT, verifyCsrfToken, getOtherUserProfile);
-
+router.get(
+  "/search/users/:username",
+  authenticateJWT,
+  verifyCsrfToken,
+  searchUser
+);
 router.get("/profile/:userId", authenticateJWT, verifyCsrfToken, getUserById);
 
-/* router.get("/users/:userId", authenticateJWT, getUserProfile); */
+router.get("/users/:userId", authenticateJWT, getUserProfile);
 router.post("/users", authenticateJWT, createOrUpdateUserProfile);
 router.put("/users/:userId", authenticateJWT, updateUserProfile);
 

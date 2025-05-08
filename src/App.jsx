@@ -2,10 +2,8 @@ import React from "react";
 import { AuthProvider } from "./context/AuthContext"; // Import the context
 import { UserProvider } from "./context/UserContext"; // Import the context
 
-import Navbar from "./components/Navbar";
 import { Routes, Route, Navigate } from "react-router-dom"; // Add Navigate for redirection
-import SignIn from "./pages/Login.jsx";
-import SignUp from "./pages/Register.jsx";
+
 import Forum from "./pages/Forum";
 import AuthPage from "./pages/AuthPage.jsx";
 import Settings from "./pages/settings/Settings.jsx";
@@ -19,14 +17,13 @@ import FriendList from "./pages/userprofile/FriendList"; // Import the UserProfi
 
 import EditProfile from "./pages/settings/EditProfile.jsx";
 import CreateProfile from "./pages/settings/CreateProfile.jsx";
-import Header from "./components/Header.jsx";
+import HeaderNavbar from "./components/HeaderNavbar.jsx";
 
 function App() {
   return (
     <AuthProvider>
       <UserProvider>
-        <Header />
-        <Navbar />
+        <HeaderNavbar />
         <Routes>
           {/* Redirect the root route to the login page */}
           <Route path="/" element={<Navigate to="/auth" />} />

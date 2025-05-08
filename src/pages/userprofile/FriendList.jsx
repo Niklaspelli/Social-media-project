@@ -13,7 +13,6 @@ function FriendList() {
   const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch friend requests sent TO this user
   useEffect(() => {
     const fetchIncomingRequests = async () => {
       try {
@@ -24,14 +23,13 @@ function FriendList() {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-            credentials: "include", // ✅ Move it here
+            credentials: "include",
           }
         );
 
         const data = await response.json();
-        console.log("data", data);
 
-        setIncomingRequests(data); // [{ sender_id, username, avatar }]
+        setIncomingRequests(data);
       } catch (err) {
         console.error("Error fetching incoming requests:", err);
       }
@@ -53,7 +51,6 @@ function FriendList() {
 
         const data = await response.json();
         setFriends(data);
-        console.log("innehåll:", data);
       } catch (err) {
         console.error("Error fetching friends:", err);
       } finally {
@@ -84,8 +81,8 @@ function FriendList() {
               <div>
                 <strong>{request.username}</strong>
                 <AcceptRejectButton
-                  senderId={request.sender_id} // comes from the backend
-                  receiverId={loggedInUserId} // the logged-in user is always the receiver
+                  senderId={request.sender_id}
+                  receiverId={loggedInUserId}
                   loggedInUserId={loggedInUserId}
                   isFriend={false}
                   isPending={true}

@@ -51,7 +51,11 @@ const AddFriendButton = ({ senderId, receiverId, token }) => {
   };
 
   useEffect(() => {
-    checkIfFriends(); // Check if they are friends when the component mounts
+    const timeoutId = setTimeout(() => {
+      checkIfFriends();
+    }, 300); // delay for smoother UX
+
+    return () => clearTimeout(timeoutId); // cleanup
   }, [senderId, receiverId]);
 
   // Function to handle friend requests and unfollow

@@ -133,3 +133,41 @@ export const getUserById = (req, res) => {
     res.status(200).json(result[0]);
   });
 };
+
+// Endpoint to search for users by a username (case-insensitive, partial match)
+export const searchUser = (req, res) => {
+  const { username } = req.params;
+
+  // Validate the username
+  if (!username || username.trim().length === 0) {
+    return res.status(400).json({ error: "Username is required" });
+  }
+
+  // SQL query to fetch users whose usernames match the search term (case-insensitive, partial match)
+  const sql = `
+    SELECT
+      u.id, 
+      u.username,
+      u.avatar
+    FROM users u
+    WHERE LOWER(u.username) LIKE LOWER(?) 
+  `;
+
+  // Add the search term with '%' for partial matching
+  const searchTerm = `${username}%`; // Starts with the search term
+
+  db.query(sql, [searchTerm], (err, result) => {
+    if (err) {
+      console.error("Error fetching user by username:", err.message);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    // If no users were found, return a 404 response
+    if (result.length === 0) {
+      return res.status(404).json({ error: "No users found" });
+    }
+
+    // Send back the results (user profiles)
+    res.status(200).json(result);
+  });
+};
