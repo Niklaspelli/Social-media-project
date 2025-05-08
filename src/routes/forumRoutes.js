@@ -3,6 +3,12 @@ import { authenticateJWT } from "../middleware/authMiddleware.js";
 import { verifyCsrfToken } from "../middleware/csrf.js";
 
 import {
+  createFeedPost,
+  getUserFeedPosts,
+  getFullFeed,
+} from "../controllers/userFeedController.js";
+
+import {
   getCompleteUserProfile,
   getUserById,
   getOtherUserProfile,
@@ -122,5 +128,9 @@ router.get("/friends/:userId", authenticateJWT, getFriendsList);
 router.get("/friends/count/:userId", authenticateJWT, getFriendCount);
 router.get("/received-requests", authenticateJWT, getIncomingFriendRequests);
 router.put("/unfollow", authenticateJWT, unfollowFriend);
+
+router.post("/feed-post", authenticateJWT, verifyCsrfToken, createFeedPost);
+router.get("/feed-post/user/:userId", authenticateJWT, getUserFeedPosts);
+router.get("/feed-post/feed/:userId", authenticateJWT, getFullFeed);
 
 export default router;

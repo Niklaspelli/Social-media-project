@@ -6,6 +6,7 @@ import { Container, Row, Col, Image, Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot, faMusic } from "@fortawesome/free-solid-svg-icons";
 import AddFriendButton from "./AddFriendButton";
+import Feed from "./feed/Feed";
 
 function UserProfile() {
   const { id: receiverId } = useParams(); // Get receiverId from URL params
@@ -77,11 +78,14 @@ function UserProfile() {
           <div className="mb-2">
             <strong>Interests:</strong> <span>{profile.interest}</span>
           </div>
+          <Col xs={12} md={5}>
+            <div>
+              <strong>Bio:</strong> <span>{profile.bio}</span>
+            </div>
+          </Col>
         </Col>
         <Col xs={12} md={5}>
-          <div>
-            <strong>Bio:</strong> <span>{profile.bio}</span>
-          </div>
+          <Feed />
         </Col>
       </Row>
     </Container>
