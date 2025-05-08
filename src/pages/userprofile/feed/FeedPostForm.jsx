@@ -53,6 +53,7 @@ const FeedPostForm = ({ onPostCreated }) => {
           onChange={(e) => setContent(e.target.value)}
           placeholder="What's on your mind?"
           rows={3}
+          className="mt-4"
         />
       </InputGroup>
       <Button variant="primary" type="submit" className="mt-2">

@@ -21,20 +21,27 @@ export const createFeedPost = (req, res) => {
 };
 
 export const getUserFeedPosts = (req, res) => {
-  const userId = req.params.userId; // Getting the userId from URL params
+  const userId = req.params.userId;
 
-  console.log("Fetching feed posts for user:", userId); // Debugging line
-
-  const sql = `SELECT * FROM user_feed WHERE userId = ? ORDER BY timestamp DESC`; // Fetch posts for the logged-in user
+  const sql = `
+    SELECT
+      uf.id,
+      uf.content,
+      uf.created_at,
+      u.username
+    FROM user_feed uf
+    JOIN users u ON uf.userId = u.id
+    WHERE uf.userId = ?  -- Filter posts for the specific user
+    ORDER BY uf.created_at DESC;  -- Optionally order by created_at, newest first
+  `;
 
   db.query(sql, [userId], (err, result) => {
     if (err) {
-      console.error("Error fetching feed posts:", err.message);
+      console.error("Error fetching user feed posts:", err.message);
       return res.status(500).json({ error: "Internal Server Error" });
     }
 
-    console.log("Feed Posts from DB:", result); // Log the posts fetched from DB for debugging
-    res.json(result); // Send the feed posts as a response
+    return res.json(result); // Send posts with username
   });
 };
 

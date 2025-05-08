@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../../../context/AuthContext"; // Adjust path as needed
 import { useParams } from "react-router-dom"; // We'll use this to get the profile's userId
 import FeedPostForm from "./FeedPostForm"; // Form to create a new post
+import { Card, Button, Spinner } from "react-bootstrap"; // Import Bootstrap components
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faThumbsUp } from "@fortawesome/free-solid-svg-icons"; // solid version
 
 const Feed = () => {
   const { authData } = useAuth(); // Get the logged-in user's data
@@ -55,19 +58,56 @@ const Feed = () => {
       {/* Only show the FeedPostForm if this is the logged-in user's profile */}
       {isOwnProfile && <FeedPostForm onPostCreated={handlePostCreated} />}
 
+      {/* Display posts in a responsive grid */}
       <div className="mt-4">
         {loading ? (
-          <p>Loading...</p>
+          <div className="text-center">
+            <Spinner animation="border" />
+            <p>Loading...</p>
+          </div>
         ) : posts.length === 0 ? (
           <p>No posts to show.</p>
         ) : (
           posts.map((post) => (
-            <div key={post.id} className="mb-3">
-              <div>
-                <strong>{post.username}</strong> ({post.created_at})
-              </div>
-              <div>{post.content}</div>
-            </div>
+            <Card key={post.id} className="mb-4">
+              <Card.Body>
+                <div className="d-flex align-items-center mb-2">
+                  <strong className="me-2">{post.username}</strong>
+                  <p
+                    className="text-muted"
+                    style={{ fontSize: "0.8em", marginBottom: 0 }}
+                  >
+                    {new Date(post.created_at).toLocaleString()}
+                  </p>
+                </div>
+                <Card.Text
+                  style={{
+                    color: "gray",
+                    fontSize: "0.9em",
+                    lineHeight: "1.6",
+                  }}
+                >
+                  {post.content}
+                </Card.Text>
+                <Button variant="outline-primary" size="sm">
+                  Comment
+                </Button>
+                <div>
+                  <FontAwesomeIcon
+                    icon={faThumbsUp}
+                    style={{
+                      cursor: "pointer",
+                      color: "black",
+                    }}
+                    size="1x"
+                  />
+                  <span style={{ marginLeft: "4px" }}>
+                    {" "}
+                    100000000000000000 likes
+                  </span>
+                </div>
+              </Card.Body>
+            </Card>
           ))
         )}
       </div>
