@@ -5,6 +5,7 @@ import FeedPostForm from "./FeedPostForm"; // Form to create a new post
 import { Card, Button, Spinner } from "react-bootstrap"; // Import Bootstrap components
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp } from "@fortawesome/free-solid-svg-icons"; // solid version
+import DeleteButton from "../../../components/DeleteButton";
 
 const Feed = () => {
   const { authData } = useAuth(); // Get the logged-in user's data
@@ -17,6 +18,12 @@ const Feed = () => {
 
   // Determine if the current profile is the logged-in user's profile or someone else's
   const isOwnProfile = loggedInUserId === Number(userId);
+
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+  }
 
   // Fetch feed posts for the logged-in user or for another user
   const fetchUserFeedPosts = async () => {
@@ -51,6 +58,46 @@ const Feed = () => {
   // Callback to refresh the feed when a new post is created
   const handlePostCreated = () => {
     fetchUserFeedPosts(); // Refresh feed after a post is created
+  };
+
+  const deleteFeedPost = async (postId) => {
+    const csrfToken = getCookie("csrfToken"); // Ensure getCookie is implemented
+
+    if (!csrfToken) {
+      console.error("CSRF Token is missing");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/auth/feed-post/${postId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${accessToken}`, // Ensure accessToken is correctly set
+            "CSRF-TOKEN": csrfToken,
+          },
+          credentials: "include",
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId)); // Optimistic UI update
+      } else {
+        // Handle different errors based on response status
+        if (response.status === 404) {
+          console.error("Post not found or unauthorized");
+        } else if (response.status === 403) {
+          console.error("Unauthorized action");
+        } else {
+          console.error("Delete failed:", data.error);
+        }
+      }
+    } catch (error) {
+      console.error("Error deleting post:", error);
+    }
   };
 
   return (
@@ -105,6 +152,9 @@ const Feed = () => {
                     {" "}
                     100000000000000000 likes
                   </span>
+                  {isOwnProfile && (
+                    <DeleteButton onDelete={() => deleteFeedPost(post.id)} />
+                  )}
                 </div>
               </Card.Body>
             </Card>

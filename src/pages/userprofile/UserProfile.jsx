@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useUsers } from "../../context/UserContext";
-import { Container, Row, Col, Image, Button } from "react-bootstrap";
+import { Container, Row, Col, Image, Button, Card } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot, faMusic } from "@fortawesome/free-solid-svg-icons";
 import AddFriendButton from "./AddFriendButton";
@@ -32,17 +32,18 @@ function UserProfile() {
   return (
     <Container style={{ color: "white" }}>
       <Row className="align-items-start">
-        <Col xs={12} md={4} className="text-center mb-3">
+        <Col xs={12} md={5} className="text-center mb-3">
           <Image
             src={profile.avatar}
             alt="User Avatar"
             roundedCircle
             width={200}
             height={200}
+            className="mb-3"
           />
-          <p style={{ color: "green" }}>
+          {/*  <p style={{ color: "green" }}>
             <strong>{profile.username}</strong>
-          </p>
+          </p> */}
 
           {/* Add friend button if not the logged-in user */}
           {Number(authData?.userId) !== Number(receiverId) && (
@@ -53,36 +54,60 @@ function UserProfile() {
             />
           )}
 
-          <p>
-            <strong>
-              Followers: <span>{profile.numberOfFriends}</span>
-            </strong>
-          </p>
-          <div className="mb-2">
-            <strong>Sex:</strong> <span>{profile.sex}</span>
-          </div>
-          <div className="mb-2">
-            <strong>Relationship Status:</strong>{" "}
-            <span>{profile.relationship_status}</span>
-          </div>
-          <Row>
-            <div className="mb-2">
-              <FontAwesomeIcon icon={faLocationDot} />
-              <span>{profile.location}</span>
-            </div>
-            <div className="mb-2">
-              <FontAwesomeIcon icon={faMusic} />
-              <span>{profile.musicTaste}</span>
-            </div>
-          </Row>
-          <div className="mb-2">
-            <strong>Interests:</strong> <span>{profile.interest}</span>
-          </div>
-          <Col xs={12} md={5}>
-            <div>
-              <strong>Bio:</strong> <span>{profile.bio}</span>
-            </div>
-          </Col>
+          <Card className="mb-3 shadow-sm">
+            <Card.Body>
+              <Card.Title className="text-muted fs-6">
+                Profile Details
+              </Card.Title>
+              <Row>
+                <Col xs={12} md={6} className="mb-2">
+                  <strong>Followers:</strong>{" "}
+                  <span>{profile.numberOfFriends}</span>
+                </Col>
+                <Col xs={12} md={6} className="mb-2">
+                  <strong>Sex:</strong> <span>{profile.sex}</span>
+                </Col>
+                <Col xs={12} md={6} className="mb-2">
+                  <strong>Relationship Status:</strong>{" "}
+                  <span>{profile.relationship_status}</span>
+                </Col>
+                <Col xs={12} md={6} className="mb-2">
+                  <FontAwesomeIcon
+                    icon={faLocationDot}
+                    className="me-2 text-secondary"
+                  />
+                  <span>{profile.location}</span>
+                </Col>
+                <Col xs={12} md={6} className="mb-2">
+                  <FontAwesomeIcon
+                    icon={faMusic}
+                    className="me-2 text-secondary"
+                  />
+                  <span>{profile.music_taste}</span>
+                </Col>
+              </Row>
+            </Card.Body>
+          </Card>
+          <Card className="mb-3 shadow-sm">
+            <Card.Body>
+              <Card.Title>Interest:</Card.Title>
+              <span>{profile.interest}</span>
+            </Card.Body>
+          </Card>
+          <Card className="mb-3 shadow-sm bg-grey">
+            <Card.Body>
+              <Card.Title className="text-black fs-6">Bio</Card.Title>
+              <Card.Text
+                style={{
+                  color: "gray",
+                  fontSize: "0.9em",
+                  lineHeight: "1.6",
+                }}
+              >
+                {profile.bio || "No bio available."}
+              </Card.Text>
+            </Card.Body>
+          </Card>
         </Col>
         <Col xs={12} md={5}>
           <Feed />

@@ -18,6 +18,7 @@ import FriendList from "./pages/userprofile/FriendList"; // Import the UserProfi
 import EditProfile from "./pages/settings/EditProfile.jsx";
 import CreateProfile from "./pages/settings/CreateProfile.jsx";
 import HeaderNavbar from "./components/HeaderNavbar.jsx";
+import AllFeed from "./pages/userprofile/feed/AllFeed.jsx";
 
 function App() {
   return (
@@ -35,6 +36,8 @@ function App() {
 
           {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
+            <Route path="/feed/:id" element={<AllFeed />} />
+
             <Route path="/user/:id" element={<UserProfile />} />
             <Route path="/friends/:id" element={<FriendList />} />
             <Route path="/forum" element={<Forum />} />

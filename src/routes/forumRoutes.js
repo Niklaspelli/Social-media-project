@@ -6,6 +6,8 @@ import {
   createFeedPost,
   getUserFeedPosts,
   getFullFeed,
+  deleteFeedPost,
+  getFriendFeed,
 } from "../controllers/userFeedController.js";
 
 import {
@@ -130,7 +132,15 @@ router.get("/received-requests", authenticateJWT, getIncomingFriendRequests);
 router.put("/unfollow", authenticateJWT, unfollowFriend);
 
 router.post("/feed-post", authenticateJWT, verifyCsrfToken, createFeedPost);
-router.get("/feed-post/user/:userId", authenticateJWT, getUserFeedPosts);
+router.get("/friends-feed/", authenticateJWT, getFriendFeed);
 router.get("/feed-post/feed/:userId", authenticateJWT, getFullFeed);
+router.get("/feed-post/user/:userId", authenticateJWT, getUserFeedPosts);
+
+router.delete(
+  "/feed-post/:postId",
+  authenticateJWT,
+  verifyCsrfToken,
+  deleteFeedPost
+);
 
 export default router;

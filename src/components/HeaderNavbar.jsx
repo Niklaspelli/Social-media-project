@@ -9,6 +9,7 @@ import {
   faSignOutAlt,
   faUser,
   faUserFriends,
+  faStream,
 } from "@fortawesome/free-solid-svg-icons";
 import SearchBar from "./SearchBar"; // Import the new SearchBar component
 
@@ -38,7 +39,9 @@ const HeaderNavbar = () => {
               <>
                 {currentUser && (
                   <Nav.Item className="d-flex align-items-center ms-3 m-4">
-                    <span className="text-success me-2">Hi, {currentUser}</span>
+                    <span className="text-success me-2">
+                      Welcome, {currentUser}
+                    </span>
                     {NavbarAvatar && (
                       <Image
                         src={NavbarAvatar}
@@ -50,7 +53,9 @@ const HeaderNavbar = () => {
                     )}
                   </Nav.Item>
                 )}
-
+                <Nav.Link as={Link} to={"/feed/:id"}>
+                  <FontAwesomeIcon icon={faStream} className="me-1" /> Feed
+                </Nav.Link>
                 {/* Use the SearchBar component */}
                 <SearchBar />
 
