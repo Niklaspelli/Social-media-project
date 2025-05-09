@@ -163,7 +163,7 @@ export const getFriendsList = (req, res) => {
 
   const sql = `
     SELECT 
-      u.id, u.username, u.avatar
+      u.id, u.username, u.avatar, u.last_seen
     FROM users u
     JOIN friend_requests fr ON (
       (fr.sender_id = u.id AND fr.receiver_id = ?) OR
@@ -208,7 +208,7 @@ export const getFriendCount = (req, res) => {
   });
 };
 
-export const getIncomingFriendRequests = (req, res) => {
+/* export const getIncomingFriendRequests = (req, res) => {
   const userId = req.user.id;
 
   // Fetch only the sender_id of pending friend requests
@@ -226,5 +226,42 @@ export const getIncomingFriendRequests = (req, res) => {
 
     // Returning the sender_id(s) of pending requests
     res.status(200).json(results);
+  });
+}; */
+
+export const getIncomingFriendRequests = (req, res) => {
+  const userId = req.user.id;
+
+  const sql = `
+    SELECT 
+      u.id AS sender_id, 
+      u.username, 
+      u.avatar
+    FROM friend_requests fr
+    JOIN users u ON u.id = fr.sender_id
+    WHERE fr.receiver_id = ? AND fr.status = 'pending'
+  `;
+
+  db.query(sql, [userId], (err, results) => {
+    if (err) {
+      console.error("Error fetching incoming friend requests:", err.message);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    res.status(200).json(results); // now includes username and avatar
+  });
+};
+
+export const updateLastSeen = (req, res) => {
+  const userId = req.user.id;
+
+  const sql = `UPDATE users SET last_seen = NOW() WHERE id = ?`;
+  db.query(sql, [userId], (err) => {
+    if (err) {
+      console.error("Error updating last_seen:", err);
+      return res.status(500).json({ error: "Failed to update last seen" });
+    }
+
+    res.sendStatus(200);
   });
 };

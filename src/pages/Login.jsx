@@ -89,6 +89,24 @@ const Login = ({ onSwitchToSignUp }) => {
           login(username, userId, avatar, accessToken);
           localStorage.setItem("accessToken", accessToken); // Store access token
           navigate(`/user/${userId}`);
+
+          // **Update last_seen time after login**
+          const lastSeenResponse = await fetch(
+            "http://localhost:5000/api/auth/update-last-seen",
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessToken}`, // Pass the JWT token in Authorization header
+              },
+            }
+          );
+
+          if (!lastSeenResponse.ok) {
+            console.error("Failed to update last seen time");
+          } else {
+            console.log("Last seen time updated successfully");
+          }
         } else {
           setError("Authentication failed. Please try again.");
         }

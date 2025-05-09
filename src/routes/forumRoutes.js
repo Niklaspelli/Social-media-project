@@ -51,6 +51,7 @@ import {
   getFriendsList,
   getFriendCount,
   unfollowFriend,
+  updateLastSeen,
 } from "../controllers/friendController.js";
 
 const router = express.Router();
@@ -130,6 +131,7 @@ router.get("/friends/:userId", authenticateJWT, getFriendsList);
 router.get("/friends/count/:userId", authenticateJWT, getFriendCount);
 router.get("/received-requests", authenticateJWT, getIncomingFriendRequests);
 router.put("/unfollow", authenticateJWT, unfollowFriend);
+router.put("/update-last-seen", authenticateJWT, updateLastSeen);
 
 router.post("/feed-post", authenticateJWT, verifyCsrfToken, createFeedPost);
 router.get("/friends-feed/", authenticateJWT, getFriendFeed);

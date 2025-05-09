@@ -63,6 +63,11 @@ function FriendList() {
 
   if (loading) return <div>Loading...</div>;
 
+  const isOnline = (lastSeen) => {
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    return new Date(lastSeen) > fiveMinutesAgo;
+  };
+
   return (
     <Container style={{ color: "white" }}>
       <h2>Your Friend Requests</h2>
@@ -112,6 +117,31 @@ function FriendList() {
                 height={100}
               />
               <p>{friend.username}</p>
+              <small
+                style={{
+                  color: isOnline(friend.last_seen) ? "lightgreen" : "gray",
+                }}
+              >
+                {isOnline(friend.last_seen)
+                  ? "Online"
+                  : `Last seen ${new Date(
+                      friend.last_seen
+                    ).toLocaleTimeString()}`}
+              </small>
+              <span
+                style={{
+                  position: "absolute",
+                  bottom: 5,
+                  right: 5,
+                  width: 15,
+                  height: 15,
+                  borderRadius: "50%",
+                  backgroundColor: isOnline(friend.last_seen)
+                    ? "limegreen"
+                    : "gray",
+                  border: "2px solid white",
+                }}
+              ></span>
             </Link>
           </Col>
         ))}
