@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+/* import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext"; // Make sure the path is correct
 import ThreadList from "./ThreadList";
 
@@ -128,3 +128,111 @@ const inputStyle = {
   color: "white",
   border: "none",
 };
+ */
+
+// components/CreateThread.js
+import React, { useState } from "react";
+import { useAuth } from "../../context/AuthContext"; // Make sure the path is correct
+import ThreadList from "./ThreadList";
+import useCreateThread from "../../queryHooks/threads/useCreateThread"; // Import your custom hook
+
+const CreateThread = () => {
+  const { authData } = useAuth();
+  const { username, accessToken } = authData;
+
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+
+  // Använd React Query hook för att skapa tråd
+  const {
+    mutate,
+    isLoading,
+    isError,
+    error: mutationError,
+    isSuccess,
+  } = useCreateThread();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(false);
+
+    if (!title || !body) {
+      setError("Title and content are required");
+      return;
+    }
+
+    mutate({ title, body, username, accessToken });
+  };
+
+  return (
+    <>
+      <ThreadList />
+      <h1 style={{ textAlign: "center" }}>Skapa ny tråd:</h1>
+      <div style={LoginContainerStyle}>
+        <form onSubmit={handleSubmit}>
+          <input
+            maxLength="50"
+            type="text"
+            placeholder="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            style={inputStyle}
+          />
+          <textarea
+            maxLength="500"
+            placeholder="Body"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            style={inputStyle}
+          ></textarea>
+          <button
+            type="submit"
+            style={{ backgroundColor: "black", margin: "20px" }}
+            disabled={isLoading}
+          >
+            {isLoading ? "Skapar tråd..." : "Skapa tråd"}
+          </button>
+        </form>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        {isSuccess && (
+          <p style={{ color: "green" }}>Thread created successfully!</p>
+        )}
+        {isError && (
+          <p style={{ color: "red" }}>Error: {mutationError.message}</p>
+        )}
+      </div>
+    </>
+  );
+};
+
+export default CreateThread;
+
+const LoginContainerStyle = {
+  marginBottom: "15px",
+  display: "flex",
+  justifyContent: "center",
+  margin: "20px",
+};
+
+const inputStyle = {
+  width: "90%",
+  maxWidth: "400px",
+  padding: "10px",
+  borderRadius: "20px",
+  border: "1px solid #ddd",
+  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+  outline: "none",
+  fontSize: "16px",
+  transition: "border-color 0.3s ease",
+  color: "white",
+  border: "none",
+};
+
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+}

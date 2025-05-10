@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"; // Importing React, useEffect, useState
+/* import React, { useEffect, useState } from "react"; // Importing React, useEffect, useState
 import { Link } from "react-router-dom"; // Importing Link for navigation
 import { useAuth } from "../../context/AuthContext"; // Adjust the path accordingly
 import "./ThreadList.css";
@@ -70,3 +70,44 @@ function ThreadList() {
 }
 
 export default ThreadList; // Export the component
+ */
+
+import { Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import useThreads from "../../queryHooks/threads/useThreads";
+import "./ThreadList.css";
+
+function ThreadList() {
+  const { authData } = useAuth();
+  const { data: threads, isLoading, error } = useThreads();
+
+  if (isLoading) return <p>Loading threads...</p>;
+  if (error) return <p style={{ color: "red" }}>{error.message}</p>;
+
+  return (
+    <div className="thread-list">
+      {threads.length > 0 ? (
+        threads.map((thread) => (
+          <div key={thread.id} className="thread-item">
+            <h2 className="thread-title">
+              <Link to={`/threads/${thread.id}`} className="thread-link">
+                {thread.title}
+              </Link>
+            </h2>
+            <p className="thread-body">{thread.body}</p>
+            <p>
+              <strong>Author:</strong> {thread.username}
+            </p>
+            <p style={{ fontSize: "0.8em", color: "#999" }}>
+              ({new Date(thread.created_at).toLocaleString()})
+            </p>
+          </div>
+        ))
+      ) : (
+        <p>No threads available.</p>
+      )}
+    </div>
+  );
+}
+
+export default ThreadList;
