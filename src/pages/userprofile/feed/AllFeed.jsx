@@ -1,39 +1,24 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, Card, Image } from "react-bootstrap";
+import { Container, Card, Image, Spinner } from "react-bootstrap";
+import useFriendsFeed from "../../../queryHooks/feed/useFriendsFeed";
 
 const AllFeed = () => {
-  const [posts, setPosts] = useState([]);
   const navigate = useNavigate();
-  const accessToken = localStorage.getItem("accessToken"); // or however you store it
-
-  useEffect(() => {
-    const fetchFriendFeed = async () => {
-      try {
-        const res = await fetch("http://localhost:5000/api/auth/friends-feed", {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        });
-
-        const data = await res.json();
-        setPosts(data);
-      } catch (error) {
-        console.error("Failed to fetch feed:", error);
-      }
-    };
-
-    fetchFriendFeed();
-  }, [accessToken]);
+  const accessToken = localStorage.getItem("accessToken");
+  const { data: posts = [], isLoading, isError } = useFriendsFeed(accessToken);
 
   return (
     <Container style={LoginContainerStyle}>
       <h2 className="text-center text-white mb-4">Feed</h2>
 
       <div style={scrollContainerStyle}>
-        {posts.length === 0 ? (
+        {isLoading ? (
+          <div className="text-center text-white">
+            <Spinner animation="border" /> <p>Loading...</p>
+          </div>
+        ) : isError ? (
+          <p className="text-white">Failed to load feed</p>
+        ) : posts.length === 0 ? (
           <p className="text-white">No posts to show</p>
         ) : (
           posts.map((post) => (
@@ -67,7 +52,7 @@ const LoginContainerStyle = {
 };
 
 const scrollContainerStyle = {
-  maxHeight: "80vh", // Adjust the max height as needed
-  overflowY: "scroll", // Enables scrolling
-  paddingBottom: "20px", // Add some padding to avoid the last post being cut off
+  maxHeight: "80vh",
+  overflowY: "scroll",
+  paddingBottom: "20px",
 };

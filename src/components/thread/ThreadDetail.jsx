@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext"; // Adjust the path accordingly
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Form,
+  Button,
+  Image,
+  Alert,
+} from "react-bootstrap";
 import LikeButton from "./LikeButton";
 
 const BackendURL = "http://localhost:5000";
@@ -134,113 +144,136 @@ function ThreadDetail() {
   }
 
   return (
-    <div>
-      {/* Thread Title and Body with Username */}
-      <h1 style={{ textAlign: "center" }}>{thread.title}</h1>
-      <div style={StyleContainer}>
-        <div style={RespContainer}>
-          <img
-            src={thread.avatar || "default-avatar.jpg"} // Avatar of the thread creator
-            alt="avatar"
-            style={{
-              width: 50,
-              height: 50,
-              borderRadius: "50%",
-              marginRight: "10px",
-            }}
-          />
-          <div style={textContent}>
-            <Link to={`/user/${thread.user_id}`}>
-              <strong>{thread.username}</strong>
-            </Link>
-            <p>{thread.body}</p>
-            <p style={{ fontSize: "0.8em", color: "#999" }}>
-              ({new Date(thread.created_at).toLocaleString()})
-            </p>
-          </div>
-        </div>
-      </div>
+    <Container className="mt-5">
+      {/* Thread Title */}
+      <h2 className="text-center text-white mb-4">{thread.title}</h2>
+
+      {/* Thread Body */}
+      <Card className="bg-dark text-white mb-4 p-3 shadow">
+        <Row>
+          <Col xs="auto">
+            <Image
+              src={thread.avatar || "/default-avatar.jpg"}
+              roundedCircle
+              width={50}
+              height={50}
+              className="me-3"
+            />
+          </Col>
+          <Col>
+            <Card.Title>
+              <Link
+                to={`/user/${thread.user_id}`}
+                className="text-white text-decoration-none"
+              >
+                <strong>{thread.username}</strong>
+              </Link>
+            </Card.Title>
+            <Card.Text>{thread.body}</Card.Text>
+            <small className="text-muted">
+              {new Date(thread.created_at).toLocaleString()}
+            </small>
+          </Col>
+        </Row>
+      </Card>
 
       {/* Responses */}
-      <div>
-        {responses.length > 0 ? (
-          responses.map((res) => (
-            <div style={StyleContainer} key={res.id}>
-              <div style={threadCreator}>
-                <img
-                  src={res.avatar || "default-avatar.jpg"} // Avatar for the response poster
-                  alt="avatar"
-                  style={{
-                    width: 50,
-                    height: 50,
-                    borderRadius: "50%",
-                    marginRight: "10px",
-                  }}
+      {responses.length > 0 ? (
+        responses.map((res) => (
+          <Card key={res.id} className="bg-dark text-white mb-3 p-3 shadow">
+            <Row>
+              <Col xs="auto">
+                <Image
+                  src={res.avatar || "/default-avatar.jpg"}
+                  roundedCircle
+                  width={50}
+                  height={50}
+                  className="me-3"
                 />
-                <div style={textContent}>
-                  <Link to={`/user/${res.user_id}`}>
+              </Col>
+              <Col>
+                <Card.Title>
+                  <Link
+                    to={`/user/${res.user_id}`}
+                    className="text-white text-decoration-none"
+                  >
                     <strong>{res.username}</strong>
                   </Link>{" "}
                   wrote:
-                  <p>{res.body}</p>
-                  <p style={{ fontSize: "0.8em", color: "#999" }}>
-                    ({new Date(res.created_at).toLocaleString()})
-                  </p>
+                </Card.Title>
+                <Card.Text>{res.body}</Card.Text>
+                <small className="text-white">
+                  {new Date(res.created_at).toLocaleString()}
+                </small>
+
+                {/* Actions */}
+                <div className="d-flex align-items-center gap-2 mt-2">
                   {res.userId === authData.id && (
-                    <div>
-                      <button
+                    <>
+                      <Button
+                        variant="danger"
+                        size="sm"
                         onClick={() => handleDeleteResponse(res.id)}
-                        style={{
-                          color: "white",
-                          cursor: "pointer",
-                          backgroundColor: "red",
-                        }}
                       >
                         Delete
-                      </button>
+                      </Button>
                       {deleteErrors[res.id] && (
-                        <p style={{ color: "red" }}>{deleteErrors[res.id]}</p>
+                        <Alert variant="danger" className="mt-2">
+                          {deleteErrors[res.id]}
+                        </Alert>
                       )}
-                    </div>
+                    </>
                   )}
+                  <LikeButton
+                    threadId={res.id}
+                    responseId={res.id}
+                    initialLikeStatus={res.userHasLiked}
+                    initialLikeCount={res.likeCount}
+                  />
                 </div>
-                <LikeButton
-                  threadId={res.id} // Pass the thread id
-                  responseId={res.id} // You could also use res.id for responseId
-                  initialLikeStatus={res.userHasLiked} // Assuming this is the "liked" state
-                  initialLikeCount={res.likeCount} // Pass the initial like count
-                />
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>No responses yet.</p>
-        )}
-      </div>
+              </Col>
+            </Row>
+          </Card>
+        ))
+      ) : (
+        <p className="text-white">No responses yet.</p>
+      )}
 
       {/* Response Form */}
-      <div style={StyleContainer}>
-        <form onSubmit={handleResponseSubmit}>
-          <textarea
-            value={responseText}
-            onChange={(e) => setResponseText(e.target.value)}
-            style={inputStyle}
-            placeholder="Write your response here..."
-            required
-          ></textarea>
-          <button
-            type="submit"
-            style={{ backgroundColor: "black", margin: "20px" }}
-          >
+      <Card className="bg-dark text-white p-3 mt-5 shadow">
+        <Form onSubmit={handleResponseSubmit}>
+          <Form.Group controlId="responseTextArea">
+            <Form.Label>Write your response</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              value={responseText}
+              onChange={(e) => setResponseText(e.target.value)}
+              placeholder="Write your response here..."
+              style={{
+                backgroundColor: "#333",
+                color: "#fff",
+                borderColor: "#444",
+              }}
+              required
+            />
+          </Form.Group>
+          <Button type="submit" variant="light" className="mt-3">
             Post Response
-          </button>
-          {error && <p style={{ color: "red" }}>{error}</p>}
-          {success && (
-            <p style={{ color: "green" }}>Response posted successfully!</p>
+          </Button>
+          {error && (
+            <Alert variant="danger" className="mt-3">
+              {error}
+            </Alert>
           )}
-        </form>
-      </div>
-    </div>
+          {success && (
+            <Alert variant="success" className="mt-3">
+              Response posted successfully!
+            </Alert>
+          )}
+        </Form>
+      </Card>
+    </Container>
   );
 }
 
