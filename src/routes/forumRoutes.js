@@ -34,6 +34,7 @@ import {
   likeResponse,
   unlikeResponse,
   getLikeCountForResponse,
+  getSubjects,
 } from "../controllers/forumController.js";
 
 import {
@@ -100,6 +101,8 @@ router.post(
   verifyCsrfToken,
   postResponseToThread
 );
+router.get("/subjects", getSubjects); // Public
+
 //response routes
 router.delete("/responses/:responseId", authenticateJWT, deleteResponse); // Protected
 

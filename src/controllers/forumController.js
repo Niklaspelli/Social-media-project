@@ -31,7 +31,7 @@ export const createThread = (req, res) => {
 };
 
 // Get all threads
-export const getAllThreads = (req, res) => {
+/* export const getAllThreads = (req, res) => {
   const sql = "SELECT * FROM threads"; // SQL query to fetch all threads
   db.query(sql, (err, results) => {
     if (err) {
@@ -41,10 +41,46 @@ export const getAllThreads = (req, res) => {
     // Respond with the list of threads
     res.status(200).json(results);
   });
+}; */
+
+export const getAllThreads = (req, res) => {
+  // Parse query parameters
+  const limit = parseInt(req.query.limit) > 0 ? parseInt(req.query.limit) : 5; // Default to 5 if no limit is specified or if the value is invalid
+  const page = parseInt(req.query.page) > 0 ? parseInt(req.query.page) : 1; // Default to page 1 if no page is specified or if the value is invalid
+  const offset = (page - 1) * limit; // Calculate the offset based on page and limit
+  const sort = req.query.sort === "asc" ? "ASC" : "DESC"; // Default to DESC (newest first)
+
+  // SQL to get the total number of threads
+  const countSql = "SELECT COUNT(*) AS total FROM threads";
+
+  // SQL to fetch threads with limit and offset if limit is specified
+  const dataSql = `SELECT * FROM threads ORDER BY created_at ${sort} LIMIT ? OFFSET ?`;
+
+  // Execute the count query first to get the total number of threads
+  db.query(countSql, (err, countResult) => {
+    if (err) {
+      console.error("Count error:", err.message);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    // Now fetch the threads with pagination and sorting
+    db.query(dataSql, [limit, offset], (err, results) => {
+      if (err) {
+        console.error("Error fetching threads:", err.message);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+
+      // Send the response with the threads, pagination info, and total pages
+      res.status(200).json({
+        threads: results,
+        total: countResult[0].total,
+        page,
+        totalPages: Math.ceil(countResult[0].total / limit), // Calculate total pages
+      });
+    });
+  });
 };
 
-// Get a specific thread with responses
-// Get a specific thread with responses
 export const getThreadWithResponses = (req, res) => {
   const { threadId } = req.params;
 
@@ -237,12 +273,10 @@ export const unlikeResponse = (req, res) => {
         return res.status(500).json({ error: "Internal Server Error" });
       }
 
-      return res
-        .status(200)
-        .json({
-          message: "Like removed successfully!",
-          likeCount: countResult[0].likeCount,
-        });
+      return res.status(200).json({
+        message: "Like removed successfully!",
+        likeCount: countResult[0].likeCount,
+      });
     });
   });
 };
@@ -265,5 +299,16 @@ export const getLikeCountForResponse = (req, res) => {
 
     // Return the like count
     res.status(200).json({ likeCount });
+  });
+};
+
+export const getSubjects = (req, res) => {
+  const sql = "SELECT * FROM subjects";
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching subjects:", err);
+      return res.status(500).json({ error: "Failed to fetch subjects" });
+    }
+    res.status(200).json(results);
   });
 };

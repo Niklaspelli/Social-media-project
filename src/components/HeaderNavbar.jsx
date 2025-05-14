@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Navbar, Nav, Button, Container, Image } from "react-bootstrap";
+import NavDropdown from "react-bootstrap/NavDropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUserEdit,
@@ -12,12 +13,18 @@ import {
   faStream,
 } from "@fortawesome/free-solid-svg-icons";
 import SearchBar from "./SearchBar"; // Import the new SearchBar component
+import useGetSubjects from "../queryHooks/threads/useGetSubjects"; // Import your custom hook
 
 const HeaderNavbar = () => {
   const { isAuthenticated, authData, logout: authLogout } = useAuth();
   const navigate = useNavigate();
   const currentUser = authData?.username;
   const NavbarAvatar = authData?.avatar;
+
+  const { data: subjects, isLoading, error } = useGetSubjects(); // Use custom hook to get subjects
+
+  if (isLoading) return <p>Loading subjects...</p>;
+  if (error) return <p style={{ color: "red" }}>{error.message}</p>;
 
   // Handle logout
   const handleLogout = () => {
@@ -58,18 +65,53 @@ const HeaderNavbar = () => {
                 </Nav.Link>
                 {/* Use the SearchBar component */}
                 <SearchBar />
+                <NavDropdown
+                  icon={faComments}
+                  title={
+                    <>
+                      {" "}
+                      <FontAwesomeIcon icon={faUser} className="me-2" />
+                      Profile
+                    </>
+                  }
+                  id="basic-nav-dropdown"
+                >
+                  <NavDropdown.Item as={Link} to={`/user/${authData.userId}`}>
+                    View Profile
+                  </NavDropdown.Item>
+                  <NavDropdown.Item
+                    as={Link}
+                    to={`/settings/${authData.userId}`}
+                  >
+                    Settings
+                  </NavDropdown.Item>
+                </NavDropdown>
 
-                <Nav.Link as={Link} to={`/user/${authData.userId}`}>
-                  <FontAwesomeIcon icon={faUser} className="me-1" /> Profile
-                </Nav.Link>
                 <Nav.Link as={Link} to={`/friends/${authData.userId}`}>
                   <FontAwesomeIcon icon={faUserFriends} className="me-1" />{" "}
                   Friends
                 </Nav.Link>
-                <Nav.Link as={Link} to={`/settings/${authData.userId}`}>
-                  <FontAwesomeIcon icon={faUserEdit} className="me-1" />{" "}
-                  Settings
-                </Nav.Link>
+
+                <NavDropdown
+                  icon={faComments}
+                  title={
+                    <>
+                      <FontAwesomeIcon icon={faComments} className="me-1" />{" "}
+                      Forum
+                    </>
+                  }
+                  id="basic-nav-dropdown"
+                >
+                  {subjects.map((subject) => (
+                    <NavDropdown.Item
+                      key={subject.id}
+                      as={Link}
+                      to={`/forum/subject/${subject.id}`}
+                    >
+                      {subject.name}
+                    </NavDropdown.Item>
+                  ))}{" "}
+                </NavDropdown>
                 <Nav.Link as={Link} to="/forum">
                   <FontAwesomeIcon icon={faComments} className="me-1" /> Forum
                 </Nav.Link>
