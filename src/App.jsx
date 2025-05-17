@@ -14,11 +14,11 @@ import ThreadList from "./components/thread/ThreadList"; // Adjust the path acco
 import ThreadDetail from "./components/thread/ThreadDetail"; // Adjust the path accordingly
 import UserProfile from "./pages/userprofile/UserProfile"; // Import the UserProfile component
 import FriendList from "./pages/userprofile/FriendList"; // Import the UserProfile component
-
 import EditProfile from "./pages/settings/EditProfile.jsx";
 import CreateProfile from "./pages/settings/CreateProfile.jsx";
 import HeaderNavbar from "./components/HeaderNavbar.jsx";
 import AllFeed from "./pages/userprofile/feed/AllFeed.jsx";
+import SubjectPage from "./components/thread/SubjectPage.jsx";
 
 function App() {
   return (
@@ -40,7 +40,8 @@ function App() {
 
             <Route path="/user/:id" element={<UserProfile />} />
             <Route path="/friends/:id" element={<FriendList />} />
-            <Route path="/forum" element={<Forum />} />
+            <Route path="/forum/subject/:id" element={<SubjectPage />} />
+
             {/* Ensure UserProfile is imported */}
             <Route path="/settings/:id" element={<Settings />} />
             <Route path="/create-profile" element={<CreateProfile />} />
@@ -48,9 +49,11 @@ function App() {
               path="/settings/edit-profile/:id"
               element={<EditProfile />}
             />
-            <Route path="/threads" element={<ThreadList />} />
             <Route path="/threads/:threadId" element={<ThreadDetail />} />
-            <Route path="/create-thread" element={<CreateThread />} />
+            <Route
+              path="/subjects/:subjectId/create"
+              element={<CreateThread />}
+            />
           </Route>
 
           {/* Fallback for undefined routes */}

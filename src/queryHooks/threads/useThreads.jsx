@@ -26,28 +26,27 @@ export default useThreads; */
 
 import { useQuery } from "@tanstack/react-query";
 
-const fetchThreads = async ({ page = 1, sort = "desc" }) => {
-  const response = await fetch(
-    `http://localhost:5000/api/auth/threads?page=${page}&limit=5&sort=${sort}`,
-    { credentials: "include" }
-  );
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch threads");
+const fetchThreads = async (
+  page = 1,
+  limit = 10,
+  sort = "desc",
+  subjectId = null
+) => {
+  let url = `http://localhost:5000/api/auth/threads?page=${page}&limit=${limit}&sort=${sort}`;
+  if (subjectId) {
+    url += `&subject_id=${subjectId}`;
   }
 
-  return await response.json();
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Failed to fetch threads");
+  return res.json();
 };
 
-const useThreads = (page = 1, limit = 5, sort = "desc") => {
-  return useQuery({
-    queryKey: ["threads", page, limit, sort],
-    queryFn: () => fetchThreads({ page: page, sort, limit }),
-    staleTime: 1000 * 60,
-    cacheTime: 1000 * 60 * 5,
+const useThreads = (page, limit, sort, subjectId) =>
+  useQuery({
+    queryKey: ["threads", page, limit, sort, subjectId],
+    queryFn: () => fetchThreads(page, limit, sort, subjectId),
     keepPreviousData: true,
-    retry: 1,
   });
-};
 
 export default useThreads;

@@ -39,29 +39,32 @@ function ThreadList() {
 export default ThreadList;
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import useThreads from "../../queryHooks/threads/useThreads";
 import "./ThreadList.css";
 
-function ThreadList() {
+function ThreadList({ subjectId }) {
   const { authData } = useAuth();
   const [page, setPage] = useState(1);
   const [sortOrder, setSortOrder] = useState("desc");
 
+  useEffect(() => {
+    setPage(1); // Reset to first page when subject changes
+  }, [subjectId]);
+
   const { data, isLoading, error, isPreviousData } = useThreads(
     page,
     5,
-    sortOrder
+    sortOrder,
+    subjectId
   );
 
   const handleToggleSort = () => {
     setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
-    setPage(1); // Reset to page 1 when sort changes
+    setPage(1);
   };
-
-  console.log(data);
 
   if (isLoading) return <p>Loading threads...</p>;
   if (error) return <p style={{ color: "red" }}>{error.message}</p>;
@@ -94,7 +97,6 @@ function ThreadList() {
         <p>No threads available.</p>
       )}
 
-      {/* Pagination controls */}
       <div style={{ marginTop: "1rem", display: "flex", gap: "1rem" }}>
         <button
           onClick={() => setPage((p) => Math.max(p - 1, 1))}

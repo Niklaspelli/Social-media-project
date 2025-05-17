@@ -133,15 +133,13 @@ const inputStyle = {
 // components/CreateThread.js
 import React, { useState } from "react";
 import { Form, Button, Card, Container, Alert, Spinner } from "react-bootstrap";
-
 import { useAuth } from "../../context/AuthContext"; // Make sure the path is correct
 import ThreadList from "./ThreadList";
 import useCreateThread from "../../queryHooks/threads/useCreateThread"; // Import your custom hook
 
-const CreateThread = () => {
+const CreateThread = ({ defaultSubjectId }) => {
   const { authData } = useAuth();
   const { username, accessToken } = authData;
-
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [error, setError] = useState(null);
@@ -166,12 +164,17 @@ const CreateThread = () => {
       return;
     }
 
-    mutate({ title, body, username, accessToken });
+    mutate({
+      title,
+      body,
+      username,
+      accessToken,
+      subject_id: defaultSubjectId, // 👈 ensure it's a number
+    });
   };
 
   return (
     <Container className="mt-5">
-      <ThreadList />
       <h2 className="text-center text-white my-4">Skapa ny tråd</h2>
 
       <Card className="bg-dark text-white p-4 shadow">

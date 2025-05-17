@@ -13,7 +13,7 @@ import {
   faStream,
 } from "@fortawesome/free-solid-svg-icons";
 import SearchBar from "./SearchBar"; // Import the new SearchBar component
-import useGetSubjects from "../queryHooks/threads/useGetSubjects"; // Import your custom hook
+import useGetSubjects from "../queryHooks/subjects/useGetSubjects"; // Import your custom hook
 
 const HeaderNavbar = () => {
   const { isAuthenticated, authData, logout: authLogout } = useAuth();
@@ -112,9 +112,7 @@ const HeaderNavbar = () => {
                     </NavDropdown.Item>
                   ))}{" "}
                 </NavDropdown>
-                <Nav.Link as={Link} to="/forum">
-                  <FontAwesomeIcon icon={faComments} className="me-1" /> Forum
-                </Nav.Link>
+
                 <Button
                   variant="outline-light"
                   className="ms-2"

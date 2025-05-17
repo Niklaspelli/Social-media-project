@@ -8,7 +8,7 @@ const createThread = async (newThread) => {
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(";").shift();
   }
-  const { title, body, username, accessToken } = newThread;
+  const { title, body, username, accessToken, subject_id } = newThread;
   const csrfToken = getCookie("csrfToken"); // Du kan ha getCookie-funktionen här också
 
   const response = await fetch(`http://localhost:5000/api/auth/threads`, {
@@ -23,6 +23,7 @@ const createThread = async (newThread) => {
       title: title,
       body: body,
       author: username,
+      subject_id,
     }),
   });
 
