@@ -1,33 +1,30 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { useUsers } from "../../context/UserContext";
-import { Container, Row, Col, Image, Button, Card } from "react-bootstrap";
+import { Container, Row, Col, Image, Card } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot, faMusic } from "@fortawesome/free-solid-svg-icons";
+
 import AddFriendButton from "./AddFriendButton";
 import Feed from "./feed/Feed";
 
+import { useUserProfile } from "../../queryHooks/users/useUserProfile"; // andra användare
+import { useCurrentUserProfile } from "../../queryHooks/users/useCurrentUserProfile"; // inloggad användare
+
 function UserProfile() {
-  const { id: receiverId } = useParams(); // Get receiverId from URL params
-  const { authData } = useAuth(); // Get auth data
-  const { userProfiles, fetchUserProfile, loading, error } = useUsers(); // Get user profile and fetch function
+  const { id: receiverId } = useParams();
+  const { authData } = useAuth();
+  const isOwnProfile = Number(authData?.userId) === Number(receiverId);
 
-  const token = authData?.accessToken; // Get the token
+  const {
+    data: profile,
+    isLoading,
+    error,
+  } = isOwnProfile ? useCurrentUserProfile() : useUserProfile(receiverId);
 
-  useEffect(() => {
-    if (token && receiverId && !userProfiles[receiverId]) {
-      fetchUserProfile(receiverId, token);
-    }
-  }, [receiverId, token, fetchUserProfile, userProfiles]);
-
-  // Access the profile data for the current user
-  const profile = userProfiles[receiverId]; // Get the profile from context
-
-  if (loading) return <p>Loading user profile...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
-
-  if (!profile) return <p>No profile available.</p>;
+  if (isLoading) return <p>Loading profile...</p>;
+  if (error) return <p style={{ color: "red" }}>{error.message}</p>;
+  if (!profile) return <p>No profile found.</p>;
 
   return (
     <Container style={{ color: "white" }}>
@@ -41,19 +38,16 @@ function UserProfile() {
             height={200}
             className="mb-3"
           />
-          {/*  <p style={{ color: "green" }}>
-            <strong>{profile.username}</strong>
-          </p> */}
 
-          {/* Add friend button if not the logged-in user */}
-          {Number(authData?.userId) !== Number(receiverId) && (
+          {!isOwnProfile && (
             <AddFriendButton
               senderId={authData?.userId}
               receiverId={receiverId}
-              token={token}
+              token={authData?.accessToken}
             />
           )}
 
+          {/* Profile Details */}
           <Card className="mb-3 shadow-sm">
             <Card.Body>
               <Card.Title className="text-muted fs-6">
@@ -61,40 +55,43 @@ function UserProfile() {
               </Card.Title>
               <Row>
                 <Col xs={12} md={6} className="mb-2">
-                  <strong>Followers:</strong>{" "}
-                  <span>{profile.numberOfFriends}</span>
+                  <strong>Followers:</strong> {profile.numberOfFriends || 0}
                 </Col>
                 <Col xs={12} md={6} className="mb-2">
-                  <strong>Sex:</strong> <span>{profile.sex}</span>
+                  <strong>Sex:</strong> {profile.sex || "Not specified"}
                 </Col>
                 <Col xs={12} md={6} className="mb-2">
                   <strong>Relationship Status:</strong>{" "}
-                  <span>{profile.relationship_status}</span>
+                  {profile.relationship_status || "Unknown"}
                 </Col>
                 <Col xs={12} md={6} className="mb-2">
                   <FontAwesomeIcon
                     icon={faLocationDot}
                     className="me-2 text-secondary"
                   />
-                  <span>{profile.location}</span>
+                  {profile.location || "No location provided"}
                 </Col>
                 <Col xs={12} md={6} className="mb-2">
                   <FontAwesomeIcon
                     icon={faMusic}
                     className="me-2 text-secondary"
                   />
-                  <span>{profile.music_taste}</span>
+                  {profile.music_taste || "No music preference"}
                 </Col>
               </Row>
             </Card.Body>
           </Card>
+
+          {/* Interest */}
           <Card className="mb-3 shadow-sm">
             <Card.Body>
-              <Card.Title>Interest:</Card.Title>
-              <span>{profile.interest}</span>
+              <Card.Title>Interest</Card.Title>
+              <span>{profile.interest || "No interest specified"}</span>
             </Card.Body>
           </Card>
-          <Card className="mb-3 shadow-sm bg-grey">
+
+          {/* Bio */}
+          <Card className="mb-3 shadow-sm bg-light">
             <Card.Body>
               <Card.Title className="text-black fs-6">Bio</Card.Title>
               <Card.Text
@@ -109,6 +106,8 @@ function UserProfile() {
             </Card.Body>
           </Card>
         </Col>
+
+        {/* Feed Section */}
         <Col xs={12} md={5}>
           <Feed />
         </Col>

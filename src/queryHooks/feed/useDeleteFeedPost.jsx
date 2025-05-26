@@ -1,21 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "../../context/AuthContext";
 
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(";").shift();
-}
-
-const deletePost = async ({ postId, accessToken }) => {
-  const csrfToken = getCookie("csrfToken");
-
+const deletePost = async ({ postId, accessToken, csrfToken }) => {
   const res = await fetch(
     `http://localhost:5000/api/auth/feed-post/${postId}`,
     {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        "CSRF-TOKEN": csrfToken,
+        "csrf-token": csrfToken,
       },
       credentials: "include",
     }
@@ -31,9 +24,10 @@ const deletePost = async ({ postId, accessToken }) => {
 
 export default function useDeleteFeedPost(userId, accessToken) {
   const queryClient = useQueryClient();
+  const { csrfToken } = useAuth();
 
   return useMutation({
-    mutationFn: ({ postId }) => deletePost({ postId, accessToken }),
+    mutationFn: ({ postId }) => deletePost({ postId, accessToken, csrfToken }),
     onSuccess: () => {
       console.log("🗑️ Post deleted via React Query hook");
       queryClient.invalidateQueries(["feedPosts", userId, accessToken]);

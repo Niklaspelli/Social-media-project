@@ -94,9 +94,6 @@ const SearchBar = () => {
     }
   };
 
-  // Debug log to ensure userProfiles is being updated
-  console.log("Rendering with userProfiles:", userProfiles);
-
   return (
     <form onSubmit={handleSearchSubmit}>
       <InputGroup>

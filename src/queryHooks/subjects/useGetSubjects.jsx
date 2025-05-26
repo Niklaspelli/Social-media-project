@@ -12,8 +12,10 @@ const fetchSubjects = async () => {
 // Custom hook to get subjects
 const useGetSubjects = () => {
   return useQuery({
-    queryKey: ["subjects"], // Unique key for caching
-    queryFn: fetchSubjects, // Function to fetch data
+    queryKey: ["subjects"],
+    queryFn: fetchSubjects,
+    staleTime: 10 * 60 * 1000, // 10 minuter
+    refetchOnWindowFocus: false,
   });
 };
 

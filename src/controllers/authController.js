@@ -90,19 +90,12 @@ export const loginUser = async (req, res) => {
           sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // Set to "None" in production
         });
 
-        res.cookie("csrfToken", csrfToken, {
-          httpOnly: false, // Must be false if you want to access it from JavaScript!
-
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "Strict",
-          maxAge: 15 * 60 * 1000,
-        });
-
         return res.json({
           userId: userRecord.id,
           username: userRecord.username,
           avatar: userRecord.avatar,
-          accessToken, // ✅ include this
+          accessToken,
+          csrfToken, // ✅ include this
         });
       } else {
         console.log("Password mismatch for user:", username);
@@ -115,9 +108,18 @@ export const loginUser = async (req, res) => {
   });
 };
 
+// CSRF-token endpoint
 export const getCsrfToken = (req, res) => {
-  const csrfToken = req.cookies.csrfToken;
-  res.json({ csrfToken });
+  const csrfToken = generateCsrfToken();
+
+  res.cookie("csrfToken", csrfToken, {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 15 * 60 * 1000,
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+  });
+
+  return res.json({ csrfToken });
 };
 
 export const logout = (req, res) => {

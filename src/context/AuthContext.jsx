@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+/* import React, { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
@@ -110,4 +110,65 @@ export const useAuth = () => {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
+};
+ */
+
+import React, { createContext, useContext, useState, useEffect } from "react";
+
+const AuthContext = createContext();
+
+export const useAuth = () => useContext(AuthContext);
+
+export const AuthProvider = ({ children }) => {
+  const [authData, setAuthData] = useState(null);
+  const [csrfToken, setCsrfToken] = useState("");
+
+  const login = (username, userId, avatar, accessToken, csrfToken) => {
+    setAuthData({ username, userId, avatar, accessToken, csrfToken });
+  };
+
+  const logout = () => {
+    setAuthData(null);
+    setCsrfToken("");
+    // här kan du lägga till en fetch till backend /logout om du har en sådan endpoint
+  };
+
+  const fetchCsrfToken = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/auth/csrf-token",
+        {
+          credentials: "include",
+        }
+      );
+      const data = await response.json();
+      if (data.csrfToken) {
+        setCsrfToken(data.csrfToken);
+      }
+    } catch (err) {
+      console.error("Failed to fetch CSRF token", err);
+    }
+  };
+
+  useEffect(() => {
+    if (!csrfToken) {
+      fetchCsrfToken();
+    }
+  }, [csrfToken]);
+
+  return (
+    <AuthContext.Provider
+      value={{
+        authData,
+        isAuthenticated: !!authData,
+        login,
+        logout,
+        csrfToken,
+        setCsrfToken,
+        fetchCsrfToken,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };

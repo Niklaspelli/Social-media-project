@@ -1,4 +1,4 @@
-import React, {
+/* import React, {
   createContext,
   useContext,
   useState,
@@ -6,19 +6,15 @@ import React, {
   useCallback,
 } from "react";
 import { useAuth } from "./AuthContext";
+import { useCsrf } from "./CsrfContext";
 
 const UserContext = createContext();
 
 export const useUsers = () => useContext(UserContext);
 
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(";").shift();
-}
-
 export const UserProvider = ({ children }) => {
   const { setAuthData } = useAuth();
+  const csrfToken = useCsrf();
 
   const [userProfiles, setUserProfiles] = useState({});
   const [currentUserProfile, setCurrentUserProfile] = useState(null);
@@ -37,8 +33,6 @@ export const UserProvider = ({ children }) => {
       }
 
       try {
-        const csrfToken = getCookie("csrfToken");
-
         const response = await fetch(
           `http://localhost:5000/api/auth/users/${userId}`,
           {
@@ -46,7 +40,7 @@ export const UserProvider = ({ children }) => {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
-              "CSRF-TOKEN": csrfToken,
+              "csrf-token": csrfToken,
             },
             credentials: "include",
           }
@@ -96,14 +90,13 @@ export const UserProvider = ({ children }) => {
     setLoading(true);
     try {
       const token = localStorage.getItem("accessToken");
-      const csrfToken = getCookie("csrfToken");
 
       const response = await fetch(`http://localhost:5000/api/auth/profile`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
-          "CSRF-TOKEN": csrfToken,
+          "csrf-token": csrfToken,
         },
         credentials: "include",
       });
@@ -146,3 +139,4 @@ export const UserProvider = ({ children }) => {
     </UserContext.Provider>
   );
 };
+ */

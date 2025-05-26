@@ -12,7 +12,7 @@ import useDeleteFeedPost from "../../../queryHooks/feed/useDeleteFeedPost";
 
 const Feed = () => {
   const { authData } = useAuth();
-  const { userId: loggedInUserId, accessToken } = authData;
+  const { userId: loggedInUserId, accessToken, csrfToken } = authData;
   const { id: userId } = useParams();
 
   const isOwnProfile = loggedInUserId === Number(userId);
@@ -23,7 +23,7 @@ const Feed = () => {
     isError,
     error,
     refetch,
-  } = useUserFeedPosts(userId, accessToken);
+  } = useUserFeedPosts(userId, accessToken, csrfToken);
 
   const { mutate: deleteFeedPost, isLoading: isDeleting } = useDeleteFeedPost(
     userId,

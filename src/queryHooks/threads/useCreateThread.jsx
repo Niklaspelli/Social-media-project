@@ -1,27 +1,27 @@
 // hooks/useCreateThread.js
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "../../context/AuthContext";
 
-// Funktion för att skapa tråd
-const createThread = async (newThread) => {
-  function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
-  }
-  const { title, body, username, accessToken, subject_id } = newThread;
-  const csrfToken = getCookie("csrfToken"); // Du kan ha getCookie-funktionen här också
-
+// Function to create thread
+const createThread = async ({
+  title,
+  body,
+  username,
+  accessToken,
+  csrfToken,
+  subject_id,
+}) => {
   const response = await fetch(`http://localhost:5000/api/auth/threads`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
-      "CSRF-TOKEN": csrfToken,
+      "csrf-token": csrfToken,
     },
     credentials: "include",
     body: JSON.stringify({
-      title: title,
-      body: body,
+      title,
+      body,
       author: username,
       subject_id,
     }),
@@ -38,12 +38,23 @@ const createThread = async (newThread) => {
   return await response.json(); // Return the created thread
 };
 
-// Custom hook för att hantera mutation
 const useCreateThread = () => {
+  const queryClient = useQueryClient();
+  const { authData, csrfToken } = useAuth();
+  const { accessToken, username } = authData || {};
+
   return useMutation({
-    mutationFn: createThread,
+    mutationFn: (newThread) =>
+      createThread({
+        ...newThread,
+        accessToken,
+        csrfToken,
+        username,
+      }),
     onSuccess: (data) => {
       console.log("Thread created successfully:", data);
+      // optionally invalidate or refetch thread lists here
+      queryClient.invalidateQueries(["threads"]);
     },
     onError: (error) => {
       console.error("Failed to create thread:", error.message);

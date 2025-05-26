@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 
@@ -7,61 +7,37 @@ const Login = ({ onSwitchToSignUp }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [loginError, setLoginError] = useState("");
-  const [error, setError] = useState(null); // Define error state
-  const [csrfToken, setCsrfToken] = useState(""); // New state for CSRF token
+  const [error, setError] = useState(null);
   const errRef = useRef();
-  const navigate = useNavigate();
-  const { login, isAuthenticated, authData } = useAuth();
 
-  // Fetch CSRF token once when the component is mounted
+  const navigate = useNavigate();
+  const { login, isAuthenticated, authData, csrfToken, fetchCsrfToken } =
+    useAuth();
+
+  // 🔐 Hämta CSRF-token om den inte finns
   useEffect(() => {
-    // Redirect if already authenticated
     if (isAuthenticated) {
       navigate(`/user/${authData.id}`);
-      return; // 🛑 Stop here, don't fetch CSRF token
+      return;
     }
-
-    const fetchCsrfToken = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:5000/api/auth/csrf-token",
-          {
-            method: "GET",
-            credentials: "include", // Include cookies for session management
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          setCsrfToken(data.csrfToken); // Store CSRF token in state
-        } else {
-          setError("Failed to fetch CSRF token.");
-        }
-      } catch (error) {
-        setError("Error fetching CSRF token.");
-      }
-    };
-
-    fetchCsrfToken();
-  }, [isAuthenticated, navigate]);
+    if (!csrfToken) {
+      fetchCsrfToken();
+    }
+  }, [isAuthenticated, navigate, authData, csrfToken, fetchCsrfToken]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setLoginError(null); // Reset any previous login error
-    setError(null); // Reset general error state
+    setError(null);
 
-    // Basic form validation
     if (!username || !password) {
       setError("Username and password are required.");
       setIsLoading(false);
       return;
     }
 
-    // Ensure CSRF token is available before sending the request
     if (!csrfToken) {
-      setError("CSRF Token is missing!");
+      setError("Missing CSRF token.");
       setIsLoading(false);
       return;
     }
@@ -71,54 +47,44 @@ const Login = ({ onSwitchToSignUp }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "CSRF-TOKEN": csrfToken, // Send CSRF token in the headers
+          "csrf-token": csrfToken,
         },
-        body: JSON.stringify({
-          username: username,
-          password: password,
-        }),
-        credentials: "include", // Include cookies for session management
+        credentials: "include",
+        body: JSON.stringify({ username, password }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        const { userId, avatar, accessToken } = data;
+        const { userId, avatar, accessToken, csrfToken: newCsrf } = data;
 
-        if (accessToken) {
-          // Successful login
-          login(username, userId, avatar, accessToken);
-          localStorage.setItem("accessToken", accessToken); // Store access token
-          navigate(`/user/${userId}`);
+        login(username, userId, avatar, accessToken);
+        localStorage.setItem("accessToken", accessToken);
 
-          // **Update last_seen time after login**
-          const lastSeenResponse = await fetch(
-            "http://localhost:5000/api/auth/update-last-seen",
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessToken}`, // Pass the JWT token in Authorization header
-              },
-            }
-          );
-
-          if (!lastSeenResponse.ok) {
-            console.error("Failed to update last seen time");
-          } else {
-            console.log("Last seen time updated successfully");
-          }
-        } else {
-          setError("Authentication failed. Please try again.");
+        // 🔁 Uppdatera CSRF-token från svar om den finns
+        if (newCsrf) {
+          fetchCsrfToken(); // eller setCsrfToken(newCsrf);
         }
+
+        // Navigera
+        navigate(`/user/${userId}`);
+
+        // Uppdatera last seen
+        await fetch("http://localhost:5000/api/auth/update-last-seen", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
       } else {
         const errorData = await response.json();
         setError(errorData.message || "Invalid username or password");
       }
     } catch (err) {
-      setError(err.message || "An unexpected error occurred.");
+      setError(err.message || "Unexpected error.");
       if (errRef.current) errRef.current.focus();
     } finally {
-      setIsLoading(false); // Reset loading state
+      setIsLoading(false);
     }
   };
 
@@ -127,9 +93,9 @@ const Login = ({ onSwitchToSignUp }) => {
       <Row className="justify-content-center">
         <Col md={6} lg={7}>
           {isLoading && <div className="alert alert-info">Logging in...</div>}
-          {loginError && (
+          {error && (
             <div className="alert alert-danger" ref={errRef} role="alert">
-              {loginError}
+              {error}
             </div>
           )}
           {error && (

@@ -13,7 +13,7 @@ const postResponse = async ({
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
-        "CSRF-TOKEN": csrfToken,
+        "csrf-token": csrfToken,
       },
       credentials: "include",
       body: JSON.stringify({ body: responseText }),
