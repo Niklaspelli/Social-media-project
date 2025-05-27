@@ -208,27 +208,6 @@ export const getFriendCount = (req, res) => {
   });
 };
 
-/* export const getIncomingFriendRequests = (req, res) => {
-  const userId = req.user.id;
-
-  // Fetch only the sender_id of pending friend requests
-  const sql = `
-    SELECT sender_id
-    FROM friend_requests
-    WHERE receiver_id = ? AND status = 'pending'
-  `;
-
-  db.query(sql, [userId], (err, results) => {
-    if (err) {
-      console.error("Error fetching incoming friend requests:", err.message);
-      return res.status(500).json({ error: "Internal Server Error" });
-    }
-
-    // Returning the sender_id(s) of pending requests
-    res.status(200).json(results);
-  });
-}; */
-
 export const getIncomingFriendRequests = (req, res) => {
   const userId = req.user.id;
 
@@ -264,4 +243,22 @@ export const updateLastSeen = (req, res) => {
 
     res.sendStatus(200);
   });
+};
+
+export const getIncomingFriendRequestCount = async (req, res) => {
+  const receiverId = req.user.id;
+
+  db.query(
+    "SELECT COUNT(*) as count FROM friend_requests WHERE receiver_id = ? AND status = 'pending'",
+    [receiverId],
+    (error, results) => {
+      if (error) {
+        console.error("Error fetching friend request count:", error);
+        return res.status(500).json({ error: "Database error" });
+      }
+
+      const count = results[0].count;
+      res.json({ count });
+    }
+  );
 };

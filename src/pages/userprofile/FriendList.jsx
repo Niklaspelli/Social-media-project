@@ -1,72 +1,49 @@
-import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import { Container, Row, Col, Image } from "react-bootstrap";
 import AcceptRejectButton from "./AcceptRejectButton";
+import useFriends from "../../queryHooks/friends/useFetchFriends";
+import useReceivedRequests from "../../queryHooks/friends/useReceivedRequest";
 
 function FriendList() {
   const { authData } = useAuth();
   const token = authData?.accessToken;
   const loggedInUserId = authData?.userId;
 
-  const [incomingRequests, setIncomingRequests] = useState([]);
-  const [friends, setFriends] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    data: incomingRequests = [],
+    isLoading: loadingRequests,
+    isError: errorRequests,
+    error: requestsError,
+  } = useReceivedRequests(token);
 
-  useEffect(() => {
-    const fetchIncomingRequests = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:5000/api/auth/received-requests",
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            credentials: "include",
-          }
-        );
-
-        const data = await response.json();
-
-        setIncomingRequests(data);
-      } catch (err) {
-        console.error("Error fetching incoming requests:", err);
-      }
-    };
-
-    fetchIncomingRequests();
-  }, [token]);
-
-  // Fetch actual friends
-  useEffect(() => {
-    const fetchFriends = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:5000/api/auth/friends/${loggedInUserId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        const data = await response.json();
-        setFriends(data);
-      } catch (err) {
-        console.error("Error fetching friends:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFriends();
-  }, [loggedInUserId, token]);
-
-  if (loading) return <div>Loading...</div>;
+  const {
+    data: friends = [],
+    isLoading: loadingFriends,
+    isError: errorFriends,
+    error: friendsError,
+  } = useFriends(authData?.userId, authData?.accessToken);
 
   const isOnline = (lastSeen) => {
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
     return new Date(lastSeen) > fiveMinutesAgo;
   };
+
+  if (loadingFriends || loadingRequests) {
+    return <div>🔄 Laddar vänlista...</div>;
+  }
+
+  if (errorFriends || errorRequests) {
+    return (
+      <div style={{ color: "red" }}>
+        ❌ Ett fel inträffade:
+        <ul>
+          {errorFriends && <li>Vänner: {friendsError.message}</li>}
+          {errorRequests && <li>Förfrågningar: {requestsError.message}</li>}
+        </ul>
+      </div>
+    );
+  }
 
   return (
     <Container style={{ color: "white" }}>

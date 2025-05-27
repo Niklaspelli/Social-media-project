@@ -14,6 +14,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import SearchBar from "./SearchBar"; // Import the new SearchBar component
 import useGetSubjects from "../queryHooks/subjects/useGetSubjects"; // Import your custom hook
+import useGetFriendRequestCount from "../queryHooks/friends/useGetFriendRequestCount";
 
 const HeaderNavbar = () => {
   const { isAuthenticated, authData, logout: authLogout } = useAuth();
@@ -21,6 +22,11 @@ const HeaderNavbar = () => {
   const currentUser = authData?.username;
   const NavbarAvatar = authData?.avatar;
 
+  const { data: notificationCountData } = useGetFriendRequestCount(
+    authData?.userId,
+    authData?.accessToken
+  );
+  const friendRequestCount = notificationCountData?.count || 0;
   const { data: subjects, isLoading, error } = useGetSubjects(); // Use custom hook to get subjects
 
   if (isLoading) return <p>Loading subjects...</p>;
@@ -87,9 +93,21 @@ const HeaderNavbar = () => {
                   </NavDropdown.Item>
                 </NavDropdown>
 
-                <Nav.Link as={Link} to={`/friends/${authData.userId}`}>
-                  <FontAwesomeIcon icon={faUserFriends} className="me-1" />{" "}
-                  Friends
+                <Nav.Link
+                  as={Link}
+                  to={`/friends/${authData.userId}`}
+                  className="position-relative"
+                >
+                  <FontAwesomeIcon icon={faUserFriends} className="me-1" />
+                  Friends{" "}
+                  {friendRequestCount > 0 && (
+                    <span
+                      className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                      style={{ fontSize: "0.6rem" }}
+                    >
+                      {friendRequestCount}
+                    </span>
+                  )}
                 </Nav.Link>
 
                 <NavDropdown

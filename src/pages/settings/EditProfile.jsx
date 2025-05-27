@@ -87,15 +87,12 @@ const EditProfile = () => {
     }
 
     try {
-      const method = mode === "edit" ? "PUT" : "POST";
-      const url =
-        mode === "edit"
-          ? `http://localhost:5000/api/auth/users/${userId}`
-          : `http://localhost:5000/api/auth/users`;
+      const url = `http://localhost:5000/api/auth/users`; // Alltid POST
+      const method = "POST";
 
       const body = {
-        user_id: userId,
-        ...formData,
+        ...formData, // innehåller sex, relationship_status, etc.
+        // userId tas från accessToken i backend – ingen user_id behövs här
       };
 
       const response = await fetch(url, {
@@ -115,12 +112,9 @@ const EditProfile = () => {
         );
       }
 
-      // Optionally get updated profile from backend, if returned
-      // const updatedProfile = await response.json();
-
       setSuccess(true);
-      await refetch(); // refresh profile data from server
-      setMode("view");
+      await refetch(); // hämta uppdaterad profil
+      setMode("view"); // byt till visningsläge
     } catch (err) {
       console.error("Error saving profile:", err);
       setError(`Error saving profile: ${err.message}`);

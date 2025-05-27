@@ -14,8 +14,9 @@ function AcceptRejectButton({
   isPending: propIsPending,
   incomingRequest: propIncomingRequest,
 }) {
-  const { authData } = useAuth();
+  const { authData, csrfToken } = useAuth();
   const token = authData?.accessToken;
+  console.log("csrf:", csrfToken);
 
   // Local state override after accept/reject
   const [status, setStatus] = useState({
@@ -24,21 +25,13 @@ function AcceptRejectButton({
     incomingRequest: propIncomingRequest,
   });
 
-  const getCookie = (name) => {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
-  };
-
   const acceptFriendRequest = async () => {
-    const csrfToken = getCookie("csrfToken");
-
     const response = await fetch("http://localhost:5000/api/auth/accept", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        "CSRF-Token": csrfToken,
+        "csrf-token": csrfToken,
       },
       credentials: "include",
       body: JSON.stringify({ senderId }),
@@ -53,14 +46,12 @@ function AcceptRejectButton({
   };
 
   const rejectFriendRequest = async () => {
-    const csrfToken = getCookie("csrfToken");
-
     const response = await fetch("http://localhost:5000/api/auth/reject", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        "CSRF-Token": csrfToken,
+        "csrf-token": csrfToken,
       },
       credentials: "include",
       body: JSON.stringify({ senderId, receiverId }),

@@ -151,10 +151,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (!csrfToken) {
-      fetchCsrfToken();
-    }
-  }, [csrfToken]);
+    fetchCsrfToken();
+  }, []);
 
   return (
     <AuthContext.Provider

@@ -48,6 +48,7 @@ import {
   acceptFriendRequest,
   rejectFriendRequest,
   getIncomingFriendRequests,
+  getIncomingFriendRequestCount,
   getFriendshipStatus,
   getFriendsList,
   getFriendCount,
@@ -89,7 +90,7 @@ router.get("/profile/:userId", authenticateJWT, verifyCsrfToken, getUserById);
 
 router.get("/users/:userId", authenticateJWT, getUserProfile);
 router.post("/users", authenticateJWT, createOrUpdateUserProfile);
-router.put("/users/:userId", authenticateJWT, updateUserProfile);
+router.put("/users", authenticateJWT, updateUserProfile);
 
 // 📝 Forum routes
 router.get("/threads", getAllThreads); // Public
@@ -135,7 +136,11 @@ router.get("/friends/count/:userId", authenticateJWT, getFriendCount);
 router.get("/received-requests", authenticateJWT, getIncomingFriendRequests);
 router.put("/unfollow", authenticateJWT, unfollowFriend);
 router.put("/update-last-seen", authenticateJWT, updateLastSeen);
-
+router.get(
+  "/friends/notifications/:userId",
+  authenticateJWT,
+  getIncomingFriendRequestCount
+);
 router.post("/feed-post", authenticateJWT, verifyCsrfToken, createFeedPost);
 router.get("/friends-feed/", authenticateJWT, getFriendFeed);
 router.get("/feed-post/feed/:userId", authenticateJWT, getFullFeed);
