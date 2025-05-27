@@ -22,6 +22,8 @@ export const createFeedPost = (req, res) => {
 
 export const getUserFeedPosts = (req, res) => {
   const userId = req.params.userId;
+  console.log("req.user.id:", req.user.id);
+  console.log("req.params.userId:", req.params.userId);
 
   const sql = `
     SELECT

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 const fetchUserFeedPosts = async ({ queryKey }) => {
-  const [userId, accessToken] = queryKey;
+  const [_key, userId, accessToken] = queryKey; // _key är "feedPosts", ignorera den
 
   const res = await fetch(
     `http://localhost:5000/api/auth/feed-post/user/${userId}`,

@@ -23,8 +23,8 @@ const useGetFriendRequestCount = (userId, accessToken) => {
     queryKey: ["friendRequestCount", userId],
     queryFn: () => fetchFriendRequestCount(userId, accessToken), // ✅ korrekt här
     enabled: !!userId && !!accessToken, // bara kör om userId finns
-    refetchInterval: 30000, // var 30:e sekund
-    staleTime: 60000, // cache i 60 sek
+    refetchInterval: 120000, // var 2:a minut istället för 30s
+    staleTime: 120000, // cache i 2 minuter
     refetchOnWindowFocus: false,
   });
 };

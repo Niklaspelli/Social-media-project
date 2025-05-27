@@ -16,6 +16,7 @@ const Feed = () => {
   const { id: userId } = useParams();
 
   const isOwnProfile = loggedInUserId === Number(userId);
+  console.log("userid: ", userId, accessToken);
 
   const {
     data: posts = [],
