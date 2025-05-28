@@ -1,8 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-const fetchUserFeedPosts = async ({ queryKey }) => {
-  const [_key, userId, accessToken] = queryKey; // _key är "feedPosts", ignorera den
-
+const fetchUserFeedPosts = async ({ userId, accessToken }) => {
   const res = await fetch(
     `http://localhost:5000/api/auth/feed-post/user/${userId}`,
     {
@@ -20,8 +18,10 @@ const fetchUserFeedPosts = async ({ queryKey }) => {
 
 export default function useUserFeedPosts(userId, accessToken) {
   return useQuery({
-    queryKey: ["feedPosts", userId, accessToken],
-    queryFn: fetchUserFeedPosts,
+    queryKey: ["feedPosts", userId], // ✅ accessToken tas bort
+    queryFn: () => fetchUserFeedPosts({ userId, accessToken }),
     enabled: !!userId && !!accessToken,
+    staleTime: 60000, // rekommenderat: cachea i 60 sek
+    refetchOnWindowFocus: false,
   });
 }

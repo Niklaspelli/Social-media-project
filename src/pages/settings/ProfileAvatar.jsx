@@ -7,21 +7,12 @@ const ProfileAvatar = ({ setSelectedPicture }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPictureModal, setShowPictureModal] = useState(false);
-  const { authData } = useAuth();
 
-  const userId = authData?.userId;
-  const token = authData?.accessToken;
-
+  const { authData, csrfToken } = useAuth();
+  const { userId, accessToken } = authData || {};
   const openPictureModal = () => {
     setShowPictureModal(true);
     setTempPicture(""); // Reset tempPicture when opening modal
-  };
-
-  const getCookie = (name) => {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
-    return null;
   };
 
   const handlePictureSelect = () => {
@@ -40,7 +31,7 @@ const ProfileAvatar = ({ setSelectedPicture }) => {
     setSelectedPicture(tempPicture);
     localStorage.setItem("profilePicture", tempPicture);
 
-    if (!token || !userId) {
+    if (!accessToken || !userId) {
       setError("ID or token is missing");
       return;
     }
@@ -48,16 +39,14 @@ const ProfileAvatar = ({ setSelectedPicture }) => {
     setIsLoading(true);
 
     try {
-      const csrfToken = getCookie("csrfToken"); // Retrieve CSRF token
-      console.log("csrfToken:", csrfToken);
       const response = await fetch(
         "http://localhost:5000/api/auth/users/avatar",
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            "CSRF-Token": csrfToken,
-            Authorization: `Bearer ${token}`,
+            "csrf-token": csrfToken,
+            Authorization: `Bearer ${accessToken}`,
           },
           body: JSON.stringify({
             avatar: tempPicture,

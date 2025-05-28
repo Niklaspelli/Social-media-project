@@ -20,17 +20,16 @@ const fetchFriendsFeed = async (accessToken) => {
 
 export default function useFriendsFeed(accessToken) {
   return useQuery({
-    queryKey: ["friendsFeed", accessToken],
+    queryKey: ["friendsFeed", accessToken], // <-- viktig!
     queryFn: () => fetchFriendsFeed(accessToken),
-    enabled: !!accessToken, // Only fetch if accessToken is present
+    enabled: !!accessToken,
+    staleTime: 60000,
+    refetchOnWindowFocus: false,
     onSuccess: () => {
       console.log("✅ Friends feed fetched via React Query hook");
     },
     onError: (error) => {
-      console.error(
-        "❌ Failed to fetch friends feed via React Query hook:",
-        error.message
-      );
+      console.error("❌ Failed to fetch friends feed:", error.message);
     },
   });
 }

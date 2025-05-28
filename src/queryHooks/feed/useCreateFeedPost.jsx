@@ -21,12 +21,12 @@ const postFeed = async ({ content, accessToken, csrfToken }) => {
 export default function useCreateFeedPost() {
   const queryClient = useQueryClient();
   const { authData, csrfToken } = useAuth();
-  const { accessToken } = authData || {};
+  const { accessToken, userId } = authData || {};
 
   return useMutation({
     mutationFn: ({ content }) => postFeed({ content, accessToken, csrfToken }),
     onSuccess: () => {
-      queryClient.invalidateQueries(["feedPosts"]);
+      queryClient.invalidateQueries(["feedPosts", userId]);
       console.log("✅ Post created successfully");
     },
   });

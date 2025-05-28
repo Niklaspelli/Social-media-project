@@ -88,7 +88,7 @@ const EditProfile = () => {
 
     try {
       const url = `http://localhost:5000/api/auth/users`; // Alltid POST
-      const method = "POST";
+      const method = profile ? "PUT" : "POST"; // 👈 Skilj på nytt vs uppdatering
 
       const body = {
         ...formData, // innehåller sex, relationship_status, etc.

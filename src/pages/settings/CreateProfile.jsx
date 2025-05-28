@@ -57,7 +57,7 @@ const CreateProfile = () => {
         <label>Sex:</label>
         <select name="sex" value={formData.sex} onChange={handleChange}>
           <option value="">Select</option>
-          <option value="Male">Male</option>
+          <option value="Male">Maleeeeeeeeeeeeee</option>
           <option value="Female">Female</option>
           <option value="Other">Other</option>
           <option value="Prefer not to say">Prefer not to say</option>

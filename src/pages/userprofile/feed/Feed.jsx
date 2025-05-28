@@ -14,9 +14,7 @@ const Feed = () => {
   const { authData } = useAuth();
   const { userId: loggedInUserId, accessToken, csrfToken } = authData;
   const { id: userId } = useParams();
-
   const isOwnProfile = loggedInUserId === Number(userId);
-  console.log("userid: ", userId, accessToken);
 
   const {
     data: posts = [],
@@ -24,72 +22,108 @@ const Feed = () => {
     isError,
     error,
     refetch,
-  } = useUserFeedPosts(userId, accessToken, csrfToken);
+  } = useUserFeedPosts(userId, accessToken);
 
   const { mutate: deleteFeedPost, isLoading: isDeleting } = useDeleteFeedPost(
     userId,
     accessToken
   );
 
-  const handlePostCreated = () => {
-    refetch(); // Refresh after a new post is added
+  // Helper för att extrahera YouTube-ID och rensa bort länken
+  const youtubeRegex =
+    /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/;
+
+  const parseContent = (content) => {
+    const match = content.match(youtubeRegex);
+    const videoID = match ? match[1] : null;
+    const cleaned = content.replace(youtubeRegex, "").trim();
+    return { videoID, cleaned };
   };
+
+  const handlePostCreated = () => {
+    refetch();
+  };
+
+  if (isLoading) {
+    return (
+      <div className="text-center">
+        <Spinner animation="border" /> <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <p style={{ color: "red" }}>Failed to load posts: {error.message}</p>
+    );
+  }
 
   return (
     <div>
       {isOwnProfile && <FeedPostForm onPostCreated={handlePostCreated} />}
 
       <div className="mt-4">
-        {isLoading ? (
-          <div className="text-center">
-            <Spinner animation="border" />
-            <p>Loading...</p>
-          </div>
-        ) : isError ? (
-          <p style={{ color: "red" }}>Failed to load posts: {error.message}</p>
-        ) : posts.length === 0 ? (
+        {posts.length === 0 ? (
           <p>No posts to show.</p>
         ) : (
-          posts.map((post) => (
-            <Card key={post.id} className="mb-4">
-              <Card.Body>
-                <div className="d-flex align-items-center mb-2">
-                  <strong className="me-2">{post.username}</strong>
-                  <p
-                    className="text-muted"
-                    style={{ fontSize: "0.8em", marginBottom: 0 }}
-                  >
-                    {new Date(post.created_at).toLocaleString()}
-                  </p>
-                </div>
-                <Card.Text
-                  style={{
-                    color: "gray",
-                    fontSize: "0.9em",
-                    lineHeight: "1.6",
-                  }}
-                >
-                  {post.content}
-                </Card.Text>
-                <Button variant="outline-primary" size="sm">
-                  Comment
-                </Button>
-                <div className="mt-2">
-                  <FontAwesomeIcon
-                    icon={faThumbsUp}
-                    style={{ cursor: "pointer", color: "black" }}
-                    size="1x"
-                  />
-                  <span style={{ marginLeft: "4px" }}>100000000 likes</span>
+          posts.map((post) => {
+            const { videoID, cleaned } = parseContent(post.content);
+
+            return (
+              <Card key={post.id} className="mb-4">
+                <Card.Body>
+                  <div className="d-flex align-items-center mb-2">
+                    <strong className="me-2">{post.username}</strong>
+                    <p
+                      className="text-muted"
+                      style={{ fontSize: "0.8em", marginBottom: 0 }}
+                    >
+                      {new Date(post.created_at).toLocaleString()}
+                    </p>
+                  </div>
+
+                  {/** Den rensade texten */}
+                  {cleaned && (
+                    <Card.Text
+                      style={{
+                        color: "gray",
+                        fontSize: "0.9em",
+                        lineHeight: "1.6",
+                      }}
+                    >
+                      {cleaned}
+                    </Card.Text>
+                  )}
+
+                  {/** Iframe-embed om videoID finns */}
+                  {videoID && (
+                    <div className="mb-3">
+                      <iframe
+                        width="100%"
+                        height="315"
+                        src={`https://www.youtube.com/embed/${videoID}`}
+                        title="YouTube video player"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  )}
+
+                  <Button variant="outline-primary" size="sm">
+                    Comment
+                  </Button>
+
                   {isOwnProfile && (
                     <DeleteButton
                       onDelete={() => deleteFeedPost({ postId: post.id })}
+                      disabled={isDeleting}
                     />
                   )}
-                </div>
-              </Card.Body>
-            </Card>
-          ))
+                </Card.Body>
+              </Card>
+            );
+          })
         )}
       </div>
     </div>

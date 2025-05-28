@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { db } from "../config/db.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { promisify } from "util";
 import { SECURE, HTTP_ONLY, SAME_SITE } from "../config.js";
 import {
   generateAccessToken,
@@ -23,20 +24,47 @@ export const registerUser = async (req, res) => {
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const addUser = "INSERT INTO users (username, password) VALUES (?, ?)";
+    const insertUserSql =
+      "INSERT INTO users (username, password) VALUES (?, ?)";
 
-    db.query(addUser, [username, hashedPassword], (err, result) => {
+    db.query(insertUserSql, [username, hashedPassword], (err, result) => {
       if (err) {
-        console.error("Error inserting data:", err.message);
+        console.error("Error inserting user:", err.message);
         return res.status(500).json({ error: "Internal Server Error" });
       }
-      res.status(201).json({ id: result.insertId, username });
+
+      const newUserId = result.insertId;
+      // Skapa tom profilrad direkt
+      const insertProfileSql = `
+        INSERT INTO user_profiles 
+          (user_id, sex, relationship_status, location, music_taste, interest, bio)
+        VALUES (?, '', '', '', '', '', '')
+      `;
+
+      db.query(insertProfileSql, [newUserId], (profErr) => {
+        if (profErr) {
+          console.error("Error creating user profile:", profErr.message);
+          // Om det failar här, kanske du vill ta bort användaren eller åtminstone notifiera
+          return res
+            .status(500)
+            .json({ error: "User created but failed to initialize profile" });
+        }
+
+        // Allt lyckades
+        res.status(201).json({
+          id: newUserId,
+          username,
+          message: "User registered and profile initialized",
+        });
+      });
     });
   } catch (error) {
     console.error("Error hashing password:", error.message);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+///Login
 export const loginUser = async (req, res) => {
   const { username, password } = req.body;
 
@@ -141,7 +169,7 @@ export const logout = (req, res) => {
   return res.status(200).json({ message: "Logout successful" });
 };
 
-export const deleteUser = (req, res) => {
+/* export const deleteUser = (req, res) => {
   const userId = req.params.userId;
   console.log(`Received DELETE request for user ID: ${userId}`);
 
@@ -158,8 +186,46 @@ export const deleteUser = (req, res) => {
 
     return res.status(200).json({ message: "User deleted successfully" });
   });
+}; */
+
+// src/controllers/authController.js
+
+const query = promisify(db.query).bind(db);
+
+export const deleteUser = async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    // 1) Ta bort alla feed-poster för användaren
+    await query(`DELETE FROM user_feed WHERE userId = ?`, [userId]);
+
+    // 2) Ta bort användarens profil (om den finns)
+    await query(`DELETE FROM user_profiles WHERE user_id = ?`, [userId]);
+
+    // 3) Ta bort vänförfrågningar där användaren är sändare eller mottagare
+    await query(
+      `DELETE FROM friend_requests 
+       WHERE sender_id = ? OR receiver_id = ?`,
+      [userId, userId]
+    );
+
+    // … Lägg på fler rader för andra tabeller som har FK mot users …
+
+    // 4) Slutligen, ta bort själva användaren
+    const result = await query(`DELETE FROM users WHERE id = ?`, [userId]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting user:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
+//update avatar
 export const updateAvatar = async (req, res) => {
   const userId = req.user.id; // ✅ Comes from verified JWT
   const { avatar } = req.body;
