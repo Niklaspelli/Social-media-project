@@ -163,6 +163,7 @@ function Register() {
                       ? "instructions"
                       : "offscreen"
                   }
+                  style={{ color: "white" }}
                 >
                   <FontAwesomeIcon icon={faInfoCircle} /> 4–24 tecken. Börjar
                   med en bokstav. Tillåtna: bokstäver, siffror, - och _.
@@ -199,6 +200,7 @@ function Register() {
                   className={
                     pwdFocus && !validPwd ? "instructions" : "offscreen"
                   }
+                  style={{ color: "white" }}
                 >
                   <FontAwesomeIcon icon={faInfoCircle} /> 8–24 tecken. Måste
                   innehålla stora och små bokstäver, en siffra och ett
@@ -238,6 +240,7 @@ function Register() {
                   className={
                     matchFocus && !validMatch ? "instructions" : "offscreen"
                   }
+                  style={{ color: "white" }}
                 >
                   <FontAwesomeIcon icon={faInfoCircle} /> Måste matcha
                   lösenordet.

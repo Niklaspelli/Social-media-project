@@ -3,13 +3,11 @@ import { AuthProvider } from "./context/AuthContext"; // Import the context
 
 import { Routes, Route, Navigate } from "react-router-dom"; // Add Navigate for redirection
 
-import Forum from "./pages/Forum";
 import AuthPage from "./pages/AuthPage.jsx";
 import Settings from "./pages/settings/Settings.jsx";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import CreateThread from "./components/thread/CreateThread"; // Adjust the path accordingly
-import ThreadList from "./components/thread/ThreadList"; // Adjust the path accordingly
 import ThreadDetail from "./components/thread/ThreadDetail"; // Adjust the path accordingly
 import UserProfile from "./pages/userprofile/UserProfile"; // Import the UserProfile component
 import FriendList from "./pages/userprofile/FriendList"; // Import the UserProfile component
@@ -18,6 +16,7 @@ import CreateProfile from "./pages/settings/CreateProfile.jsx";
 import HeaderNavbar from "./components/HeaderNavbar.jsx";
 import AllFeed from "./pages/userprofile/feed/AllFeed.jsx";
 import SubjectPage from "./components/thread/SubjectPage.jsx";
+import EventView from "./pages/events/event-view.jsx";
 
 function App() {
   return (
@@ -38,6 +37,7 @@ function App() {
 
           <Route path="/user/:id" element={<UserProfile />} />
           <Route path="/friends/:id" element={<FriendList />} />
+          <Route path="/events/:id" element={<EventView />} />
           <Route path="/forum/subject/:id" element={<SubjectPage />} />
 
           {/* Ensure UserProfile is imported */}

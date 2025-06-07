@@ -59,7 +59,7 @@ const Settings = () => {
         <section className="text-center text-white">
           <h2>Your account is deleted! Welcome back!</h2>
           <p>
-            <Link to="/">Login</Link>
+            <Link to="/auth">Login</Link>
           </p>
         </section>
       ) : (

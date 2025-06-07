@@ -56,6 +56,8 @@ import {
   updateLastSeen,
 } from "../controllers/friendController.js";
 
+import { createEvent, getAllEvents } from "../controllers/eventController.js";
+
 const router = express.Router();
 
 router.get("/csrf-token", getCsrfToken); // ⬅️ Add this line
@@ -152,5 +154,9 @@ router.delete(
   verifyCsrfToken,
   deleteFeedPost
 );
+
+//events
+router.post("/events", authenticateJWT, verifyCsrfToken, createEvent); // Protected
+router.get("/events", authenticateJWT, getAllEvents);
 
 export default router;

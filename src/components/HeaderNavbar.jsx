@@ -1,4 +1,3 @@
-import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Navbar, Nav, Button, Container, Image } from "react-bootstrap";
@@ -108,6 +107,13 @@ const HeaderNavbar = () => {
                       {friendRequestCount}
                     </span>
                   )}
+                </Nav.Link>
+                <Nav.Link
+                  as={Link}
+                  to={`/events/:id`}
+                  className="position-relative"
+                >
+                  Events
                 </Nav.Link>
 
                 <NavDropdown

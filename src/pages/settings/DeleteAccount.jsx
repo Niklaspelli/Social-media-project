@@ -6,6 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 
 const DeleteAccount = ({ isLoading, onConfirm, onCancel }) => {
   const navigate = useNavigate();
+
   const { logout } = useAuth();
 
   const handleConfirm = async () => {
