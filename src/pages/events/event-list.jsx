@@ -1,9 +1,13 @@
 import React from "react";
 import { Card, Container, Spinner, Alert } from "react-bootstrap";
+import { useAuth } from "../../context/AuthContext"; // ✅ hämta authData
 import useEvents from "../../queryHooks/events/useEvents";
 
 const EventList = () => {
-  const { data: events, isLoading, isError, error } = useEvents();
+  const { authData } = useAuth();
+  const { accessToken } = authData || {};
+
+  const { data: events, isLoading, isError, error } = useEvents(accessToken);
 
   if (isLoading)
     return (
@@ -37,7 +41,7 @@ const EventList = () => {
         >
           <Card.Body>
             <Card.Title>{event.title}</Card.Title>
-            <Card.Subtitle className="mb-2 text-muted">
+            <Card.Subtitle className="mb-2 text-muted text-white">
               {new Date(event.datetime).toLocaleString()} — {event.location}
             </Card.Subtitle>
             <Card.Text>{event.description}</Card.Text>

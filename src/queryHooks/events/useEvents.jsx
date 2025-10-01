@@ -1,24 +1,26 @@
 import { useQuery } from "@tanstack/react-query";
 
-const fetchEvents = async () => {
-  const response = await fetch("http://localhost:5000/api/auth/events", {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-  });
+const useEvents = (accessToken) => {
+  const fetchEvents = async () => {
+    const response = await fetch("http://localhost:5000/api/auth/events", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`, // 🔑 samma som create
+      },
+    });
 
-  if (!response.ok) {
-    throw new Error("Kunde inte hämta events");
-  }
+    if (!response.ok) {
+      throw new Error("Kunde inte hämta events");
+    }
 
-  return response.json();
-};
+    return response.json();
+  };
 
-const useEvents = () => {
   return useQuery({
     queryKey: ["events"],
     queryFn: fetchEvents,
+    enabled: !!accessToken, // kör bara om token finns
+    staleTime: 1000 * 60 * 5,
   });
 };
 

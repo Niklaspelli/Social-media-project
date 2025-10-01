@@ -83,7 +83,7 @@ export const loginUser = async (req, res) => {
 
     if (result.length === 0) {
       console.log("Login attempt with non-existent username:", username);
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Wrong username or password!" });
     }
 
     const userRecord = result[0];
@@ -127,7 +127,7 @@ export const loginUser = async (req, res) => {
         });
       } else {
         console.log("Password mismatch for user:", username);
-        return res.status(401).json({ message: "Invalid credentials" });
+        return res.status(401).json({ message: "Wrong username or password!" });
       }
     } catch (err) {
       console.error("Error during password comparison:", err.message);

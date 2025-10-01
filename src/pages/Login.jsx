@@ -98,11 +98,6 @@ const Login = ({ onSwitchToSignUp }) => {
               {error}
             </div>
           )}
-          {error && (
-            <div className="alert alert-danger" role="alert">
-              {error}
-            </div>
-          )}
 
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
