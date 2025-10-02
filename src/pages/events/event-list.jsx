@@ -42,11 +42,17 @@ const EventList = () => {
           <Card.Body>
             <Card.Title>{event.title}</Card.Title>
             <Card.Subtitle className="mb-2 text-muted text-white">
-              {new Date(event.datetime).toLocaleString()} — {event.location}
+              <p style={{ fontSize: "0.8em", color: "#999" }}>
+                ({new Date(event.datetime).toLocaleString()})
+              </p>
+              <p style={{ fontSize: "0.8em", color: "#999" }}>
+                Plats: {event.location}
+              </p>
             </Card.Subtitle>
-            <Card.Text>{event.description}</Card.Text>
             <Card.Footer className="text-muted">
-              Skapad av: {event.creator_username}
+              <p style={{ fontSize: "0.8em", color: "#999" }}>
+                Skapad av: {event.creator_name}
+              </p>
             </Card.Footer>
           </Card.Body>
         </Card>

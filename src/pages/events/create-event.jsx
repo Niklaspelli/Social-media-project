@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Form, Button, Card, Container, Alert, Spinner } from "react-bootstrap";
 import { useAuth } from "../../context/AuthContext"; // Kontrollera att sökvägen är korrekt
 import useCreateEvent from "../../queryHooks/events/useCreateEvent"; // Din event-hook
+import useFriends from "../../queryHooks/friends/useFetchFriends";
 
 const CreateEvent = () => {
   const { authData } = useAuth();
@@ -10,7 +11,10 @@ const CreateEvent = () => {
   const [description, setDescription] = useState("");
   const [datetime, setDatetime] = useState("");
   const [location, setLocation] = useState("");
+  const [selectedFriends, setSelectedFriends] = useState([]);
   const [error, setError] = useState(null);
+
+  const loggedInUserId = authData?.userId;
 
   const {
     mutate,
@@ -19,6 +23,11 @@ const CreateEvent = () => {
     error: mutationError,
     isSuccess,
   } = useCreateEvent();
+
+  const { data: friends = [], isLoading: loadingFriends } = useFriends(
+    authData.userId,
+    accessToken
+  );
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -34,8 +43,17 @@ const CreateEvent = () => {
       description,
       datetime,
       location,
+      invitedUserIds: selectedFriends,
       accessToken,
     });
+  };
+
+  const handleFriendToggle = (friendId) => {
+    setSelectedFriends((prev) =>
+      prev.includes(friendId)
+        ? prev.filter((id) => id !== friendId)
+        : [...prev, friendId]
+    );
   };
 
   return (
@@ -108,6 +126,23 @@ const CreateEvent = () => {
               }}
               required
             />
+          </Form.Group>
+
+          <Form.Group controlId="eventInvites" className="mb-3">
+            <Form.Label>Bjud in vänner</Form.Label>
+            {loadingFriends ? (
+              <p>Laddar vänner...</p>
+            ) : (
+              friends.map((friend) => (
+                <Form.Check
+                  key={friend.id}
+                  type="checkbox"
+                  label={friend.username}
+                  checked={selectedFriends.includes(friend.id)}
+                  onChange={() => handleFriendToggle(friend.id)}
+                />
+              ))
+            )}
           </Form.Group>
 
           <div className="d-grid gap-2">

@@ -9,6 +9,7 @@ const createEvent = async ({
   location,
   accessToken,
   csrfToken,
+  ...eventData
 }) => {
   const response = await fetch(`http://localhost:5000/api/auth/events`, {
     method: "POST",
@@ -23,6 +24,7 @@ const createEvent = async ({
       description,
       datetime,
       location,
+      ...eventData,
     }),
   });
 

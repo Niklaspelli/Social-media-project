@@ -1,6 +1,7 @@
 import { db } from "../config/db.js"; // justera efter din struktur
 
 export const createEvent = (req, res) => {
+  console.log("Body vid createEvent:", req.body);
   const { title, description, datetime, location, invitedUserIds } = req.body;
   const { id: userId } = req.user; // från auth middleware
 
@@ -75,15 +76,17 @@ export const getUserEvents = (req, res) => {
   const userId = req.user.id;
 
   const sql = `
-    SELECT e.*, 'creator' AS relation
+    SELECT e.*, u.name AS creator_name,'creator' AS relation
     FROM events e
+    JOIN users u ON e.creator_id = u.id
     WHERE e.creator_id = ?
 
     UNION
 
-    SELECT e.*, 'invited' AS relation
+    SELECT e.*, u.name AS creator_name, 'invited' AS relation
     FROM events e
     JOIN event_invitations ei ON e.id = ei.event_id
+    JOIN users u ON e.creator_id = u.id
     WHERE ei.invited_user_id = ?
 
     ORDER BY datetime ASC;
