@@ -10,6 +10,7 @@ import {
   faUser,
   faUserFriends,
   faStream,
+  faBell,
 } from "@fortawesome/free-solid-svg-icons";
 import SearchBar from "./SearchBar"; // Import the new SearchBar component
 import useGetSubjects from "../queryHooks/subjects/useGetSubjects"; // Import your custom hook
@@ -68,6 +69,18 @@ const HeaderNavbar = () => {
                 <Nav.Link as={Link} to={"/feed/:id"}>
                   <FontAwesomeIcon icon={faStream} className="me-1" /> Feed
                 </Nav.Link>
+                <Nav.Link as={Link} to={"/notifications/:id"}>
+                  <FontAwesomeIcon icon={faBell} className="me-1" />{" "}
+                  Notifications
+                  {friendRequestCount > 0 && (
+                    <span
+                      className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                      style={{ fontSize: "0.6rem" }}
+                    >
+                      {friendRequestCount}
+                    </span>
+                  )}
+                </Nav.Link>
                 {/* Use the SearchBar component */}
                 <SearchBar />
                 <NavDropdown
@@ -99,14 +112,6 @@ const HeaderNavbar = () => {
                 >
                   <FontAwesomeIcon icon={faUserFriends} className="me-1" />
                   Friends{" "}
-                  {friendRequestCount > 0 && (
-                    <span
-                      className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                      style={{ fontSize: "0.6rem" }}
-                    >
-                      {friendRequestCount}
-                    </span>
-                  )}
                 </Nav.Link>
                 <Nav.Link
                   as={Link}

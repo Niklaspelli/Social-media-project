@@ -17,6 +17,7 @@ import HeaderNavbar from "./components/HeaderNavbar.jsx";
 import AllFeed from "./pages/userprofile/feed/AllFeed.jsx";
 import SubjectPage from "./components/thread/SubjectPage.jsx";
 import EventView from "./pages/events/event-view.jsx";
+import Notifications from "./pages/Notifications.jsx";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/feed/:id" element={<AllFeed />} />
+          <Route path="/notifications/:id" element={<Notifications />} />
 
           <Route path="/user/:id" element={<UserProfile />} />
           <Route path="/friends/:id" element={<FriendList />} />
