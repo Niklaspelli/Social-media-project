@@ -58,16 +58,6 @@ export const createEvent = (req, res) => {
                 .status(500)
                 .json({ error: "Event skapades men kunde inte bjuda in alla" });
             }
-            console.log("Skickar tillbaka event-data:", {
-              id: eventId,
-              title,
-              description,
-              datetime,
-              location,
-              creator_id: userId,
-              creator_name,
-              avatar,
-            });
 
             res.status(201).json({
               message: "Event skapades!",
@@ -270,5 +260,101 @@ export const getAllEventsPaginated = (req, res) => {
       return res.status(500).json({ error: "Internt serverfel" });
     }
     res.json({ page, limit, events: results });
+  });
+};
+
+export const getIncomingEventInvitations = (req, res) => {
+  const userId = req.user.id;
+
+  const sql = `
+    SELECT 
+      ei.event_id,
+      e.title,
+      e.description,
+      e.datetime,
+      e.location,
+      u.username AS creator_name,
+      u.avatar AS creator_avatar
+    FROM event_invitations ei
+    JOIN events e ON ei.event_id = e.id
+    JOIN users u ON e.creator_id = u.id
+    WHERE ei.invited_user_id = ? AND ei.status = 'pending'
+  `;
+
+  db.query(sql, [userId], (err, results) => {
+    if (err) {
+      console.error("Error fetching event invitations:", err.message);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    res.status(200).json(results);
+  });
+};
+
+export const getIncomingEventInvitationCount = (req, res) => {
+  const userId = req.user.id;
+
+  const sql = `
+    SELECT COUNT(*) AS count
+    FROM event_invitations
+    WHERE invited_user_id = ? AND status = 'pending'
+  `;
+
+  db.query(sql, [userId], (err, results) => {
+    if (err) {
+      console.error("Error fetching event invitation count:", err.message);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    const count = results[0].count || 0;
+    res.json({ count });
+  });
+};
+
+export const acceptEventInvitation = (req, res) => {
+  const userId = req.user.id;
+  const { eventId } = req.body; // ← ändrat från req.params
+
+  const sql = `
+    UPDATE event_invitations
+    SET status = 'accepted'
+    WHERE event_id = ? AND invited_user_id = ? AND status = 'pending'
+  `;
+
+  db.query(sql, [eventId, userId], (err, result) => {
+    if (err) {
+      console.error("Error accepting event invitation:", err.message);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "No pending invitation found" });
+    }
+
+    res.status(200).json({ message: "Invitation accepted" });
+  });
+};
+
+export const rejectEventInvitation = (req, res) => {
+  const userId = req.user.id;
+  const { eventId } = req.body; // ← ändrat från req.params
+
+  const sql = `
+    UPDATE event_invitations
+    SET status = 'rejected'
+    WHERE event_id = ? AND invited_user_id = ? AND status = 'pending'
+  `;
+
+  db.query(sql, [eventId, userId], (err, result) => {
+    if (err) {
+      console.error("Error rejecting event invitation:", err.message);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "No pending invitation found" });
+    }
+
+    res.status(200).json({ message: "Invitation rejected" });
   });
 };

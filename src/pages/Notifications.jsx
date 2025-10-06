@@ -1,5 +1,6 @@
 import { useAuth } from "../context/AuthContext";
 import useReceivedRequests from "../queryHooks/friends/useReceivedRequest";
+import useInvitationRequests from "../queryHooks/events/useInvitationRequests";
 import { Container, Row, Col, Image } from "react-bootstrap";
 import AcceptRejectButton from "./userprofile/AcceptRejectButton";
 
@@ -8,20 +9,23 @@ function Notifications() {
   const token = authData?.accessToken;
   const loggedInUserId = authData?.userId;
 
-  const {
-    data: incomingRequests = [],
-    isLoading: loadingRequests,
-    isError: errorRequests,
-    error: requestsError,
-  } = useReceivedRequests(token);
+  // Friend requests
+  const { data: incomingFriendRequests = [] } = useReceivedRequests(token);
+
+  // Event invitations
+  const { data: incomingEventInvitations = [] } = useInvitationRequests(token);
 
   return (
     <Container>
       <h1>Notifications</h1>
+
+      {/* Friend Requests */}
       <h2>Your Friend Requests</h2>
       <Row>
-        {incomingRequests.length === 0 && <p>No incoming notifications</p>}
-        {incomingRequests.map((request) => (
+        {incomingFriendRequests.length === 0 && (
+          <p>No incoming friend requests</p>
+        )}
+        {incomingFriendRequests.map((request) => (
           <Col key={request.sender_id} xs={12} md={6}>
             <div className="d-flex align-items-center gap-3 mb-3">
               <Image
@@ -32,16 +36,48 @@ function Notifications() {
                 height={50}
               />
               <div>
-                <strong>{request.username}</strong>
                 <AcceptRejectButton
-                  senderId={request.sender_id}
+                  type="friend"
+                  id={request.sender_id} // senderId
                   receiverId={loggedInUserId}
                   loggedInUserId={loggedInUserId}
-                  isFriend={false}
+                  username={request.username}
+                  avatar={request.avatar}
                   isPending={true}
                   incomingRequest={true}
-                  avatar={request.avatar}
-                  username={request.username}
+                />
+              </div>
+            </div>
+          </Col>
+        ))}
+      </Row>
+
+      {/* Event Invitations */}
+      <h2>Your Event Invitations</h2>
+      <Row>
+        {incomingEventInvitations.length === 0 && (
+          <p>No incoming event invitations</p>
+        )}
+        {incomingEventInvitations.map((invitation) => (
+          <Col key={invitation.event_id} xs={12} md={6}>
+            <div className="d-flex align-items-center gap-3 mb-3">
+              <Image
+                src={invitation.creator_avatar}
+                alt={invitation.creator_name}
+                roundedCircle
+                width={50}
+                height={50}
+              />
+              <div>
+                <AcceptRejectButton
+                  type="event"
+                  id={invitation.event_id} // eventId
+                  receiverId={loggedInUserId} // invitedUserId
+                  loggedInUserId={loggedInUserId}
+                  username={invitation.creator_name}
+                  avatar={invitation.creator_avatar}
+                  isPending={true}
+                  incomingRequest={true}
                 />
               </div>
             </div>

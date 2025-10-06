@@ -3,15 +3,13 @@ import { Button } from "react-bootstrap";
 import React, { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
-// ... other imports
-
 function AcceptRejectButton({
-  senderId,
-  receiverId,
+  type, // "friend" eller "event"
+  id, // senderId för friend, eventId för event
+  receiverId, // för friend, invitedUserId för event
   loggedInUserId,
   username,
   avatar,
-  isFriend: propIsFriend,
   isPending: propIsPending,
   incomingRequest: propIncomingRequest,
 }) {
@@ -19,17 +17,24 @@ function AcceptRejectButton({
   const token = authData?.accessToken;
   const queryClient = useQueryClient();
 
-  console.log("csrf:", csrfToken);
-
-  // Local state override after accept/reject
   const [status, setStatus] = useState({
-    isFriend: propIsFriend,
     isPending: propIsPending,
     incomingRequest: propIncomingRequest,
   });
 
-  const acceptFriendRequest = async () => {
-    const response = await fetch("http://localhost:5000/api/auth/accept", {
+  // Accept-knapp
+  const accept = async () => {
+    const endpoint =
+      type === "friend"
+        ? "http://localhost:5000/api/auth/accept"
+        : "http://localhost:5000/api/auth/events/invitations/accept";
+
+    const body =
+      type === "friend"
+        ? { senderId: id }
+        : { eventId: id, invitedUserId: receiverId };
+
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -37,20 +42,35 @@ function AcceptRejectButton({
         "csrf-token": csrfToken,
       },
       credentials: "include",
-      body: JSON.stringify({ senderId }),
+      body: JSON.stringify(body),
     });
 
     const data = await response.json();
     if (response.ok) {
-      setStatus({ isFriend: true, isPending: false, incomingRequest: false });
-      queryClient.invalidateQueries(["friendRequestCount", loggedInUserId]);
+      setStatus({ isPending: false, incomingRequest: false });
+      queryClient.invalidateQueries(
+        type === "friend"
+          ? ["friendRequestCount", loggedInUserId]
+          : ["eventInvitationCount"]
+      );
     } else {
       alert(data.error);
     }
   };
 
-  const rejectFriendRequest = async () => {
-    const response = await fetch("http://localhost:5000/api/auth/reject", {
+  // Reject-knapp
+  const reject = async () => {
+    const endpoint =
+      type === "friend"
+        ? "http://localhost:5000/api/auth/reject"
+        : "http://localhost:5000/api/auth/events/invitations/reject";
+
+    const body =
+      type === "friend"
+        ? { senderId: id, receiverId }
+        : { eventId: id, invitedUserId: receiverId };
+
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -58,65 +78,45 @@ function AcceptRejectButton({
         "csrf-token": csrfToken,
       },
       credentials: "include",
-      body: JSON.stringify({ senderId, receiverId }),
+      body: JSON.stringify(body),
     });
 
     const data = await response.json();
     if (response.ok) {
-      setStatus({ isFriend: false, isPending: false, incomingRequest: false });
-      queryClient.invalidateQueries(["friendRequestCount", loggedInUserId]);
+      setStatus({ isPending: false, incomingRequest: false });
+      queryClient.invalidateQueries(
+        type === "friend"
+          ? ["friendRequestCount", loggedInUserId]
+          : ["eventInvitationCount"]
+      );
     } else {
       alert(data.error);
     }
   };
 
-  const { isFriend, isPending, incomingRequest } = status;
-
-  console.log("=== AcceptRejectButton DEBUG ===");
-  console.log("senderId:", senderId);
-  console.log("receiverId:", receiverId);
-  console.log("loggedInUserId:", loggedInUserId);
-  console.log("isFriend:", isFriend);
-  console.log("isPending:", isPending);
-  console.log("incomingRequest:", incomingRequest);
-  console.log("receiverId === loggedInUserId:", receiverId === loggedInUserId);
+  if (!status.isPending) return null;
 
   return (
     <div>
-      {isFriend && (
-        <div style={inputStyle}>You are friends with this user!</div>
-      )}
-      {isPending && incomingRequest && receiverId === loggedInUserId && (
+      {status.incomingRequest && receiverId === loggedInUserId && (
         <>
-          <strong>{username}</strong>
-          <p> wants to be your friend</p>
-          <Button variant="dark" onClick={acceptFriendRequest}>
+          {username && <strong>{username}</strong>}
+          <p>
+            {type === "friend"
+              ? "wants to be your friend"
+              : "invited you to an event"}
+          </p>
+          <Button variant="dark" onClick={accept}>
             Accept
           </Button>{" "}
-          <Button variant="light" onClick={rejectFriendRequest}>
+          <Button variant="light" onClick={reject}>
             Reject
           </Button>
         </>
       )}
-
-      {isPending && senderId === loggedInUserId && !incomingRequest && (
-        <p>Friend request pending...</p>
-      )}
+      {!status.incomingRequest && id === loggedInUserId && <p>Pending...</p>}
     </div>
   );
 }
 
 export default AcceptRejectButton;
-
-const inputStyle = {
-  borderRadius: "20px",
-  border: "1px solid #ddd",
-  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-  outline: "none",
-  fontSize: "16px",
-  transition: "border-color 0.3s ease",
-  backgroundColor: "grey",
-  color: "white",
-  padding: "10px 20px",
-  margin: "10px 0",
-};

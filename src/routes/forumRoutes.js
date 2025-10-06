@@ -56,7 +56,14 @@ import {
   updateLastSeen,
 } from "../controllers/friendController.js";
 
-import { createEvent, getAllEvents } from "../controllers/eventController.js";
+import {
+  createEvent,
+  getAllEvents,
+  getIncomingEventInvitations,
+  getIncomingEventInvitationCount,
+  acceptEventInvitation,
+  rejectEventInvitation,
+} from "../controllers/eventController.js";
 
 const router = express.Router();
 
@@ -158,5 +165,23 @@ router.delete(
 //events
 router.post("/events", authenticateJWT, verifyCsrfToken, createEvent); // Protected
 router.get("/events", authenticateJWT, getAllEvents);
+router.get("/events/invitations", authenticateJWT, getIncomingEventInvitations);
+router.get(
+  "/events/invitations/count",
+  authenticateJWT,
+  getIncomingEventInvitationCount
+);
+router.post(
+  "/events/invitations/accept",
+  authenticateJWT,
+  verifyCsrfToken,
+  acceptEventInvitation
+);
+router.post(
+  "/events/invitations/reject",
+  authenticateJWT,
+  verifyCsrfToken,
+  rejectEventInvitation
+);
 
 export default router;
