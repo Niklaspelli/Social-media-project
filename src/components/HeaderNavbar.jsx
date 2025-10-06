@@ -37,7 +37,7 @@ const HeaderNavbar = () => {
     authLogout();
     navigate("/");
   };
-
+  console.log("Friend request count data:", notificationCountData);
   return (
     <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
       <Container>
@@ -69,13 +69,13 @@ const HeaderNavbar = () => {
                 <Nav.Link as={Link} to={"/feed/:id"}>
                   <FontAwesomeIcon icon={faStream} className="me-1" /> Feed
                 </Nav.Link>
-                <Nav.Link as={Link} to={"/notifications/:id"}>
+                <Nav.Link as={Link} to={`/notifications/${authData.userId}`}>
                   <FontAwesomeIcon icon={faBell} className="me-1" />{" "}
                   Notifications
                   {friendRequestCount > 0 && (
                     <span
-                      className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                      style={{ fontSize: "0.6rem" }}
+                      className="badge rounded-pill bg-danger ms-1"
+                      style={{ fontSize: "0.75rem", verticalAlign: "middle" }}
                     >
                       {friendRequestCount}
                     </span>

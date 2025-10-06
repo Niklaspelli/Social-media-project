@@ -1,6 +1,7 @@
 import { useAuth } from "../../context/AuthContext";
 import { Button } from "react-bootstrap";
 import React, { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 // ... other imports
 
@@ -16,6 +17,8 @@ function AcceptRejectButton({
 }) {
   const { authData, csrfToken } = useAuth();
   const token = authData?.accessToken;
+  const queryClient = useQueryClient();
+
   console.log("csrf:", csrfToken);
 
   // Local state override after accept/reject
@@ -40,6 +43,7 @@ function AcceptRejectButton({
     const data = await response.json();
     if (response.ok) {
       setStatus({ isFriend: true, isPending: false, incomingRequest: false });
+      queryClient.invalidateQueries(["friendRequestCount", loggedInUserId]);
     } else {
       alert(data.error);
     }
@@ -60,6 +64,7 @@ function AcceptRejectButton({
     const data = await response.json();
     if (response.ok) {
       setStatus({ isFriend: false, isPending: false, incomingRequest: false });
+      queryClient.invalidateQueries(["friendRequestCount", loggedInUserId]);
     } else {
       alert(data.error);
     }

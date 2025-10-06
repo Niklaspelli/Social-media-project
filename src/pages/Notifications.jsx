@@ -20,7 +20,7 @@ function Notifications() {
       <h1>Notifications</h1>
       <h2>Your Friend Requests</h2>
       <Row>
-        {incomingRequests.length === 0 && <p>No incoming requests</p>}
+        {incomingRequests.length === 0 && <p>No incoming notifications</p>}
         {incomingRequests.map((request) => (
           <Col key={request.sender_id} xs={12} md={6}>
             <div className="d-flex align-items-center gap-3 mb-3">
@@ -48,8 +48,6 @@ function Notifications() {
           </Col>
         ))}
       </Row>
-
-      <p>You have no new notifications.</p>
     </Container>
   );
 }
