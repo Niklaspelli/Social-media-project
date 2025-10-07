@@ -18,6 +18,7 @@ import AllFeed from "./pages/userprofile/feed/AllFeed.jsx";
 import SubjectPage from "./components/thread/SubjectPage.jsx";
 import EventView from "./pages/events/event-view.jsx";
 import Notifications from "./pages/Notifications.jsx";
+import EventDetails from "./pages/events/event-details.jsx";
 
 function App() {
   return (
@@ -39,7 +40,9 @@ function App() {
 
           <Route path="/user/:id" element={<UserProfile />} />
           <Route path="/friends/:id" element={<FriendList />} />
+          <Route path="/events/event-details/:id" element={<EventDetails />} />
           <Route path="/events/:id" element={<EventView />} />
+
           <Route path="/forum/subject/:id" element={<SubjectPage />} />
 
           {/* Ensure UserProfile is imported */}

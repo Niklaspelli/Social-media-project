@@ -2,14 +2,16 @@ import { useAuth } from "../../context/AuthContext";
 import { Button } from "react-bootstrap";
 import React, { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 
 function AcceptRejectButton({
   type, // "friend" eller "event"
   id, // senderId för friend, eventId för event
-  receiverId, // för friend, invitedUserId för event
+  receiverId,
   loggedInUserId,
   username,
   avatar,
+  eventTitle, // endast för event
   isPending: propIsPending,
   incomingRequest: propIncomingRequest,
 }) {
@@ -22,17 +24,13 @@ function AcceptRejectButton({
     incomingRequest: propIncomingRequest,
   });
 
-  // Accept-knapp
   const accept = async () => {
     const endpoint =
       type === "friend"
         ? "http://localhost:5000/api/auth/accept"
         : "http://localhost:5000/api/auth/events/invitations/accept";
 
-    const body =
-      type === "friend"
-        ? { senderId: id }
-        : { eventId: id, invitedUserId: receiverId };
+    const body = type === "friend" ? { senderId: id } : { eventId: id };
 
     const response = await fetch(endpoint, {
       method: "POST",
@@ -58,7 +56,6 @@ function AcceptRejectButton({
     }
   };
 
-  // Reject-knapp
   const reject = async () => {
     const endpoint =
       type === "friend"
@@ -66,9 +63,7 @@ function AcceptRejectButton({
         : "http://localhost:5000/api/auth/events/invitations/reject";
 
     const body =
-      type === "friend"
-        ? { senderId: id, receiverId }
-        : { eventId: id, invitedUserId: receiverId };
+      type === "friend" ? { senderId: id, receiverId } : { eventId: id };
 
     const response = await fetch(endpoint, {
       method: "POST",
@@ -100,21 +95,33 @@ function AcceptRejectButton({
     <div>
       {status.incomingRequest && receiverId === loggedInUserId && (
         <>
-          {username && <strong>{username}</strong>}
           <p>
-            {type === "friend"
-              ? "wants to be your friend"
-              : "invited you to an event"}
+            {type === "friend" ? (
+              <>
+                <strong>{username}</strong> wants to be your friend
+              </>
+            ) : (
+              <>
+                <strong>{username}</strong> invited you to{" "}
+                <Link
+                  to={`/events/event-details/${id}`}
+                  style={{ textDecoration: "underline" }}
+                >
+                  {eventTitle}
+                </Link>
+              </>
+            )}
           </p>
-          <Button variant="dark" onClick={accept}>
-            Accept
-          </Button>{" "}
-          <Button variant="light" onClick={reject}>
-            Reject
-          </Button>
+          <div className="d-flex gap-2 mt-2">
+            <Button variant="dark" size="sm" onClick={accept}>
+              Accept
+            </Button>
+            <Button variant="light" size="sm" onClick={reject}>
+              Reject
+            </Button>
+          </div>
         </>
       )}
-      {!status.incomingRequest && id === loggedInUserId && <p>Pending...</p>}
     </div>
   );
 }

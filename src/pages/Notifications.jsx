@@ -35,18 +35,16 @@ function Notifications() {
                 width={50}
                 height={50}
               />
-              <div>
-                <AcceptRejectButton
-                  type="friend"
-                  id={request.sender_id} // senderId
-                  receiverId={loggedInUserId}
-                  loggedInUserId={loggedInUserId}
-                  username={request.username}
-                  avatar={request.avatar}
-                  isPending={true}
-                  incomingRequest={true}
-                />
-              </div>
+              <AcceptRejectButton
+                type="friend"
+                id={request.sender_id}
+                receiverId={loggedInUserId}
+                loggedInUserId={loggedInUserId}
+                username={request.username}
+                avatar={request.avatar}
+                isPending={true}
+                incomingRequest={true}
+              />
             </div>
           </Col>
         ))}
@@ -68,18 +66,17 @@ function Notifications() {
                 width={50}
                 height={50}
               />
-              <div>
-                <AcceptRejectButton
-                  type="event"
-                  id={invitation.event_id} // eventId
-                  receiverId={loggedInUserId} // invitedUserId
-                  loggedInUserId={loggedInUserId}
-                  username={invitation.creator_name}
-                  avatar={invitation.creator_avatar}
-                  isPending={true}
-                  incomingRequest={true}
-                />
-              </div>
+              <AcceptRejectButton
+                type="event"
+                id={invitation.event_id}
+                receiverId={loggedInUserId}
+                loggedInUserId={loggedInUserId}
+                username={invitation.creator_name}
+                avatar={invitation.creator_avatar}
+                eventTitle={invitation.title}
+                isPending={true}
+                incomingRequest={true}
+              />
             </div>
           </Col>
         ))}

@@ -1,64 +1,63 @@
-import React from "react";
-import { Card, Container, Spinner, Alert } from "react-bootstrap";
-import { useAuth } from "../../context/AuthContext"; // ✅ hämta authData
-import useEvents from "../../queryHooks/events/useEvents";
+import { useAuth } from "../../context/AuthContext";
+import { useQuery } from "@tanstack/react-query";
+import { Container, Row, Col, Card, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
-const EventList = () => {
+const fetchUserEvents = async (token) => {
+  const res = await fetch("http://localhost:5000/api/auth/events/user", {
+    headers: { Authorization: `Bearer ${token}` },
+    credentials: "include",
+  });
+
+  if (!res.ok) throw new Error("Failed to fetch events");
+  return res.json();
+};
+
+function EventList() {
   const { authData } = useAuth();
-  const { accessToken } = authData || {};
+  const token = authData?.accessToken;
 
-  const { data: events, isLoading, isError, error } = useEvents(accessToken);
+  const { data: events = [], isLoading } = useQuery({
+    queryKey: ["userEvents"],
+    queryFn: () => fetchUserEvents(token),
+    enabled: !!token,
+  });
 
-  if (isLoading)
-    return (
-      <Container className="text-center mt-5">
-        <Spinner animation="border" />
-      </Container>
-    );
-
-  if (isError)
-    return (
-      <Container className="mt-5">
-        <Alert variant="danger">
-          Fel vid hämtning av events: {error.message}
-        </Alert>
-      </Container>
-    );
+  if (isLoading) return <p>Loading events...</p>;
 
   return (
-    <Container className="mt-5">
-      <h2 className="text-white mb-4">Kommande Events</h2>
-      {events.length === 0 && (
-        <p className="text-white">Inga events hittades.</p>
-      )}
-      {events.map((event) => (
-        <Card
-          key={event.id}
-          bg="dark"
-          text="white"
-          className="mb-3 shadow"
-          style={{ borderColor: "#444" }}
-        >
-          <Card.Body>
-            <Card.Title>{event.title}</Card.Title>
-            <Card.Subtitle className="mb-2 text-muted text-white">
-              <p style={{ fontSize: "0.8em", color: "#999" }}>
-                ({new Date(event.datetime).toLocaleString()})
-              </p>
-              <p style={{ fontSize: "0.8em", color: "#999" }}>
-                Plats: {event.location}
-              </p>
-            </Card.Subtitle>
-            <Card.Footer className="text-muted">
-              <p style={{ fontSize: "0.8em", color: "#999" }}>
-                Skapad av: {event.creator_name}
-              </p>
-            </Card.Footer>
-          </Card.Body>
-        </Card>
-      ))}
+    <Container>
+      <h1>Your Events</h1>
+      <Row>
+        {events.length === 0 && <p>No events found</p>}
+        {events.map((event) => (
+          <Col key={event.id} xs={12} md={6} lg={4} className="mb-3">
+            <Card>
+              <Card.Body>
+                <Card.Title>{event.title}</Card.Title>
+                <Card.Subtitle className="mb-2 text-muted">
+                  {event.relation === "creator"
+                    ? "Created by you"
+                    : `Invited by ${event.creator_name}`}
+                </Card.Subtitle>
+                <Card.Text>
+                  {event.description}
+                  <br />
+                  <strong>Date:</strong>{" "}
+                  {new Date(event.datetime).toLocaleString()}
+                  <br />
+                  <strong>Location:</strong> {event.location}
+                </Card.Text>
+                <Link to={`/events/event-details/${event.id}`}>
+                  <Button variant="primary">View Details</Button>
+                </Link>
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
     </Container>
   );
-};
+}
 
 export default EventList;

@@ -358,3 +358,54 @@ export const rejectEventInvitation = (req, res) => {
     res.status(200).json({ message: "Invitation rejected" });
   });
 };
+
+export const getEventById = (req, res) => {
+  const { id } = req.params;
+
+  const sql = `
+    SELECT 
+      e.id, e.title, e.description, e.datetime, e.location,
+      u.username AS creator_name, u.avatar AS creator_avatar
+    FROM events e
+    JOIN users u ON e.creator_id = u.id
+    WHERE e.id = ?
+  `;
+
+  db.query(sql, [id], (err, result) => {
+    if (err) {
+      console.error("Error fetching event:", err.message);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+
+    if (result.length === 0) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    res.status(200).json(result[0]);
+  });
+};
+
+// GET /api/events/:eventId/invitees
+export const getEventInvitees = (req, res) => {
+  const { eventId } = req.params;
+
+  const sql = `
+    SELECT 
+      u.id,
+      u.username,
+      u.avatar,
+      ei.status
+    FROM event_invitations ei
+    JOIN users u ON ei.invited_user_id = u.id
+    WHERE ei.event_id = ?
+  `;
+
+  db.query(sql, [eventId], (err, results) => {
+    if (err) {
+      console.error("Error fetching invitees:", err.message);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    res.status(200).json(results);
+  });
+};
