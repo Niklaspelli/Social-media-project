@@ -40,7 +40,7 @@ function EventList() {
                     ? "Created by you"
                     : `Invited by ${event.creator_name}`}
                 </Card.Subtitle>
-                <Card.Text>
+                <Card.Text className="text-black">
                   {event.description}
                   <br />
                   <strong>Date:</strong>{" "}
@@ -49,7 +49,12 @@ function EventList() {
                   <strong>Location:</strong> {event.location}
                 </Card.Text>
                 <Link to={`/events/event-details/${event.id}`}>
-                  <Button variant="primary">View Details</Button>
+                  <Button
+                    variant="light"
+                    style={{ backgroundColor: "black", color: "white" }}
+                  >
+                    View Details
+                  </Button>
                 </Link>
               </Card.Body>
             </Card>

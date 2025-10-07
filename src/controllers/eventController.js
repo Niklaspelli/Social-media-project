@@ -360,9 +360,9 @@ export const rejectEventInvitation = (req, res) => {
 };
 
 export const getEventById = (req, res) => {
-  const { id } = req.params;
+  const { eventId } = req.params;
 
-  const sql = `
+  const eventSql = `
     SELECT 
       e.id, e.title, e.description, e.datetime, e.location,
       u.username AS creator_name, u.avatar AS creator_avatar
@@ -371,17 +371,35 @@ export const getEventById = (req, res) => {
     WHERE e.id = ?
   `;
 
-  db.query(sql, [id], (err, result) => {
+  const attendeesSql = `
+    SELECT 
+      u.id, u.username, u.avatar, ei.status
+    FROM event_invitations ei
+    JOIN users u ON ei.invited_user_id = u.id
+    WHERE ei.event_id = ? AND ei.status = 'accepted'
+  `;
+
+  db.query(eventSql, [eventId], (err, eventResult) => {
     if (err) {
       console.error("Error fetching event:", err.message);
       return res.status(500).json({ error: "Internal server error" });
     }
 
-    if (result.length === 0) {
+    if (eventResult.length === 0) {
       return res.status(404).json({ error: "Event not found" });
     }
 
-    res.status(200).json(result[0]);
+    const event = eventResult[0];
+
+    db.query(attendeesSql, [eventId], (err, attendeesResult) => {
+      if (err) {
+        console.error("Error fetching attendees:", err.message);
+        return res.status(500).json({ error: "Internal server error" });
+      }
+
+      event.attendees = attendeesResult;
+      res.status(200).json(event);
+    });
   });
 };
 

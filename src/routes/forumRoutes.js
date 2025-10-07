@@ -188,7 +188,7 @@ router.post(
   verifyCsrfToken,
   rejectEventInvitation
 );
-router.get("/events/:id", authenticateJWT, getEventById);
+router.get("/events/:eventId", authenticateJWT, getEventById);
 router.get("/events/:eventId/invitees", authenticateJWT, getEventInvitees);
 
 export default router;
