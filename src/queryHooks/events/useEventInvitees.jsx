@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 const fetchEventInvitees = async (eventId, token) => {
   const res = await fetch(
-    `http://localhost:5000/api/events/${eventId}/invitees`,
+    `http://localhost:5000/api/auth/events/${eventId}/invitees`,
     {
       headers: {
         Authorization: `Bearer ${token}`,

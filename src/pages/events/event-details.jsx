@@ -1,52 +1,31 @@
+/* ✅ Förklaringar:
+
+Vi använder useEventDetails för att hämta själva eventet (title, creator, location osv).
+
+Vi använder useEventInvitees för att hämta alla invitees och deras status.
+
+accepted beräknas lokalt som invitees.filter(i => i.status === 'accepted').
+
+Vi visar två sektioner i en Accordion: en för accepted attendees, en för alla invitees.
+
+På detta sätt har du en tydlig separation och du behöver inte blanda in event.attendees från backend längre. */
+
 import { useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { useQuery } from "@tanstack/react-query";
 import { Container, Spinner, Image, Accordion } from "react-bootstrap";
-
-const fetchEventDetails = async (id, token) => {
-  const response = await fetch(`http://localhost:5000/api/auth/events/${id}`, {
-    method: "GET",
-    headers: { Authorization: `Bearer ${token}` },
-    credentials: "include",
-  });
-  if (!response.ok) throw new Error("Failed to fetch event details");
-  return response.json();
-};
-
-const fetchEventInvitees = async (id, token) => {
-  const response = await fetch(
-    `http://localhost:5000/api/auth/events/${id}/invitees`,
-    {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-      credentials: "include",
-    }
-  );
-  if (!response.ok) throw new Error("Failed to fetch invitees");
-  return response.json();
-};
+import useEventDetails from "../../queryHooks/events/useEventDetails";
+import useEventInvitees from "../../queryHooks/events/useEventInvitees";
 
 function EventDetails() {
   const { id } = useParams();
   const { authData } = useAuth();
   const token = authData?.accessToken;
 
-  const {
-    data: event,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ["eventDetails", id],
-    queryFn: () => fetchEventDetails(id, token),
-    enabled: !!token && !!id,
-  });
+  // Hämta eventdetaljer + attendees (accepted)
+  const { data: event, isLoading, isError, error } = useEventDetails(id, token);
 
-  const { data: invitees = [] } = useQuery({
-    queryKey: ["eventInvitees", id],
-    queryFn: () => fetchEventInvitees(id, token),
-    enabled: !!token && !!id,
-  });
+  // Hämta alla invitees (oavsett status)
+  const { data: invitees = [] } = useEventInvitees(id, token);
 
   if (isLoading)
     return (
@@ -62,8 +41,17 @@ function EventDetails() {
       </Container>
     );
 
+  if (!event)
+    return (
+      <Container className="text-center mt-5">
+        <p>Event not found.</p>
+      </Container>
+    );
+
   // Dela upp invitees i accepted och alla
   const accepted = invitees.filter((i) => i.status === "accepted");
+
+  console.log("invitees", invitees);
 
   return (
     <Container className="mt-4">
@@ -95,9 +83,10 @@ function EventDetails() {
       </p>
 
       <Accordion alwaysOpen className="my-3">
+        {/* Accepted attendees */}
         <Accordion.Item eventKey="0">
           <Accordion.Header>
-            Show accepted attendees ({accepted.length})
+            Accepted attendees ({accepted.length})
           </Accordion.Header>
           <Accordion.Body>
             {accepted.length > 0 ? (
@@ -123,10 +112,9 @@ function EventDetails() {
           </Accordion.Body>
         </Accordion.Item>
 
+        {/* All invitees */}
         <Accordion.Item eventKey="1">
-          <Accordion.Header>
-            Show all invitees ({invitees.length})
-          </Accordion.Header>
+          <Accordion.Header>All invitees ({invitees.length})</Accordion.Header>
           <Accordion.Body>
             {invitees.length > 0 ? (
               <ul>
