@@ -3,6 +3,7 @@ import React from "react";
 import { Image, ListGroup, Spinner } from "react-bootstrap";
 import useEventInvitees from "../../queryHooks/events/useEventInvitees";
 import { useAuth } from "../../context/AuthContext";
+import "./event-styling.css";
 
 function EventInviteesList({ eventId }) {
   const { authData } = useAuth();

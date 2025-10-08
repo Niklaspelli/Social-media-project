@@ -1,0 +1,20 @@
+/* Tar bort blå bakgrund och ändrar färg vid klick */
+.accordion-button:not(.collapsed) {
+    background-color: #f2f2f2 !important;
+    /* ljusgrå istället för blå */
+    color: #222 !important;
+    /* mörk text */
+    box-shadow: none !important;
+}
+
+/* För mus-hover-effekt */
+.accordion-button:hover {
+    background-color: #e9ecef !important;
+    /* lite mörkare grå */
+}
+
+/* Tar bort den blåa ramen vid fokus */
+.accordion-button:focus {
+    box-shadow: none !important;
+    border-color: #ccc !important;
+}

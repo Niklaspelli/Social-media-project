@@ -360,8 +360,7 @@ export const rejectEventInvitation = (req, res) => {
 };
 
 export const getEventById = (req, res) => {
-  const { eventId } = req.params;
-
+  const eventId = req.params.id;
   const eventSql = `
     SELECT 
       e.id, e.title, e.description, e.datetime, e.location,
@@ -405,7 +404,7 @@ export const getEventById = (req, res) => {
 
 // GET /api/events/:eventId/invitees
 export const getEventInvitees = (req, res) => {
-  const { eventId } = req.params;
+  const eventId = req.params.id;
 
   const sql = `
     SELECT 
