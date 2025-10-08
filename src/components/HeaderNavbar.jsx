@@ -119,13 +119,14 @@ const HeaderNavbar = () => {
                   <FontAwesomeIcon icon={faUserFriends} className="me-1" />
                   Friends{" "}
                 </Nav.Link>
-                <Nav.Link
-                  as={Link}
-                  to={`/events/:id`}
-                  className="position-relative"
-                >
-                  Events
-                </Nav.Link>
+                <NavDropdown title={<> Events</>} id="basic-nav-dropdown">
+                  <NavDropdown.Item as={Link} to={`/events/create`}>
+                    Create event
+                  </NavDropdown.Item>
+                  <NavDropdown.Item as={Link} to={`/events/${authData.userId}`}>
+                    Your events
+                  </NavDropdown.Item>
+                </NavDropdown>
 
                 <NavDropdown
                   icon={faComments}

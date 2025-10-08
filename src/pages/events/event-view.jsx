@@ -6,7 +6,6 @@ const EventView = () => {
   return (
     <div style={{ color: "white" }}>
       <CreateEvent />
-      <EventList />
     </div>
   );
 };
