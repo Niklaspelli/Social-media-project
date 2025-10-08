@@ -1,4 +1,4 @@
-// components/EventInviteesList.jsx
+/* // components/EventInviteesList.jsx
 import React from "react";
 import { Image, ListGroup, Spinner } from "react-bootstrap";
 import useEventInvitees from "../../queryHooks/events/useEventInvitees";
@@ -43,3 +43,4 @@ function EventInviteesList({ eventId }) {
 }
 
 export default EventInviteesList;
+ */

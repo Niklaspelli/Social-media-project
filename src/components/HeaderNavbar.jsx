@@ -4,7 +4,6 @@ import { Navbar, Nav, Button, Container, Image } from "react-bootstrap";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faUserEdit,
   faComments,
   faSignOutAlt,
   faUser,

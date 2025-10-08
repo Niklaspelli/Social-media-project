@@ -12,6 +12,7 @@ import {
 import { useAuth } from "../../context/AuthContext"; // Kontrollera att sökvägen är korrekt
 import useCreateEvent from "../../queryHooks/events/useCreateEvent"; // Din event-hook
 import useFriends from "../../queryHooks/friends/useFetchFriends";
+
 import "./event-styling.css";
 
 const CreateEvent = () => {
@@ -21,6 +22,8 @@ const CreateEvent = () => {
   const [description, setDescription] = useState("");
   const [datetime, setDatetime] = useState("");
   const [location, setLocation] = useState("");
+  const [eventImage, setEventImage] = useState(null);
+  const [imageIndex, setImageIndex] = useState(0);
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [error, setError] = useState(null);
 
@@ -54,10 +57,26 @@ const CreateEvent = () => {
       datetime,
       location,
       invitedUserIds: selectedFriends,
+      event_image: eventImage,
+
       accessToken,
     });
   };
 
+  const uploadToImgBB = async (file) => {
+    const apiKey = import.meta.env.VITE_IMGBB_API_KEY;
+    console.log("ImgBB API key:", apiKey);
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+      method: "POST",
+      body: formData,
+    });
+    const data = await res.json();
+    return data.data.url; // detta är URL:en du sparar i databasen
+  };
   const handleFriendToggle = (friendId) => {
     setSelectedFriends((prev) =>
       prev.includes(friendId)
@@ -68,53 +87,75 @@ const CreateEvent = () => {
 
   return (
     <Container className="mt-5">
-      <h2 className="text-center text-white my-4">Skapa nytt event</h2>
+      <h2 className="text-center text-white my-4">Create new event</h2>
 
       <Card className="bg-dark text-white p-4 shadow">
         <Form onSubmit={handleSubmit}>
           <Form.Group controlId="eventTitle" className="mb-3">
-            <Form.Label>Titel</Form.Label>
+            <Form.Label>Title:</Form.Label>
             <Form.Control
               type="text"
               maxLength={100}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Titel på eventet"
+              placeholder="Event title"
               style={{
-                backgroundColor: "#333",
-                color: "white",
                 borderColor: "#444",
               }}
               required
             />
           </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Välj eventbild:</Form.Label>
+            <Form.Control
+              type="file"
+              accept="image/*"
+              onChange={async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                try {
+                  const url = await uploadToImgBB(file);
+                  setEventImage(url);
+                } catch (err) {
+                  console.error("Kunde inte ladda upp bilden:", err);
+                }
+              }}
+            />
+            {eventImage && (
+              <Image
+                src={eventImage}
+                alt="Event"
+                rounded
+                width={150}
+                height={80}
+                style={{ objectFit: "cover", marginTop: 10 }}
+              />
+            )}
+          </Form.Group>
 
           <Form.Group controlId="eventDescription" className="mb-3">
-            <Form.Label>Beskrivning</Form.Label>
+            <Form.Label>Description:</Form.Label>
             <Form.Control
               as="textarea"
               rows={3}
               maxLength={500}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Beskriv eventet"
+              placeholder="Describe the event"
               style={{
-                backgroundColor: "#333",
-                color: "white",
                 borderColor: "#444",
               }}
             />
           </Form.Group>
 
           <Form.Group controlId="eventDatetime" className="mb-3">
-            <Form.Label>Datum & Tid</Form.Label>
+            <Form.Label>Date & Time:</Form.Label>
             <Form.Control
               type="datetime-local"
               value={datetime}
               onChange={(e) => setDatetime(e.target.value)}
               style={{
-                backgroundColor: "#333",
-                color: "white",
                 borderColor: "#444",
               }}
               required
@@ -122,16 +163,14 @@ const CreateEvent = () => {
           </Form.Group>
 
           <Form.Group controlId="eventLocation" className="mb-3">
-            <Form.Label>Plats</Form.Label>
+            <Form.Label>Location:</Form.Label>
             <Form.Control
               type="text"
               maxLength={200}
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              placeholder="Var hålls eventet?"
+              placeholder="Where will the event be held?"
               style={{
-                backgroundColor: "#333",
-                color: "white",
                 borderColor: "#444",
               }}
               required
@@ -139,7 +178,7 @@ const CreateEvent = () => {
           </Form.Group>
           <Accordion alwaysOpen className="my-3">
             <Accordion.Item eventKey="1">
-              <Accordion.Header>Invite friends</Accordion.Header>
+              <Accordion.Header>Invite friends...</Accordion.Header>
               <Accordion.Body>
                 {friends.map((friend) => {
                   const isSelected = selectedFriends.includes(friend.id);
@@ -200,10 +239,10 @@ const CreateEvent = () => {
               {isLoading ? (
                 <>
                   <Spinner animation="border" size="sm" className="me-2" />
-                  Skapar event...
+                  Creating event...
                 </>
               ) : (
-                "Skapa event"
+                "Create event"
               )}
             </Button>
           </div>

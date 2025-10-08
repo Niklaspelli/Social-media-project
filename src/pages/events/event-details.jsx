@@ -1,15 +1,3 @@
-/* ✅ Förklaringar:
-
-Vi använder useEventDetails för att hämta själva eventet (title, creator, location osv).
-
-Vi använder useEventInvitees för att hämta alla invitees och deras status.
-
-accepted beräknas lokalt som invitees.filter(i => i.status === 'accepted').
-
-Vi visar två sektioner i en Accordion: en för accepted attendees, en för alla invitees.
-
-På detta sätt har du en tydlig separation och du behöver inte blanda in event.attendees från backend längre. */
-
 import { useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { Container, Spinner, Image, Accordion } from "react-bootstrap";
@@ -22,12 +10,11 @@ function EventDetails() {
   const { authData } = useAuth();
   const token = authData?.accessToken;
 
-  // Hämta eventdetaljer + attendees (accepted)
+  // Hämta eventdetaljer + attendees
   const { data: event, isLoading, isError, error } = useEventDetails(id, token);
-
-  // Hämta alla invitees (oavsett status)
   const { data: invitees = [] } = useEventInvitees(id, token);
 
+  // Loading state
   if (isLoading)
     return (
       <Container className="text-center mt-5">
@@ -35,13 +22,15 @@ function EventDetails() {
       </Container>
     );
 
+  // Error state
   if (isError)
     return (
       <Container className="text-center mt-5">
-        <p>Error: {error.message}</p>
+        <p>Error: {error?.message || "Something went wrong."}</p>
       </Container>
     );
 
+  // Event not found
   if (!event)
     return (
       <Container className="text-center mt-5">
@@ -52,35 +41,46 @@ function EventDetails() {
   // Dela upp invitees i accepted och alla
   const accepted = invitees.filter((i) => i.status === "accepted");
 
-  console.log("invitees", invitees);
-
   return (
     <Container className="mt-4">
-      <h1>{event.title}</h1>
+      <h1 className="text-white">{event.title || "Untitled Event"}</h1>
+
+      {/* Eventbild med fallback */}
+      <Image
+        src={event.event_image}
+        alt={event.title || "Eventbild"}
+        width={360}
+        height={360}
+        className="mb-3"
+        style={{ objectFit: "cover" }}
+        rounded
+      />
+
       <p>
-        Hosted by <strong>{event.creator_name}</strong>
+        Hosted by <strong>{event.creator_name || "Unknown"}</strong>
       </p>
 
-      {event.creator_avatar && (
-        <Image
-          src={event.creator_avatar}
-          alt={event.creator_name}
-          roundedCircle
-          width={60}
-          height={60}
-          className="mb-3"
-        />
-      )}
+      {/* Creator avatar med fallback */}
+      <Image
+        src={event.creator_avatar || "https://i.pravatar.cc/60"}
+        alt={event.creator_name || "Creator"}
+        roundedCircle
+        width={60}
+        height={60}
+        className="mb-3"
+      />
 
       <p>
         <strong>Date & Time:</strong>{" "}
-        {new Date(event.datetime).toLocaleString("sv-SE")}
+        {event.datetime
+          ? new Date(event.datetime).toLocaleString("sv-SE")
+          : "TBD"}
       </p>
       <p>
-        <strong>Location:</strong> {event.location}
+        <strong>Location:</strong> {event.location || "TBD"}
       </p>
       <p>
-        <strong>Description:</strong> {event.description}
+        <strong>Description:</strong> {event.description || "No description."}
       </p>
 
       <Accordion alwaysOpen className="my-3">
@@ -94,16 +94,14 @@ function EventDetails() {
               <ul>
                 {accepted.map((a) => (
                   <li key={a.id} className="d-flex align-items-center gap-2">
-                    {a.avatar && (
-                      <Image
-                        src={a.avatar}
-                        alt={a.username}
-                        roundedCircle
-                        width={30}
-                        height={30}
-                      />
-                    )}
-                    <span>{a.username}</span>
+                    <Image
+                      src={a.avatar || "https://i.pravatar.cc/30"}
+                      alt={a.username || "User"}
+                      roundedCircle
+                      width={30}
+                      height={30}
+                    />
+                    <span>{a.username || "Unknown"}</span>
                   </li>
                 ))}
               </ul>
@@ -121,17 +119,16 @@ function EventDetails() {
               <ul>
                 {invitees.map((i) => (
                   <li key={i.id} className="d-flex align-items-center gap-2">
-                    {i.avatar && (
-                      <Image
-                        src={i.avatar}
-                        alt={i.username}
-                        roundedCircle
-                        width={30}
-                        height={30}
-                      />
-                    )}
+                    <Image
+                      src={i.avatar || "https://i.pravatar.cc/30"}
+                      alt={i.username || "User"}
+                      roundedCircle
+                      width={30}
+                      height={30}
+                    />
                     <span>
-                      {i.username} {i.status === "accepted" ? "(Coming)" : ""}
+                      {i.username || "Unknown"}{" "}
+                      {i.status === "accepted" ? "(Coming)" : ""}
                     </span>
                   </li>
                 ))}

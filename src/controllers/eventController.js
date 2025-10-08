@@ -2,7 +2,14 @@ import { db } from "../config/db.js"; // justera efter din struktur
 
 export const createEvent = (req, res) => {
   console.log("Body vid createEvent:", req.body);
-  const { title, description, datetime, location, invitedUserIds } = req.body;
+  const {
+    title,
+    description,
+    datetime,
+    location,
+    invitedUserIds,
+    event_image,
+  } = req.body;
   const { id: userId } = req.user;
 
   if (!title || !datetime || !location) {
@@ -12,13 +19,13 @@ export const createEvent = (req, res) => {
   }
 
   const insertEventSql = `
-    INSERT INTO events (creator_id, title, description, datetime, location)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO events (creator_id, title, description, datetime, location, event_image)
+    VALUES (?, ?, ?, ?, ?, ?)
   `;
 
   db.query(
     insertEventSql,
-    [userId, title, description, datetime, location],
+    [userId, title, description, datetime, location, event_image],
     (err, result) => {
       if (err) {
         console.error("Fel vid skapande av event:", err.message);
@@ -70,6 +77,7 @@ export const createEvent = (req, res) => {
                 creator_id: userId,
                 creator_name,
                 avatar,
+                event_image,
                 invitedUserIds,
               },
             });
@@ -84,6 +92,7 @@ export const createEvent = (req, res) => {
               description,
               datetime,
               location,
+              event_image,
               creator_id: userId,
               creator_name,
               avatar,
@@ -107,6 +116,7 @@ export const getUserEvents = (req, res) => {
       e.description,
       e.datetime,
       e.location,
+      e.event_image,
       e.created_at,
       u.username AS creator_name,
       'creator' AS relation
@@ -123,6 +133,7 @@ export const getUserEvents = (req, res) => {
       e.description,
       e.datetime,
       e.location,
+      e.event_image,
       e.created_at,
       u.username AS creator_name,
       'invited' AS relation
@@ -363,7 +374,7 @@ export const getEventById = (req, res) => {
   const eventId = req.params.id;
   const eventSql = `
     SELECT 
-      e.id, e.title, e.description, e.datetime, e.location,
+      e.id, e.title, e.description, e.datetime, e.location, e.event_image,
       u.username AS creator_name, u.avatar AS creator_avatar
     FROM events e
     JOIN users u ON e.creator_id = u.id
