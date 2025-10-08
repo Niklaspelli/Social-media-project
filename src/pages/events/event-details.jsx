@@ -15,6 +15,7 @@ import { useAuth } from "../../context/AuthContext";
 import { Container, Spinner, Image, Accordion } from "react-bootstrap";
 import useEventDetails from "../../queryHooks/events/useEventDetails";
 import useEventInvitees from "../../queryHooks/events/useEventInvitees";
+import "./event-styling.css";
 
 function EventDetails() {
   const { id } = useParams();
@@ -107,7 +108,7 @@ function EventDetails() {
                 ))}
               </ul>
             ) : (
-              <p>No one has accepted yet.</p>
+              <p className="text-black">No one has accepted yet.</p>
             )}
           </Accordion.Body>
         </Accordion.Item>
@@ -130,7 +131,7 @@ function EventDetails() {
                       />
                     )}
                     <span>
-                      {i.username} {i.status === "accepted" ? "(accepted)" : ""}
+                      {i.username} {i.status === "accepted" ? "(Coming)" : ""}
                     </span>
                   </li>
                 ))}

@@ -15,6 +15,7 @@ import {
 import SearchBar from "./SearchBar"; // Import the new SearchBar component
 import useGetSubjects from "../queryHooks/subjects/useGetSubjects"; // Import your custom hook
 import useGetFriendRequestCount from "../queryHooks/friends/useGetFriendRequestCount";
+import useEventInvitationCount from "../queryHooks/events/useInvitationCount";
 
 const HeaderNavbar = () => {
   const { isAuthenticated, authData, logout: authLogout } = useAuth();
@@ -26,6 +27,12 @@ const HeaderNavbar = () => {
     authData?.userId,
     authData?.accessToken
   );
+
+  const { data: invitationCountData } = useEventInvitationCount(
+    authData?.accessToken
+  );
+  const invitationCount = invitationCountData?.count || 0;
+
   const friendRequestCount = notificationCountData?.count || 0;
   const { data: subjects, isLoading, error } = useGetSubjects(); // Use custom hook to get subjects
 
@@ -72,12 +79,12 @@ const HeaderNavbar = () => {
                 <Nav.Link as={Link} to={`/notifications/${authData.userId}`}>
                   <FontAwesomeIcon icon={faBell} className="me-1" />{" "}
                   Notifications
-                  {friendRequestCount > 0 && (
+                  {friendRequestCount + invitationCount > 0 && (
                     <span
                       className="badge rounded-pill bg-danger ms-1"
                       style={{ fontSize: "0.75rem", verticalAlign: "middle" }}
                     >
-                      {friendRequestCount}
+                      {friendRequestCount + invitationCount}
                     </span>
                   )}
                 </Nav.Link>

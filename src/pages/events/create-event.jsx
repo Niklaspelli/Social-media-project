@@ -1,8 +1,18 @@
 import React, { useState } from "react";
-import { Form, Button, Card, Container, Alert, Spinner } from "react-bootstrap";
+import {
+  Form,
+  Button,
+  Card,
+  Container,
+  Alert,
+  Spinner,
+  Accordion,
+  Image,
+} from "react-bootstrap";
 import { useAuth } from "../../context/AuthContext"; // Kontrollera att sökvägen är korrekt
 import useCreateEvent from "../../queryHooks/events/useCreateEvent"; // Din event-hook
 import useFriends from "../../queryHooks/friends/useFetchFriends";
+import "./event-styling.css";
 
 const CreateEvent = () => {
   const { authData } = useAuth();
@@ -127,23 +137,58 @@ const CreateEvent = () => {
               required
             />
           </Form.Group>
+          <Accordion alwaysOpen className="my-3">
+            <Accordion.Item eventKey="1">
+              <Accordion.Header>Invite friends</Accordion.Header>
+              <Accordion.Body>
+                {friends.map((friend) => {
+                  const isSelected = selectedFriends.includes(friend.id);
 
-          <Form.Group controlId="eventInvites" className="mb-3">
-            <Form.Label>Bjud in vänner</Form.Label>
-            {loadingFriends ? (
-              <p>Laddar vänner...</p>
-            ) : (
-              friends.map((friend) => (
-                <Form.Check
-                  key={friend.id}
-                  type="checkbox"
-                  label={friend.username}
-                  checked={selectedFriends.includes(friend.id)}
-                  onChange={() => handleFriendToggle(friend.id)}
-                />
-              ))
-            )}
-          </Form.Group>
+                  return (
+                    <div
+                      key={friend.id}
+                      onClick={() => handleFriendToggle(friend.id)}
+                      className={`d-flex align-items-center gap-2 mb-2 p-2 rounded ${
+                        isSelected ? "bg-dark text-white" : "bg-light"
+                      }`}
+                      style={{ cursor: "pointer" }}
+                    >
+                      {friend.avatar && (
+                        <Image
+                          src={friend.avatar}
+                          alt={friend.username}
+                          roundedCircle
+                          width={30}
+                          height={30}
+                        />
+                      )}
+                      <span>{friend.username}</span>
+
+                      <div
+                        style={{
+                          marginLeft: "auto",
+                          width: 20,
+                          height: 20,
+                          border: "2px solid",
+                          borderColor: isSelected ? "white" : "black",
+                          backgroundColor: isSelected ? "white" : "transparent",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {isSelected && (
+                          <span style={{ color: "black", fontSize: 16 }}>
+                            ✓
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
 
           <div className="d-grid gap-2">
             <Button
