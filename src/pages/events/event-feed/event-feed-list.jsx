@@ -121,7 +121,7 @@ const EventFeedList = () => {
         const newPosts = posts.filter(
           (p) => !prev.some((prevP) => prevP.id === p.id)
         );
-        return [...prev, ...newPosts];
+        return [...newPosts, ...prev];
       });
     }
   }, [posts]);
