@@ -4,6 +4,7 @@ import { Container, Spinner, Image, Accordion, Card } from "react-bootstrap";
 import useEventDetails from "../../queryHooks/events/useEventDetails";
 import useEventInvitees from "../../queryHooks/events/useEventInvitees";
 import "./event-styling.css";
+import EventFeedPostForm from "./event-feed/event-feed-post-form";
 
 function EventDetails() {
   const { id } = useParams();
@@ -176,6 +177,7 @@ function EventDetails() {
           </Accordion.Item>
         </Accordion>
       </Card>
+      <EventFeedPostForm eventId={event.id} />
     </Container>
   );
 }

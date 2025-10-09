@@ -27,7 +27,7 @@ function EventList() {
 
   return (
     <Container>
-      <h1>Your Events</h1>
+      <h2 className="text-white p-4 text-center">Your Events</h2>
       <Row>
         {events.length === 0 && <p>No events found</p>}
         {events.map((event) => (

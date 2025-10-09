@@ -68,6 +68,13 @@ import {
   getEventInvitees,
 } from "../controllers/eventController.js";
 
+import {
+  createEventFeedPost,
+  getEventFeedPosts,
+  getFullEventFeed,
+  deleteEventFeedPost,
+} from "../controllers/eventFeedController.js";
+
 const router = express.Router();
 
 router.get("/csrf-token", getCsrfToken); // ⬅️ Add this line
@@ -165,6 +172,12 @@ router.delete(
   deleteFeedPost
 );
 
+//feed
+
+router.get("/friends-feed/", authenticateJWT, getFriendFeed);
+router.get("/feed-post/feed/:userId", authenticateJWT, getFullFeed);
+router.get("/feed-post/user/:userId", authenticateJWT, getUserFeedPosts);
+
 //events
 router.post("/events", authenticateJWT, verifyCsrfToken, createEvent); // Protected
 router.get("/events", authenticateJWT, getAllEvents);
@@ -190,5 +203,21 @@ router.post(
 );
 router.get("/events/:id", authenticateJWT, getEventById);
 router.get("/events/:id/invitees", authenticateJWT, getEventInvitees);
+
+router.post(
+  "/events/:eventId/feed",
+  authenticateJWT,
+  verifyCsrfToken,
+  createEventFeedPost
+);
+
+router.get("/event-feed-post/user/:userId", authenticateJWT, getEventFeedPosts);
+router.get("/event-feed-post/feed/:userId", authenticateJWT, getFullEventFeed);
+router.delete(
+  "/event-feed-post/:postId",
+  authenticateJWT,
+  verifyCsrfToken,
+  deleteEventFeedPost
+);
 
 export default router;
