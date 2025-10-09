@@ -5,6 +5,7 @@ import useEventDetails from "../../queryHooks/events/useEventDetails";
 import useEventInvitees from "../../queryHooks/events/useEventInvitees";
 import "./event-styling.css";
 import EventFeedPostForm from "./event-feed/event-feed-post-form";
+import EventFeedList from "./event-feed/event-feed-list";
 
 function EventDetails() {
   const { id } = useParams();
@@ -177,7 +178,14 @@ function EventDetails() {
           </Accordion.Item>
         </Accordion>
       </Card>
-      <EventFeedPostForm eventId={event.id} />
+      <Card
+        className="bg-dark border-0 shadow-lg rounded-4 p-4 mx-auto mt-4"
+        style={{ maxWidth: "700px" }}
+      >
+        <h4 className="text-white mb-3">Event Feed</h4>
+        <EventFeedPostForm eventId={event.id} />
+        <EventFeedList eventId={event.id} />
+      </Card>
     </Container>
   );
 }

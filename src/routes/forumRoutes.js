@@ -71,7 +71,6 @@ import {
 import {
   createEventFeedPost,
   getEventFeedPosts,
-  getFullEventFeed,
   deleteEventFeedPost,
 } from "../controllers/eventFeedController.js";
 
@@ -211,8 +210,7 @@ router.post(
   createEventFeedPost
 );
 
-router.get("/event-feed-post/user/:userId", authenticateJWT, getEventFeedPosts);
-router.get("/event-feed-post/feed/:userId", authenticateJWT, getFullEventFeed);
+router.get("/events/:eventId/feed", authenticateJWT, getEventFeedPosts);
 router.delete(
   "/event-feed-post/:postId",
   authenticateJWT,

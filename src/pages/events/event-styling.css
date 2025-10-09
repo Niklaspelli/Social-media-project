@@ -18,3 +18,9 @@
     box-shadow: none !important;
     border-color: #ccc !important;
 }
+
+.event-feed-list {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-top: 1rem;
+}
