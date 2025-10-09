@@ -18,7 +18,7 @@ const postEventFeed = async ({ eventId, content, accessToken, csrfToken }) => {
 
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to post to event feed");
-  return data;
+  return data; // data innehåller den nya posten
 };
 
 export default function useCreateEventFeedPost() {
@@ -30,8 +30,19 @@ export default function useCreateEventFeedPost() {
     mutationFn: ({ eventId, content }) =>
       postEventFeed({ eventId, content, accessToken, csrfToken }),
 
-    onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries(["eventFeedPosts", variables.eventId]);
+    onSuccess: (newPost, variables) => {
+      // Uppdatera cachen direkt istället för att refetcha
+      queryClient.setQueryData(
+        ["eventFeedPosts", variables.eventId],
+        (oldData) => {
+          if (!oldData) return { posts: [newPost] };
+          return {
+            ...oldData,
+            posts: [newPost, ...oldData.posts],
+            total: oldData.total + 1, // prepend nya posten
+          };
+        }
+      );
       console.log("✅ Event feed post created successfully");
     },
 

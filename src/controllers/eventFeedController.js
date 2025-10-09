@@ -27,8 +27,11 @@ export const createEventFeedPost = (req, res) => {
   });
 };
 
+// GET /api/auth/events/:eventId/feed?limit=4&offset=0
 export const getEventFeedPosts = (req, res) => {
-  const { eventId } = req.params; // Hämtar eventets ID från URL:en
+  const { eventId } = req.params;
+  const limit = parseInt(req.query.limit) || 4; // default 4 posts
+  const offset = parseInt(req.query.offset) || 0; // default 0
 
   const sql = `
     SELECT
@@ -41,17 +44,18 @@ export const getEventFeedPosts = (req, res) => {
       u.avatar
     FROM event_messages em
     JOIN users u ON em.user_id = u.id
-    WHERE em.event_id = ?  -- Filtrerar på eventet
+    WHERE em.event_id = ?
     ORDER BY em.created_at DESC
+    LIMIT ? OFFSET ?;
   `;
 
-  db.query(sql, [eventId], (err, results) => {
+  db.query(sql, [eventId, limit, offset], (err, results) => {
     if (err) {
       console.error("Error fetching event feed posts:", err.message);
       return res.status(500).json({ error: "Internal Server Error" });
     }
 
-    return res.status(200).json(results); // Skickar alla inlägg med användarinformation
+    res.status(200).json(results);
   });
 };
 
