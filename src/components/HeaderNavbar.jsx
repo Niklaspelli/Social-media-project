@@ -11,8 +11,8 @@ import {
   faStream,
   faBell,
 } from "@fortawesome/free-solid-svg-icons";
-import SearchBar from "./SearchBar"; // Import the new SearchBar component
-import useGetSubjects from "../queryHooks/subjects/useGetSubjects"; // Import your custom hook
+import SearchBar from "./SearchBar";
+import useGetSubjects from "../queryHooks/subjects/useGetSubjects";
 import useGetFriendRequestCount from "../queryHooks/friends/useGetFriendRequestCount";
 import useEventInvitationCount from "../queryHooks/events/useInvitationCount";
 
@@ -33,12 +33,11 @@ const HeaderNavbar = () => {
   const invitationCount = invitationCountData?.count || 0;
 
   const friendRequestCount = notificationCountData?.count || 0;
-  const { data: subjects, isLoading, error } = useGetSubjects(); // Use custom hook to get subjects
+  const { data: subjects, isLoading, error } = useGetSubjects();
 
   if (isLoading) return <p>Loading subjects...</p>;
   if (error) return <p style={{ color: "red" }}>{error.message}</p>;
 
-  // Handle logout
   const handleLogout = () => {
     authLogout();
     navigate("/");
@@ -87,7 +86,6 @@ const HeaderNavbar = () => {
                     </span>
                   )}
                 </Nav.Link>
-                {/* Use the SearchBar component */}
                 <SearchBar />
                 <NavDropdown
                   icon={faComments}

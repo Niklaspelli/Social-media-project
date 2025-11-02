@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Button,
   InputGroup,
@@ -12,12 +12,12 @@ import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 
 const SearchBar = () => {
-  const [searchTerm, setSearchTerm] = useState(""); // The input search term
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm); // The debounced search term
-  const [userProfiles, setUserProfiles] = useState([]); // Holds the fetched users
-  const [loading, setLoading] = useState(false); // Loading state
-  const [error, setError] = useState(null); // Error state
-  const { authData } = useAuth(); // Fetch authentication data from context
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+  const [userProfiles, setUserProfiles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const { authData } = useAuth();
 
   const token = authData?.accessToken;
 
@@ -28,11 +28,10 @@ const SearchBar = () => {
     return null;
   };
 
-  // Function to fetch user data based on username
   const fetchUser = async (username) => {
-    setLoading(true); // Mark as loading when request starts
-    setError(null); // Reset error message before new fetch
-    console.log("Fetching users for:", username); // Debug log
+    setLoading(true);
+    setError(null);
+    console.log("Fetching users for:", username);
 
     try {
       const csrfToken = getCookie("csrfToken");

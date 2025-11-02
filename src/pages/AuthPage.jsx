@@ -1,37 +1,4 @@
-/* import React, { useState } from "react";
-import Login from "./Login";
-import Register from "./Register";
-import { Container, Row, Col, Button } from "react-bootstrap";
-
-const AuthPage = () => {
-  const [showSignUp, setShowSignUp] = useState(false);
-
-  return (
-    <Container fluid>
-      <Row style={{ height: "100vh", backgroundColor: "black" }}>
-        {showSignUp ? (
-          <Register />
-        ) : (
-          <Login onSwitchToSignUp={() => setShowSignUp(true)} />
-        )}
-
-        {/* Optional: You could add a button here to switch back */
-/*         {showSignUp && (
-          <Button
-            variant="dark"
-            style={{ margin: "20px" }}
-            onClick={() => setShowSignUp(false)}
-          >
-            Tillbaka till inloggning
-          </Button>
-        )}
-      </Row>
-    </Container>
-  );
-};
-
-export default AuthPage; */
-import React, { useState } from "react";
+import { useState } from "react";
 import Login from "./Login";
 import Register from "./Register";
 import { Container, Row, Col, Button } from "react-bootstrap";
@@ -91,15 +58,6 @@ const formContainerStyle = {
   color: "white",
 };
 
-const backgroundImage = {
-  backgroundColor: "rgba(0, 0, 0, 0.7)", // Blur/dark overlay
-  backdropFilter: "blur(10px)",
-  WebkitBackdropFilter: "blur(10px)",
-  height: "100vh",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-};
 const logoMaskContainer = {
   width: "100%",
   height: "100vh",

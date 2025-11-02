@@ -1,6 +1,5 @@
 import bcrypt from "bcryptjs";
 import { db } from "../config/db.js";
-import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { promisify } from "util";
 import { SECURE, HTTP_ONLY, SAME_SITE } from "../config.js";
@@ -106,16 +105,16 @@ export const loginUser = async (req, res) => {
         // Set cookies with appropriate attributes
         res.cookie("accessToken", accessToken, {
           httpOnly: HTTP_ONLY,
-          secure: process.env.NODE_ENV === "production", // Set to true in production only
+          secure: SECURE, // Set to true in production only
           maxAge: 15 * 60 * 1000, // 15 minutes
-          sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // Set to "None" in production
+          sameSite: SAME_SITE, // Set to "None" in production
         });
 
         res.cookie("refreshToken", refreshToken, {
           httpOnly: HTTP_ONLY,
-          secure: process.env.NODE_ENV === "production", // Set to true in production only
+          secure: SECURE, // Set to true in production only
           maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-          sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // Set to "None" in production
+          sameSite: SAME_SITE, // Set to "None" in production
         });
 
         return res.json({

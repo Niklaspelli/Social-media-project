@@ -1,10 +1,7 @@
-import React from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import FeedPostForm from "./FeedPostForm";
 import { Card, Button, Spinner } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 import DeleteButton from "../../../components/DeleteButton";
 
 import useUserFeedPosts from "../../../queryHooks/feed/useUserFeedPosts";
@@ -12,7 +9,7 @@ import useDeleteFeedPost from "../../../queryHooks/feed/useDeleteFeedPost";
 
 const Feed = () => {
   const { authData } = useAuth();
-  const { userId: loggedInUserId, accessToken, csrfToken } = authData;
+  const { userId: loggedInUserId, accessToken } = authData;
   const { id: userId } = useParams();
   const isOwnProfile = loggedInUserId === Number(userId);
 

@@ -10,7 +10,7 @@ export const createFeedPost = (req, res) => {
 
   const sql = `INSERT INTO user_feed (userId, content) VALUES (?, ?)`;
 
-  db.query(sql, [userId, content], (err, result) => {
+  db.query(sql, [userId, content], (err) => {
     if (err) {
       console.error("Error creating feed post:", err.message);
       return res.status(500).json({ error: "Internal Server Error" });

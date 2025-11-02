@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { useAuth } from "../../context/AuthContext"; // Assuming you have an AuthContext
+import { useState, useEffect } from "react";
+import { useAuth } from "../../context/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faThumbsUp } from "@fortawesome/free-solid-svg-icons"; // solid version
+import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 
 const BackendURL = "http://localhost:5000";
 
@@ -11,21 +11,19 @@ function LikeButton({
   initialLikeStatus,
   initialLikeCount,
 }) {
-  const { authData } = useAuth(); // Access the auth context to get the token
-  const { accessToken } = authData; // Destructure accessToken from context
+  const { authData } = useAuth();
+  const { accessToken } = authData;
 
   const [liked, setLiked] = useState(initialLikeStatus);
   const [likeCount, setLikeCount] = useState(initialLikeCount);
   const [error, setError] = useState(null);
 
-  // Function to get the CSRF token from cookies
   function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(";").shift();
   }
 
-  // Fetch like count when the component mounts
   useEffect(() => {
     const fetchLikeCount = async () => {
       try {
@@ -37,16 +35,15 @@ function LikeButton({
         }
 
         const data = await response.json();
-        setLikeCount(data.likeCount); // Set the like count state
+        setLikeCount(data.likeCount);
       } catch (error) {
         setError(error.message);
       }
     };
 
     fetchLikeCount();
-  }, [responseId]); // Run when responseId changes
+  }, [responseId]);
 
-  // Toggle like/unlike action
   const toggleLike = async () => {
     try {
       const csrfToken = getCookie("csrfToken");
@@ -69,19 +66,18 @@ function LikeButton({
         credentials: "include",
       });
 
-      // ✅ Handle known error
       if (!response.ok) {
         const errData = await response.json();
         if (errData?.error === "You have already liked this response.") {
-          setLiked(true); // Reflect actual server state
+          setLiked(true);
           return;
         }
         throw new Error("Failed to update like");
       }
 
       const data = await response.json();
-      setLiked(!liked); // Toggle like status
-      setLikeCount(data.likeCount); // Update count from backend
+      setLiked(!liked);
+      setLikeCount(data.likeCount);
     } catch (error) {
       console.error("Error during like/unlike:", error);
       setError(error.message);

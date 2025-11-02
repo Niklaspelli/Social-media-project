@@ -120,7 +120,7 @@ export const createOrUpdateUserProfile = (req, res) => {
   db.query(
     sql,
     [userId, sex, relationship_status, location, music_taste, interest, bio],
-    (err, result) => {
+    (err) => {
       if (err) {
         console.error("Error creating or updating user profile:", err.message);
         return res

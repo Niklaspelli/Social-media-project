@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { Button } from "react-bootstrap";
 import ProfileAvatar from "./ProfileAvatar";
@@ -9,14 +9,13 @@ import EditProfile from "./EditProfile";
 const Settings = () => {
   const { authData, csrfToken } = useAuth();
   const { userId, accessToken } = authData || {};
-  const navigate = useNavigate();
   const errRef = useRef();
 
   const [isLoading, setIsLoading] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [showToast, setShowToast] = useState(false);
+  const [setShowToast] = useState(false);
 
   const handleDelete = async () => {
     if (!accessToken || !userId) {

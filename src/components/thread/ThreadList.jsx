@@ -39,14 +39,12 @@ function ThreadList() {
 export default ThreadList;
  */
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
 import useThreads from "../../queryHooks/threads/useThreads";
 import "./ThreadList.css";
 
 function ThreadList({ subjectId }) {
-  const { authData } = useAuth();
   const [page, setPage] = useState(1);
   const [sortOrder, setSortOrder] = useState("desc");
 

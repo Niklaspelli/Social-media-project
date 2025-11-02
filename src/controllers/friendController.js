@@ -1,34 +1,65 @@
 import { db } from "../config/db.js";
 
 export const sendFriendRequest = (req, res) => {
-  const senderId = req.user.id; // Logged-in user
+  const senderId = req.user.id;
   const { receiverId } = req.body;
 
-  // Validate required fields first
   if (!receiverId) {
     return res.status(400).json({ error: "Receiver ID is required." });
   }
 
-  // Prevent sending a friend request to yourself
   if (Number(senderId) === Number(receiverId)) {
     return res
       .status(400)
       .json({ error: "You cannot send a friend request to yourself." });
   }
 
-  const sql = `
-    INSERT INTO friend_requests (sender_id, receiver_id, status)
-    VALUES (?, ?, 'pending')
+  const checkSql = `
+    SELECT status FROM friend_requests
+    WHERE (sender_id = ? AND receiver_id = ?)
+       OR (sender_id = ? AND receiver_id = ?)
+    LIMIT 1
   `;
 
-  db.query(sql, [senderId, receiverId], (err, result) => {
-    if (err) {
-      console.error("Error sending friend request:", err.message);
-      return res.status(500).json({ error: "Internal Server Error" });
-    }
+  db.query(
+    checkSql,
+    [senderId, receiverId, receiverId, senderId],
+    (err, results) => {
+      if (err) {
+        console.error("Error checking existing friendship:", err);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
 
-    return res.status(201).json({ message: "Friend request sent!" });
-  });
+      if (results.length > 0) {
+        const status = results[0].status;
+
+        if (status === "pending") {
+          return res
+            .status(400)
+            .json({ error: "A friend request is already pending." });
+        }
+
+        if (status === "accepted") {
+          return res.status(400).json({ error: "You are already friends." });
+        }
+      }
+
+      // ✅ Only insert if no relationship exists
+      const insertSql = `
+      INSERT INTO friend_requests (sender_id, receiver_id, status)
+      VALUES (?, ?, 'pending')
+    `;
+
+      db.query(insertSql, [senderId, receiverId], (err2) => {
+        if (err2) {
+          console.error("Error sending friend request:", err2);
+          return res.status(500).json({ error: "Internal Server Error" });
+        }
+
+        return res.status(201).json({ message: "Friend request sent!" });
+      });
+    }
+  );
 };
 
 // Accept a friend request
@@ -138,20 +169,14 @@ export const unfollowFriend = (req, res) => {
     WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)
   `;
 
-  db.query(
-    sql,
-    [senderId, receiverId, receiverId, senderId],
-    (err, results) => {
-      if (err) {
-        console.error("Error ending friendship:", err.message);
-        return res.status(500).json({ error: "Internal Server Error" });
-      }
-
-      return res
-        .status(200)
-        .json({ message: "Friendship ended successfully." });
+  db.query(sql, [senderId, receiverId, receiverId, senderId], (err) => {
+    if (err) {
+      console.error("Error ending friendship:", err.message);
+      return res.status(500).json({ error: "Internal Server Error" });
     }
-  );
+
+    return res.status(200).json({ message: "Friendship ended successfully." });
+  });
 };
 
 export const getFriendsList = (req, res) => {

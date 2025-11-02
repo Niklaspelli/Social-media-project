@@ -3,7 +3,6 @@ import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
-import { AUTH, AUTH_TYPES } from "./config.js";
 
 const app = express();
 

@@ -131,10 +131,9 @@ const inputStyle = {
  */
 
 // components/CreateThread.js
-import React, { useState } from "react";
+import { useState } from "react";
 import { Form, Button, Card, Container, Alert, Spinner } from "react-bootstrap";
 import { useAuth } from "../../context/AuthContext"; // Make sure the path is correct
-import ThreadList from "./ThreadList";
 import useCreateThread from "../../queryHooks/threads/useCreateThread"; // Import your custom hook
 
 const CreateThread = ({ defaultSubjectId }) => {
@@ -143,7 +142,7 @@ const CreateThread = ({ defaultSubjectId }) => {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
+  const [setSuccess] = useState(false);
 
   // Använd React Query hook för att skapa tråd
   const {

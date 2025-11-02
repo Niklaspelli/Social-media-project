@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import LikeButton from "./LikeButton";
@@ -7,12 +7,10 @@ import usePostResponse from "../../queryHooks/threads/usePostResponse";
 import useDeleteResponse from "../../queryHooks/threads/useDeleteResponse";
 import { useQueryClient } from "@tanstack/react-query";
 
-const BackendURL = "http://localhost:5000";
-
 function ThreadResponse() {
   const { threadId } = useParams();
   const { authData } = useAuth();
-  const { username, avatar, accessToken } = authData;
+  const { accessToken } = authData;
 
   const { data, isLoading, error } = useThreadDetail(threadId);
   const queryClient = useQueryClient();
@@ -22,11 +20,8 @@ function ThreadResponse() {
     isLoading: postLoading,
     error: postError,
   } = usePostResponse();
-  const {
-    mutate: deleteResponse,
-    isLoading: deleteLoading,
-    error: deleteError,
-  } = useDeleteResponse();
+  const { mutate: deleteResponse, isLoading: deleteLoading } =
+    useDeleteResponse();
 
   const [responseText, setResponseText] = useState("");
   const [submitError, setSubmitError] = useState(null);

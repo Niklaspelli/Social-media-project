@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import { Container, Card, Image, Spinner } from "react-bootstrap";
 import useFriendsFeed from "../../../queryHooks/feed/useFriendsFeed";

@@ -1,5 +1,4 @@
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
 import { ACCESS_TOKEN_SECRET } from "../config.js"; // ✅ import the correct secret
 
 export const authenticateJWT = (req, res, next) => {
@@ -17,9 +16,7 @@ export const authenticateJWT = (req, res, next) => {
     return res.status(401).json({ error: "Access token missing" });
   }
 
-  const secretKey = process.env.ACCESS_TOKEN_SECRET;
-
-  jwt.verify(token, secretKey, (err, user) => {
+  jwt.verify(token, ACCESS_TOKEN_SECRET, (err, user) => {
     if (err) {
       console.log("JWT error:", err.message); // Log any JWT errors
 

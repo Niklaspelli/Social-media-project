@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-
+import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useCurrentUserProfile } from "../../queryHooks/users/useCurrentUserProfile";
 
@@ -9,7 +7,6 @@ import { Container, Row, Col, Form, Button } from "react-bootstrap";
 const EditProfile = () => {
   const { authData } = useAuth();
   const { userId, csrfToken, accessToken } = authData || {};
-  const queryClient = useQueryClient();
 
   const {
     data: profile,

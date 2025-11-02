@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext"; // Adjust the path accordingly
 import {
@@ -18,7 +18,7 @@ const BackendURL = "http://localhost:5000";
 function ThreadDetail() {
   const { threadId } = useParams();
   const { authData } = useAuth();
-  const { username, avatar, accessToken, csrfToken } = authData;
+  const { accessToken } = authData;
   const [thread, setThread] = useState({});
   const [responses, setResponses] = useState([]);
   const [responseText, setResponseText] = useState("");
@@ -26,7 +26,6 @@ function ThreadDetail() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  // State to store deletion errors for specific responses
   const [deleteErrors, setDeleteErrors] = useState({});
 
   function getCookie(name) {
@@ -278,74 +277,3 @@ function ThreadDetail() {
 }
 
 export default ThreadDetail;
-
-const inputStyle = {
-  width: "500px",
-  height: "200px",
-
-  borderRadius: "20px",
-  border: "1px solid #ddd",
-  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-  outline: "none",
-  fontSize: "16px",
-  transition: "border-color 0.3s ease",
-  backgroundColor: "grey",
-  color: "white",
-  border: "none",
-};
-
-const StyleContainer = {
-  marginBottom: "15px",
-  display: "flex",
-  justifyContent: "center",
-  margin: "20px",
-};
-
-const threadCreator = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "flex-start",
-  justifyContent: "center",
-  marginBottom: "15px",
-  margin: "5px",
-
-  width: "100%", // Full width of the parent
-  maxWidth: "500px", // Limit the max width
-  borderRadius: "20px",
-  padding: "15px",
-  boxSizing: "border-box",
-  boxShadow: "2px 2px 0px black",
-  backgroundColor: "white",
-  background: "hsla(0, 2.70%, 50.00%, 0.78)", // Fully transparent background
-
-  backdropFilter: "blur(8px)", // Blur the background content behind the element
-  overflowWrap: "break-word", // Ensure long words break
-};
-
-const RespContainer = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "flex-start",
-  justifyContent: "center",
-  marginBottom: "15px",
-  margin: "5px",
-
-  width: "100%", // Full width of the parent
-  maxWidth: "500px", // Limit the max width
-  borderRadius: "20px",
-  padding: "15px",
-  boxSizing: "border-box",
-  boxShadow: "2px 2px 0px black",
-  backgroundColor: "white",
-  background: "hsla(0, 0.90%, 22.50%, 0.78)", // Fully transparent background
-
-  backdropFilter: "blur(8px)", // Blur the background content behind the element
-  overflowWrap: "break-word", // Ensure long words break
-};
-
-// Example of how the text container could look
-const textContent = {
-  width: "100%",
-  wordWrap: "break-word",
-  marginBottom: "10px",
-};

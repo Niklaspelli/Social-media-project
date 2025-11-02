@@ -1,4 +1,3 @@
-// DeleteAccount.jsx
 import { useState } from "react";
 import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 
 const DeleteAccount = ({ isLoading, onConfirm, onCancel }) => {
   const navigate = useNavigate();
+  const [setSuccess] = useState(false);
 
   const { logout } = useAuth();
 

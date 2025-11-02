@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "react-bootstrap";
 
 const AddFriendButton = ({ senderId, receiverId, token }) => {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Form,
   Button,
@@ -8,6 +8,8 @@ import {
   Spinner,
   Accordion,
   Image,
+  Row,
+  Col,
 } from "react-bootstrap";
 import { useAuth } from "../../context/AuthContext"; // Kontrollera att sökvägen är korrekt
 import useCreateEvent from "../../queryHooks/events/useCreateEvent"; // Din event-hook
@@ -23,11 +25,8 @@ const CreateEvent = () => {
   const [datetime, setDatetime] = useState("");
   const [location, setLocation] = useState("");
   const [eventImage, setEventImage] = useState(null);
-  const [imageIndex, setImageIndex] = useState(0);
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [error, setError] = useState(null);
-
-  const loggedInUserId = authData?.userId;
 
   const {
     mutate,
@@ -37,10 +36,7 @@ const CreateEvent = () => {
     isSuccess,
   } = useCreateEvent();
 
-  const { data: friends = [], isLoading: loadingFriends } = useFriends(
-    authData.userId,
-    accessToken
-  );
+  const { data: friends = [] } = useFriends(authData.userId, accessToken);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -89,146 +85,173 @@ const CreateEvent = () => {
     <Container className="mt-5">
       <h2 className="text-center text-white my-4">Create new event</h2>
 
-      <Card className="bg-dark text-white p-4 shadow">
+      <Card
+        className="bg-dark text-white p-4 shadow mx-auto"
+        style={{ maxWidth: "600px" }}
+      >
+        {" "}
         <Form onSubmit={handleSubmit}>
-          <Form.Group controlId="eventTitle" className="mb-3">
-            <Form.Label>Title:</Form.Label>
-            <Form.Control
-              type="text"
-              maxLength={100}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Event title"
-              style={{
-                borderColor: "#444",
-              }}
-              required
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Välj eventbild:</Form.Label>
-            <Form.Control
-              type="file"
-              accept="image/*"
-              onChange={async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
+          <Row className="mb-3">
+            <Col md={12}>
+              <Form.Group controlId="eventTitle" className="mb-3">
+                <Form.Label>Title:</Form.Label>
 
-                try {
-                  const url = await uploadToImgBB(file);
-                  setEventImage(url);
-                } catch (err) {
-                  console.error("Kunde inte ladda upp bilden:", err);
-                }
-              }}
-            />
-            {eventImage && (
-              <Image
-                src={eventImage}
-                alt="Event"
-                rounded
-                width={150}
-                height={80}
-                style={{ objectFit: "cover", marginTop: 10 }}
-              />
-            )}
-          </Form.Group>
+                <Form.Control
+                  type="text"
+                  maxLength={100}
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Event title"
+                  style={{
+                    borderColor: "#444",
+                  }}
+                  required
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row className="mb-3">
+            <Col md={12}>
+              <Form.Group className="mb-3">
+                <Form.Label>Välj eventbild:</Form.Label>
+                <Form.Control
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
 
-          <Form.Group controlId="eventDescription" className="mb-3">
-            <Form.Label>Description:</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              maxLength={500}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe the event"
-              style={{
-                borderColor: "#444",
-              }}
-            />
-          </Form.Group>
+                    try {
+                      const url = await uploadToImgBB(file);
+                      setEventImage(url);
+                    } catch (err) {
+                      console.error("Kunde inte ladda upp bilden:", err);
+                    }
+                  }}
+                />
+                {eventImage && (
+                  <Image
+                    src={eventImage}
+                    alt="Event"
+                    rounded
+                    width={150}
+                    height={80}
+                    style={{ objectFit: "cover", marginTop: 10 }}
+                  />
+                )}
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row className="mb-3">
+            <Col md={12}>
+              <Form.Group controlId="eventDescription" className="mb-3">
+                <Form.Label>Description:</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  maxLength={500}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Describe the event"
+                  style={{
+                    borderColor: "#444",
+                  }}
+                />
+              </Form.Group>
+            </Col>{" "}
+          </Row>
+          <Row className="mb-3">
+            <Col md={12}>
+              <Form.Group controlId="eventDatetime" className="mb-3">
+                <Form.Label>Date & Time:</Form.Label>
+                <Form.Control
+                  type="datetime-local"
+                  value={datetime}
+                  onChange={(e) => setDatetime(e.target.value)}
+                  style={{
+                    borderColor: "#444",
+                  }}
+                  required
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row className="mb-3">
+            <Col md={12}>
+              <Form.Group controlId="eventLocation" className="mb-3">
+                <Form.Label>Location:</Form.Label>
+                <Form.Control
+                  type="text"
+                  maxLength={200}
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder="Where will the event be held?"
+                  style={{
+                    borderColor: "#444",
+                  }}
+                  required
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row className="mb-3">
+            <Col md={12}>
+              <Accordion alwaysOpen className="my-3">
+                <Accordion.Item eventKey="1">
+                  <Accordion.Header>Invite friends...</Accordion.Header>
+                  <Accordion.Body>
+                    {friends.map((friend) => {
+                      const isSelected = selectedFriends.includes(friend.id);
 
-          <Form.Group controlId="eventDatetime" className="mb-3">
-            <Form.Label>Date & Time:</Form.Label>
-            <Form.Control
-              type="datetime-local"
-              value={datetime}
-              onChange={(e) => setDatetime(e.target.value)}
-              style={{
-                borderColor: "#444",
-              }}
-              required
-            />
-          </Form.Group>
+                      return (
+                        <div
+                          key={friend.id}
+                          onClick={() => handleFriendToggle(friend.id)}
+                          className={`d-flex align-items-center gap-2 mb-2 p-2 rounded ${
+                            isSelected ? "bg-dark text-white" : "bg-light"
+                          }`}
+                          style={{ cursor: "pointer" }}
+                        >
+                          {friend.avatar && (
+                            <Image
+                              src={friend.avatar}
+                              alt={friend.username}
+                              roundedCircle
+                              width={30}
+                              height={30}
+                            />
+                          )}
+                          <span>{friend.username}</span>
 
-          <Form.Group controlId="eventLocation" className="mb-3">
-            <Form.Label>Location:</Form.Label>
-            <Form.Control
-              type="text"
-              maxLength={200}
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="Where will the event be held?"
-              style={{
-                borderColor: "#444",
-              }}
-              required
-            />
-          </Form.Group>
-          <Accordion alwaysOpen className="my-3">
-            <Accordion.Item eventKey="1">
-              <Accordion.Header>Invite friends...</Accordion.Header>
-              <Accordion.Body>
-                {friends.map((friend) => {
-                  const isSelected = selectedFriends.includes(friend.id);
-
-                  return (
-                    <div
-                      key={friend.id}
-                      onClick={() => handleFriendToggle(friend.id)}
-                      className={`d-flex align-items-center gap-2 mb-2 p-2 rounded ${
-                        isSelected ? "bg-dark text-white" : "bg-light"
-                      }`}
-                      style={{ cursor: "pointer" }}
-                    >
-                      {friend.avatar && (
-                        <Image
-                          src={friend.avatar}
-                          alt={friend.username}
-                          roundedCircle
-                          width={30}
-                          height={30}
-                        />
-                      )}
-                      <span>{friend.username}</span>
-
-                      <div
-                        style={{
-                          marginLeft: "auto",
-                          width: 20,
-                          height: 20,
-                          border: "2px solid",
-                          borderColor: isSelected ? "white" : "black",
-                          backgroundColor: isSelected ? "white" : "transparent",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        {isSelected && (
-                          <span style={{ color: "black", fontSize: 16 }}>
-                            ✓
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </Accordion.Body>
-            </Accordion.Item>
-          </Accordion>
-
+                          <div
+                            style={{
+                              marginLeft: "auto",
+                              width: 20,
+                              height: 20,
+                              border: "2px solid",
+                              borderColor: isSelected ? "white" : "black",
+                              backgroundColor: isSelected
+                                ? "white"
+                                : "transparent",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            {isSelected && (
+                              <span style={{ color: "black", fontSize: 16 }}>
+                                ✓
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </Accordion.Body>
+                </Accordion.Item>
+              </Accordion>
+            </Col>
+          </Row>
           <div className="d-grid gap-2">
             <Button
               type="submit"

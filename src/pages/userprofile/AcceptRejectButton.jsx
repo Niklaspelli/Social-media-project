@@ -1,6 +1,6 @@
 import { useAuth } from "../../context/AuthContext";
 import { Button } from "react-bootstrap";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 
@@ -10,7 +10,6 @@ function AcceptRejectButton({
   receiverId,
   loggedInUserId,
   username,
-  avatar,
   eventTitle, // endast för event
   isPending: propIsPending,
   incomingRequest: propIncomingRequest,

@@ -113,11 +113,12 @@ export const useAuth = () => {
 };
  */
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
+let cachedCsrfToken = null;
 
 export const AuthProvider = ({ children }) => {
   const [authData, setAuthData] = useState(null);
@@ -134,6 +135,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   const fetchCsrfToken = async () => {
+    if (cachedCsrfToken) return cachedCsrfToken; // återanvänd token
+
     try {
       const response = await fetch(
         "http://localhost:5000/api/auth/csrf-token",

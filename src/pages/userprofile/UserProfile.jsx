@@ -1,4 +1,3 @@
-import React from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { Container, Row, Col, Image, Card } from "react-bootstrap";
@@ -16,11 +15,23 @@ function UserProfile() {
   const { authData } = useAuth();
   const isOwnProfile = Number(authData?.userId) === Number(receiverId);
 
+  // ⚡ Call both hooks at the top level
   const {
-    data: profile,
-    isLoading,
-    error,
-  } = isOwnProfile ? useCurrentUserProfile() : useUserProfile(receiverId);
+    data: currentUserProfile,
+    isLoading: isLoadingCurrent,
+    error: errorCurrent,
+  } = useCurrentUserProfile();
+
+  const {
+    data: otherUserProfile,
+    isLoading: isLoadingOther,
+    error: errorOther,
+  } = useUserProfile(receiverId);
+
+  // ⚡ Decide which profile to use
+  const profile = isOwnProfile ? currentUserProfile : otherUserProfile;
+  const isLoading = isOwnProfile ? isLoadingCurrent : isLoadingOther;
+  const error = isOwnProfile ? errorCurrent : errorOther;
 
   if (isLoading) return <p>Loading profile...</p>;
   if (error) return <p style={{ color: "red" }}>{error.message}</p>;

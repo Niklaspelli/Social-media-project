@@ -7,10 +7,8 @@ import useReceivedRequests from "../../queryHooks/friends/useReceivedRequest";
 function FriendList() {
   const { authData } = useAuth();
   const token = authData?.accessToken;
-  const loggedInUserId = authData?.userId;
 
   const {
-    data: incomingRequests = [],
     isLoading: loadingRequests,
     isError: errorRequests,
     error: requestsError,

@@ -1,4 +1,3 @@
-import React from "react";
 import { AuthProvider } from "./context/AuthContext"; // Import the context
 
 import { Routes, Route, Navigate } from "react-router-dom"; // Add Navigate for redirection
