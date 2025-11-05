@@ -7,7 +7,7 @@ const postResponse = async ({
   csrfToken,
 }) => {
   const response = await fetch(
-    `http://localhost:5000/api/auth/threads/${threadId}/responses`,
+    `http://localhost:5000/api/forum/threads/${threadId}/responses`,
     {
       method: "POST",
       headers: {

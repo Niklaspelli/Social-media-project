@@ -37,7 +37,7 @@ const SearchBar = () => {
       const csrfToken = getCookie("csrfToken");
 
       const response = await fetch(
-        `http://localhost:5000/api/auth/search/users/${encodeURIComponent(
+        `http://localhost:5000/api/users/search/users/${encodeURIComponent(
           username
         )}`,
         {

@@ -11,7 +11,7 @@ const createThread = async ({
   csrfToken,
   subject_id,
 }) => {
-  const response = await fetch(`http://localhost:5000/api/auth/threads`, {
+  const response = await fetch(`http://localhost:5000/api/forum/threads`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

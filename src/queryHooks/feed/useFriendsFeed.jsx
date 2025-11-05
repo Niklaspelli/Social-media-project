@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 const fetchFriendsFeed = async (accessToken) => {
-  const res = await fetch("http://localhost:5000/api/auth/friends-feed", {
+  const res = await fetch("http://localhost:5000/api/feed/friends-feed", {
     headers: {
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",

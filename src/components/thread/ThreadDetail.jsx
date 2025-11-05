@@ -42,7 +42,7 @@ function ThreadDetail() {
       setLoading(true);
       try {
         const response = await fetch(
-          `${BackendURL}/api/auth/threads/${threadId}`
+          `${BackendURL}/api/forum/threads/${threadId}`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch thread");
@@ -69,7 +69,7 @@ function ThreadDetail() {
 
     try {
       const response = await fetch(
-        `${BackendURL}/api/auth/threads/${threadId}/responses`,
+        `${BackendURL}/api/forum/threads/${threadId}/responses`,
         {
           method: "POST",
           headers: {

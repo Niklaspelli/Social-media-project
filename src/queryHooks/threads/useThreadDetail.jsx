@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 const fetchThreadDetail = async (threadId) => {
   const response = await fetch(
-    `http://localhost:5000/api/auth/threads/${threadId}`,
+    `http://localhost:5000/api/forum/threads/${threadId}`,
     {
       credentials: "include",
     }

@@ -26,8 +26,8 @@ function AcceptRejectButton({
   const accept = async () => {
     const endpoint =
       type === "friend"
-        ? "http://localhost:5000/api/auth/accept"
-        : "http://localhost:5000/api/auth/events/invitations/accept";
+        ? "http://localhost:5000/api/friends/accept"
+        : "http://localhost:5000/api/events/events/invitations/accept";
 
     const body = type === "friend" ? { senderId: id } : { eventId: id };
 
@@ -58,8 +58,8 @@ function AcceptRejectButton({
   const reject = async () => {
     const endpoint =
       type === "friend"
-        ? "http://localhost:5000/api/auth/reject"
-        : "http://localhost:5000/api/auth/events/invitations/reject";
+        ? "http://localhost:5000/api/friends/reject"
+        : "http://localhost:5000/api/events/events/invitations/reject";
 
     const body =
       type === "friend" ? { senderId: id, receiverId } : { eventId: id };

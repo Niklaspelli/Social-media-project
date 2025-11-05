@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 const useFriends = (loggedInUserId, token) => {
   const fetchFriends = async () => {
     const response = await fetch(
-      `http://localhost:5000/api/auth/friends/${loggedInUserId}`,
+      `http://localhost:5000/api/friends/friends/${loggedInUserId}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }

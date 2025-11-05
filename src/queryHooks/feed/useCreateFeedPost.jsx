@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../context/AuthContext";
 
 const postFeed = async ({ content, accessToken, csrfToken }) => {
-  const res = await fetch("http://localhost:5000/api/auth/feed-post", {
+  const res = await fetch("http://localhost:5000/api/feed/feed-post", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

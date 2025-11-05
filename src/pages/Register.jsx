@@ -37,13 +37,10 @@ function Register() {
 
     const fetchCsrfToken = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:5000/api/auth/csrf-token",
-          {
-            method: "GET",
-            credentials: "include", // To include cookies
-          }
-        );
+        const response = await fetch("http://localhost:5000/api/csrf-token", {
+          method: "GET",
+          credentials: "include", // To include cookies
+        });
         if (response.ok) {
           const data = await response.json();
           setCsrfToken(data.csrfToken);
@@ -82,7 +79,7 @@ function Register() {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/register", {
+      const response = await fetch("http://localhost:5000/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

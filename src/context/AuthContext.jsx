@@ -138,12 +138,9 @@ export const AuthProvider = ({ children }) => {
     if (cachedCsrfToken) return cachedCsrfToken; // återanvänd token
 
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/auth/csrf-token",
-        {
-          credentials: "include",
-        }
-      );
+      const response = await fetch("http://localhost:5000/api/csrf-token", {
+        credentials: "include",
+      });
       const data = await response.json();
       if (data.csrfToken) {
         setCsrfToken(data.csrfToken);

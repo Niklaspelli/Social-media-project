@@ -7,7 +7,7 @@ const fetchEventFeedPosts = async ({
   offset = 0,
 }) => {
   const res = await fetch(
-    `http://localhost:5000/api/auth/events/${eventId}/feed?limit=${limit}&offset=${offset}`,
+    `http://localhost:5000/api/eventfeed/events/${eventId}/feed?limit=${limit}&offset=${offset}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,

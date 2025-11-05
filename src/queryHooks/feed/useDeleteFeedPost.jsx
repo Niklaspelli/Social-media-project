@@ -3,7 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 
 const deletePost = async ({ postId, accessToken, csrfToken }) => {
   const res = await fetch(
-    `http://localhost:5000/api/auth/feed-post/${postId}`,
+    `http://localhost:5000/api/feed/feed-post/${postId}`,
     {
       method: "DELETE",
       headers: {

@@ -32,7 +32,7 @@ const fetchThreads = async (
   sort = "desc",
   subjectId = null
 ) => {
-  let url = `http://localhost:5000/api/auth/threads?page=${page}&limit=${limit}&sort=${sort}`;
+  let url = `http://localhost:5000/api/forum/threads?page=${page}&limit=${limit}&sort=${sort}`;
   if (subjectId) {
     url += `&subject_id=${subjectId}`;
   }

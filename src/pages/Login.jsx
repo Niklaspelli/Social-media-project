@@ -69,7 +69,7 @@ const Login = ({ onSwitchToSignUp }) => {
         navigate(`/user/${userId}`);
 
         // Uppdatera last seen
-        await fetch("http://localhost:5000/api/auth/update-last-seen", {
+        await fetch("http://localhost:5000/api/update-last-seen", {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",

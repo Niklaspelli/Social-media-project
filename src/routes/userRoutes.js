@@ -1,6 +1,6 @@
 import express from "express";
 import { authenticateJWT } from "../middleware/authMiddleware.js";
-import { verifyCsrfToken } from "../middleware/csrf";
+import { verifyCsrfToken } from "../middleware/csrf.js";
 import {
   getCompleteUserProfile,
   getUserById,
@@ -25,9 +25,5 @@ router.get(
   searchUser
 );
 router.get("/profile/:userId", authenticateJWT, verifyCsrfToken, getUserById);
-
-router.get("/users/:userId", authenticateJWT, getUserProfile);
-router.post("/users", authenticateJWT, createOrUpdateUserProfile);
-router.put("/users", authenticateJWT, updateUserProfile);
 
 export default router;

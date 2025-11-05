@@ -12,7 +12,7 @@ const createEvent = async ({
   event_image,
   ...eventData
 }) => {
-  const response = await fetch(`http://localhost:5000/api/auth/events`, {
+  const response = await fetch(`http://localhost:5000/api/events/events`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

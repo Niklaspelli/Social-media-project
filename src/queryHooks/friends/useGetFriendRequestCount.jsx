@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 // Denna funktion hämtar faktiskt datan
 const fetchFriendRequestCount = async (userId, accessToken) => {
   const res = await fetch(
-    `http://localhost:5000/api/auth/friends/notifications/${userId}`,
+    `http://localhost:5000/api/friends/friends/notifications/${userId}`,
     {
       method: "GET",
       headers: {

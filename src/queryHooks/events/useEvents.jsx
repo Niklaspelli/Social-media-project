@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 const useEvents = (accessToken) => {
   const fetchEvents = async () => {
-    const response = await fetch("http://localhost:5000/api/auth/events", {
+    const response = await fetch("http://localhost:5000/api/events/events", {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`, // 🔑 samma som create

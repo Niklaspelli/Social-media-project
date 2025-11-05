@@ -4,7 +4,7 @@ import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 const fetchUserEvents = async (token) => {
-  const res = await fetch("http://localhost:5000/api/auth/events/user", {
+  const res = await fetch("http://localhost:5000/api/events/events/user", {
     headers: { Authorization: `Bearer ${token}` },
     credentials: "include",
   });

@@ -5,6 +5,7 @@ import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
 
 const app = express();
+app.use(helmet());
 
 const allowedOrigins = ["http://localhost:5173", "http://localhost:5000"];
 
@@ -26,14 +27,13 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
 });
-
 app.use(limiter);
+
 app.use(express.json());
-app.use(helmet());
 app.use(cookieParser());
 
-const forumRoutes = (await import("./routes/forumRoutes.js")).default;
-app.use("/api/auth", forumRoutes);
+const routes = (await import("./routes/index.js")).default;
+app.use("/api", routes);
 
 app.use((req, res) => res.status(404).send("Not found"));
 

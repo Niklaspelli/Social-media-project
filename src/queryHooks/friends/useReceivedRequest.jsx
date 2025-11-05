@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 const fetchReceivedRequests = async (token) => {
   const response = await fetch(
-    "http://localhost:5000/api/auth/received-requests",
+    "http://localhost:5000/api/friends/received-requests",
     {
       method: "GET",
       headers: {

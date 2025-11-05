@@ -27,7 +27,7 @@ function LikeButton({
   useEffect(() => {
     const fetchLikeCount = async () => {
       try {
-        const url = `${BackendURL}/api/auth/responses/${responseId}/like-count`;
+        const url = `${BackendURL}/api/responses/${responseId}/like-count`;
 
         const response = await fetch(url);
         if (!response.ok) {
@@ -52,7 +52,7 @@ function LikeButton({
         throw new Error("Access token is missing. Please log in again.");
       }
 
-      const url = `${BackendURL}/api/auth/${
+      const url = `${BackendURL}/api/${
         responseId ? `responses/${responseId}/like` : `threads/${threadId}/like`
       }`;
 

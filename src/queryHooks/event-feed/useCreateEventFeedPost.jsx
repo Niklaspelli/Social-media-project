@@ -3,7 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 
 const postEventFeed = async ({ eventId, content, accessToken, csrfToken }) => {
   const res = await fetch(
-    `http://localhost:5000/api/auth/events/${eventId}/feed`,
+    `http://localhost:5000/api/eventfeed/events/${eventId}/feed`,
     {
       method: "POST",
       headers: {

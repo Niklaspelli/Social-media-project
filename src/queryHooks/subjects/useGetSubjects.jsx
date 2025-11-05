@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 // Function to fetch subjects from your backend
 const fetchSubjects = async () => {
-  const response = await fetch("http://localhost:5000/api/auth/subjects");
+  const response = await fetch("http://localhost:5000/api/forum/subjects");
   if (!response.ok) {
     throw new Error("Failed to fetch subjects");
   }

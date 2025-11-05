@@ -2,15 +2,18 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../context/AuthContext";
 
 const fetchUserProfile = async (userId, accessToken, csrfToken) => {
-  const res = await fetch(`http://localhost:5000/api/auth/users/${userId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-      "csrf-token": csrfToken,
-    },
-    credentials: "include",
-  });
+  const res = await fetch(
+    `http://localhost:5000/api/userprofile/users/${userId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+        "csrf-token": csrfToken,
+      },
+      credentials: "include",
+    }
+  );
 
   if (!res.ok) {
     const message = await res.text();
