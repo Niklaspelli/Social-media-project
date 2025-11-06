@@ -97,10 +97,10 @@ export const rejectFriendRequest = (req, res) => {
   }
 
   const sql = `
-    UPDATE friend_requests
-    SET status = 'rejected'
-    WHERE sender_id = ? AND receiver_id = ? 
-  `;
+  UPDATE friend_requests
+  SET status = 'rejected'
+  WHERE sender_id = ? AND receiver_id = ? AND status = 'pending'
+`;
 
   db.query(sql, [senderId, receiverId], (err, result) => {
     if (err) {
@@ -109,7 +109,9 @@ export const rejectFriendRequest = (req, res) => {
     }
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ error: "No pending request found" });
+      return res.status(400).json({
+        error: "Cannot reject: request already accepted or does not exist.",
+      });
     }
 
     return res.status(200).json({ message: "Friend request rejected." });
@@ -160,7 +162,7 @@ export const getFriendshipStatus = (req, res) => {
 };
 
 // PUT /api/auth/unfollow
-export const unfollowFriend = (req, res) => {
+/* export const unfollowFriend = (req, res) => {
   const { senderId, receiverId } = req.body; // Assuming these are passed in the request body
 
   const sql = `
@@ -177,7 +179,7 @@ export const unfollowFriend = (req, res) => {
 
     return res.status(200).json({ message: "Friendship ended successfully." });
   });
-};
+}; */
 
 export const getFriendsList = (req, res) => {
   const loggedInUserId = req.user?.id;
@@ -187,14 +189,13 @@ export const getFriendsList = (req, res) => {
   }
 
   const sql = `
-    SELECT 
-      u.id, u.username, u.avatar, u.last_seen
-    FROM users u
-    JOIN friend_requests fr ON (
-      (fr.sender_id = u.id AND fr.receiver_id = ?) OR
-      (fr.receiver_id = u.id AND fr.sender_id = ?)
-    )
-    WHERE fr.status = 'accepted' AND u.id != ?
+SELECT u.id, u.username, u.avatar, u.last_seen
+FROM users u
+JOIN friend_requests fr ON (
+  (fr.sender_id = u.id AND fr.receiver_id = ?) OR
+  (fr.receiver_id = u.id AND fr.sender_id = ?)
+)
+WHERE u.id != ?
   `;
 
   db.query(
@@ -286,4 +287,36 @@ export const getIncomingFriendRequestCount = async (req, res) => {
       res.json({ count });
     }
   );
+};
+
+// PUT /api/friends/unfollow
+export const unfollowFriend = (req, res) => {
+  const { senderId, receiverId } = req.body; // båda användare
+
+  if (!senderId || !receiverId) {
+    return res
+      .status(400)
+      .json({ error: "Both senderId and receiverId are required." });
+  }
+
+  const sql = `
+    DELETE FROM friend_requests
+    WHERE (sender_id = ? AND receiver_id = ?)
+       OR (sender_id = ? AND receiver_id = ?)
+  `;
+
+  db.query(sql, [senderId, receiverId, receiverId, senderId], (err, result) => {
+    if (err) {
+      console.error("Error unfollowing/removing friendship:", err.message);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "No friendship or request found." });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Friendship removed successfully." });
+  });
 };

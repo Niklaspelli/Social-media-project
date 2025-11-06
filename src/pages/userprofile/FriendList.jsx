@@ -2,52 +2,46 @@ import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import { Container, Row, Col, Image } from "react-bootstrap";
 import useFriends from "../../queryHooks/friends/useFetchFriends";
-import useReceivedRequests from "../../queryHooks/friends/useReceivedRequest";
 
 function FriendList() {
   const { authData } = useAuth();
   const token = authData?.accessToken;
-
-  const {
-    isLoading: loadingRequests,
-    isError: errorRequests,
-    error: requestsError,
-  } = useReceivedRequests(token);
+  const userId = authData?.userId;
 
   const {
     data: friends = [],
-    isLoading: loadingFriends,
-    isError: errorFriends,
-    error: friendsError,
-  } = useFriends(authData?.userId, authData?.accessToken);
+    isLoading,
+    isError,
+    error,
+  } = useFriends(userId, token);
 
   const isOnline = (lastSeen) => {
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
     return new Date(lastSeen) > fiveMinutesAgo;
   };
 
-  if (loadingFriends || loadingRequests) {
-    return <div>🔄 Laddar vänlista...</div>;
-  }
-
-  if (errorFriends || errorRequests) {
+  if (isLoading) return <div>🔄 Laddar vänlista...</div>;
+  if (isError)
     return (
-      <div style={{ color: "red" }}>
-        ❌ Ett fel inträffade:
-        <ul>
-          {errorFriends && <li>Vänner: {friendsError.message}</li>}
-          {errorRequests && <li>Förfrågningar: {requestsError.message}</li>}
-        </ul>
-      </div>
+      <div style={{ color: "red" }}>❌ Ett fel inträffade: {error.message}</div>
     );
-  }
+
+  // Remove duplicates just in case
+  const uniqueFriends = Array.from(
+    new Map(friends.map((f) => [f.id, f])).values()
+  );
 
   return (
     <Container style={{ color: "white" }}>
       <h2 className="mt-5">Your Friends</h2>
       <Row>
-        {friends.map((friend) => (
-          <Col key={friend.id} xs={12} md={4} className="mb-4 text-center">
+        {uniqueFriends.map((friend, index) => (
+          <Col
+            key={`${friend.id}-${index}`}
+            xs={12}
+            md={4}
+            className="mb-4 text-center"
+          >
             <Link
               to={`/user/${friend.id}`}
               style={{ textDecoration: "none", color: "inherit" }}

@@ -22,9 +22,13 @@ router.post(
   verifyCsrfToken,
   sendFriendRequest
 );
-router.post("/accept", authenticateJWT, verifyCsrfToken, acceptFriendRequest);
-router.post("/reject", authenticateJWT, verifyCsrfToken, rejectFriendRequest);
-router.get("/status/:senderId/:receiverId", getFriendshipStatus);
+router.post("/accept", authenticateJWT, acceptFriendRequest);
+router.post("/reject", authenticateJWT, rejectFriendRequest);
+router.get(
+  "/status/:senderId/:receiverId",
+  authenticateJWT,
+  getFriendshipStatus
+);
 router.get("/friends/:userId", authenticateJWT, getFriendsList);
 router.get("/friends/count/:userId", authenticateJWT, getFriendCount);
 router.get("/received-requests", authenticateJWT, getIncomingFriendRequests);

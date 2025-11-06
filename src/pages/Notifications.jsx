@@ -26,9 +26,9 @@ function Notifications() {
 
       <div className="d-flex flex-column gap-3">
         {/* Friend requests */}
-        {incomingFriendRequests.map((request) => (
+        {incomingFriendRequests.map((request, index) => (
           <div
-            key={request.sender_id}
+            key={`${request.sender_id}-${index}`}
             className="d-flex align-items-center gap-3 p-2 border rounded"
           >
             <Image
@@ -52,9 +52,9 @@ function Notifications() {
         ))}
 
         {/* Event invitations */}
-        {incomingEventInvitations.map((invitation) => (
+        {incomingEventInvitations.map((invitation, index) => (
           <div
-            key={invitation.event_id}
+            key={`${invitation.event_id}-${index}`}
             className="d-flex align-items-center gap-3 p-2 border rounded"
           >
             <Image

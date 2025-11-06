@@ -14,7 +14,7 @@ function AcceptRejectButton({
   isPending: propIsPending,
   incomingRequest: propIncomingRequest,
 }) {
-  const { authData, csrfToken } = useAuth();
+  const { authData } = useAuth();
   const token = authData?.accessToken;
   const queryClient = useQueryClient();
 
@@ -36,7 +36,6 @@ function AcceptRejectButton({
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        "csrf-token": csrfToken,
       },
       credentials: "include",
       body: JSON.stringify(body),
@@ -50,6 +49,7 @@ function AcceptRejectButton({
           ? ["friendRequestCount", loggedInUserId]
           : ["eventInvitationCount"]
       );
+      queryClient.invalidateQueries(["friends", loggedInUserId]); // <--- lägg till detta
     } else {
       alert(data.error);
     }
@@ -69,7 +69,6 @@ function AcceptRejectButton({
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        "csrf-token": csrfToken,
       },
       credentials: "include",
       body: JSON.stringify(body),
@@ -83,6 +82,7 @@ function AcceptRejectButton({
           ? ["friendRequestCount", loggedInUserId]
           : ["eventInvitationCount"]
       );
+      queryClient.invalidateQueries(["friends", loggedInUserId]); // <--- lägg till detta
     } else {
       alert(data.error);
     }
