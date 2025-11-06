@@ -25,7 +25,7 @@ const Settings = () => {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `http://localhost:5000/api/auth/users/${userId}`,
+        `http://localhost:5000/api/userprofile/users/${userId}`,
         {
           method: "DELETE",
           headers: {

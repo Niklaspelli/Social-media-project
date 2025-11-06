@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+/* import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../context/AuthContext";
 
 const fetchCurrentUserProfile = async (accessToken, csrfToken) => {
@@ -35,6 +35,30 @@ export const useCurrentUserProfile = () => {
     queryKey: ["currentUserProfile", userId],
     queryFn: () => fetchCurrentUserProfile(accessToken, csrfToken),
     enabled: !!accessToken && !!csrfToken && !!userId,
+    staleTime: 5 * 60 * 1000,
+    retry: 3,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 3000),
+    refetchOnWindowFocus: false,
+  });
+}; */
+
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "../../context/AuthContext";
+import { apiFetch } from "../../api/api";
+
+export const useCurrentUserProfile = () => {
+  const { authData } = useAuth();
+  const accessToken = authData?.accessToken;
+  const userId = authData?.userId;
+
+  return useQuery({
+    queryKey: ["currentUserProfile", userId],
+    queryFn: () =>
+      apiFetch("/users/profile", {
+        method: "GET",
+        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+      }),
+    enabled: !!accessToken && !!userId, // ✅ Kör endast när CSRF-token är redo
     staleTime: 5 * 60 * 1000,
     retry: 3,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 3000),

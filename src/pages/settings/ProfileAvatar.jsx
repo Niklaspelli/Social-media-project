@@ -39,21 +39,18 @@ const ProfileAvatar = ({ setSelectedPicture }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/auth/users/avatar",
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            "csrf-token": csrfToken,
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            avatar: tempPicture,
-          }),
-          credentials: "include",
-        }
-      );
+      const response = await fetch("http://localhost:5000/api/auth/avatar", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "csrf-token": csrfToken,
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          avatar: tempPicture,
+        }),
+        credentials: "include",
+      });
 
       if (!response.ok) {
         throw new Error(

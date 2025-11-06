@@ -1,6 +1,5 @@
 import express from "express";
 import { authenticateJWT } from "../middleware/authMiddleware.js";
-import { verifyCsrfToken } from "../middleware/csrf.js";
 import {
   getCompleteUserProfile,
   getUserById,
@@ -14,16 +13,16 @@ const router = express.Router();
 router.get(
   "/profile",
   authenticateJWT,
-  verifyCsrfToken,
+
   getCompleteUserProfile
 );
-router.get("/users/:id", authenticateJWT, verifyCsrfToken, getOtherUserProfile);
+router.get("/users/:id", authenticateJWT, getOtherUserProfile);
 router.get(
   "/search/users/:username",
   authenticateJWT,
-  verifyCsrfToken,
+
   searchUser
 );
-router.get("/profile/:userId", authenticateJWT, verifyCsrfToken, getUserById);
+router.get("/profile/:userId", authenticateJWT, getUserById);
 
 export default router;

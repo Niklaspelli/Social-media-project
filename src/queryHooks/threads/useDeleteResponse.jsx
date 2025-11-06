@@ -1,13 +1,16 @@
 import { useMutation } from "@tanstack/react-query";
 
 const deleteResponse = async ({ responseId, accessToken }) => {
-  const response = await fetch(`http://localhost:5000/response/${responseId}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+  const response = await fetch(
+    `http://localhost:5000/api/forum/response/${responseId}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
 
   if (!response.ok) {
     throw new Error("Failed to delete response");

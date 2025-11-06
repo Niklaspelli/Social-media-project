@@ -61,7 +61,6 @@ const CreateEvent = () => {
 
   const uploadToImgBB = async (file) => {
     const apiKey = import.meta.env.VITE_IMGBB_API_KEY;
-    console.log("ImgBB API key:", apiKey);
 
     const formData = new FormData();
     formData.append("image", file);

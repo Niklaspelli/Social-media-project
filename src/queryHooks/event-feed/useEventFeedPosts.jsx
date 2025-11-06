@@ -33,7 +33,7 @@ export default function useEventFeedPosts(
       fetchEventFeedPosts({ eventId, accessToken, limit, offset: 0 }),
     enabled: !!eventId && !!accessToken,
     staleTime: 0,
-    refetchInterval: 5000, // hämtar nytt var 5:e sekund
+    refetchInterval: false, // hämtar nytt var 5:e sekund
     refetchOnWindowFocus: true,
   });
 }

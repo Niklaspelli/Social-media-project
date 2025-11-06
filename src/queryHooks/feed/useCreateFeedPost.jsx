@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+/* import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../context/AuthContext";
 
 const postFeed = async ({ content, accessToken, csrfToken }) => {
@@ -28,6 +28,45 @@ export default function useCreateFeedPost() {
     onSuccess: () => {
       queryClient.invalidateQueries(["feedPosts", userId]);
       console.log("✅ Post created successfully");
+    },
+  });
+}
+ */
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiFetch } from "../../api/api";
+import { useAuth, getCsrfToken } from "../../context/AuthContext";
+
+const postFeed = async ({ content, accessToken }) => {
+  if (!accessToken) throw new Error("No access token available");
+
+  const csrfToken = await getCsrfToken();
+  if (!csrfToken) throw new Error("CSRF token not ready");
+
+  return apiFetch("/feed/feed-post", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+      "csrf-token": csrfToken,
+    },
+    body: JSON.stringify({ content }),
+  });
+};
+
+export default function useCreateFeedPost() {
+  const queryClient = useQueryClient();
+  const { authData } = useAuth();
+  const { accessToken, userId } = authData || {};
+
+  return useMutation({
+    mutationFn: ({ content }) => postFeed({ content, accessToken }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["feedPosts", userId]);
+      console.log("✅ Post created successfully");
+    },
+    onError: (error) => {
+      console.error("❌ Failed to create feed post:", error.message);
     },
   });
 }

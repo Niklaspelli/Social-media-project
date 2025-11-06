@@ -1,39 +1,42 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth, getCsrfToken } from "../../context/AuthContext";
+import { apiFetch } from "../../api/api";
 
-const deleteEventFeedPost = async ({ postId, accessToken, csrfToken }) => {
-  const res = await fetch(
-    `http://localhost:5000/api/eventfeed/event-feed-post/${postId}`,
-    {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "csrf-token": csrfToken,
-      },
-      credentials: "include",
-    }
-  );
+const deleteEventFeedPost = async ({ postId, accessToken }) => {
+  if (!accessToken) throw new Error("No access token available");
 
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || "Failed to delete post");
-  }
+  const csrfToken = await getCsrfToken();
+  if (!csrfToken) throw new Error("CSRF token not ready");
 
-  return postId;
+  return apiFetch(`/eventfeed/events/feed/${postId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "csrf-token": csrfToken,
+    },
+  });
 };
 
 export default function useDeleteEventFeedPost(eventId) {
   const queryClient = useQueryClient();
-  const { authData, csrfToken } = useAuth();
+  const { authData } = useAuth();
   const { accessToken } = authData || {};
 
   return useMutation({
-    mutationFn: ({ postId }) =>
-      deleteEventFeedPost({ postId, accessToken, csrfToken }),
-    onSuccess: () => {
+    mutationFn: ({ postId }) => deleteEventFeedPost({ postId, accessToken }),
+    onSuccess: (deletedPostId) => {
       console.log("🗑️ Event feed post deleted");
-      // Invalidatera just feeden för det aktuella eventet
-      queryClient.invalidateQueries(["eventFeedPosts", eventId]);
+
+      // Uppdatera cache direkt
+      queryClient.setQueryData(["eventFeedPosts", eventId], (oldData) => {
+        if (!oldData || !Array.isArray(oldData.posts))
+          return { posts: [], total: 0 };
+        return {
+          ...oldData,
+          posts: oldData.posts.filter((p) => p.id !== deletedPostId),
+          total: Math.max(oldData.total - 1, 0),
+        };
+      });
     },
     onError: (error) => {
       console.error("❌ Failed to delete event feed post:", error.message);

@@ -21,7 +21,7 @@ const AddFriendButton = ({ senderId, receiverId, token }) => {
   const checkIfFriends = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/auth/status/${senderId}/${receiverId}`,
+        `http://localhost:5000/api/friends/status/${senderId}/${receiverId}`,
         {
           method: "GET",
           headers: {
@@ -73,7 +73,7 @@ const AddFriendButton = ({ senderId, receiverId, token }) => {
 
     // Send the PUT request to unfollow
     if (action === "unfollow") {
-      const url = "http://localhost:5000/api/auth/unfollow"; // Match the route in your backend
+      const url = "http://localhost:5000/api/friends/unfollow"; // Match the route in your backend
       const body = {
         senderId: senderId,
         receiverId: receiverId,
@@ -107,7 +107,7 @@ const AddFriendButton = ({ senderId, receiverId, token }) => {
 
     // If action is "request" (i.e., sending a friend request)
     if (action === "request") {
-      const url = "http://localhost:5000/api/auth/friend-request"; // Backend route for sending friend request
+      const url = "http://localhost:5000/api/friends/friend-request"; // Backend route for sending friend request
       const body = {
         senderId: senderId,
         receiverId: receiverId,

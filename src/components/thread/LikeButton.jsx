@@ -27,7 +27,7 @@ function LikeButton({
   useEffect(() => {
     const fetchLikeCount = async () => {
       try {
-        const url = `${BackendURL}/api/responses/${responseId}/like-count`;
+        const url = `${BackendURL}/api/forum/responses/${responseId}/like-count`;
 
         const response = await fetch(url);
         if (!response.ok) {
@@ -53,7 +53,9 @@ function LikeButton({
       }
 
       const url = `${BackendURL}/api/${
-        responseId ? `responses/${responseId}/like` : `threads/${threadId}/like`
+        responseId
+          ? `forum/responses/${responseId}/like`
+          : `threads/${threadId}/like`
       }`;
 
       const response = await fetch(url, {

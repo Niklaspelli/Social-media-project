@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+/* import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { getCsrfToken } from "../context/AuthContext";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 
 const Login = ({ onSwitchToSignUp }) => {
@@ -155,6 +156,61 @@ const Login = ({ onSwitchToSignUp }) => {
         </Col>
       </Row>
     </Container>
+  );
+};
+
+export default Login;
+ */
+
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { apiFetch } from "../api/api";
+
+const Login = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+
+    try {
+      // 1️⃣ Login
+      const data = await apiFetch("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ username, password }),
+      });
+
+      const { userId, avatar, accessToken } = data;
+      login(username, userId, avatar, accessToken);
+
+      // 2️⃣ Update last seen
+      await apiFetch("/friends/update-last-seen", {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      navigate(`/user/${userId}`);
+    } catch (err) {
+      setError(err.message || "Login failed");
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input value={username} onChange={(e) => setUsername(e.target.value)} />
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+      <button type="submit">Login</button>
+      {error && <div>{error}</div>}
+    </form>
   );
 };
 

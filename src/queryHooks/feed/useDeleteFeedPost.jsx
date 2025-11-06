@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+/* import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../context/AuthContext";
 
 const deletePost = async ({ postId, accessToken, csrfToken }) => {
@@ -31,6 +31,53 @@ export default function useDeleteFeedPost(userId, accessToken) {
     onSuccess: () => {
       console.log("🗑️ Post deleted via React Query hook");
       queryClient.invalidateQueries(["feedPosts", userId, accessToken]);
+    },
+    onError: (error) => {
+      console.error(
+        "❌ Failed to delete post via React Query hook:",
+        error.message
+      );
+    },
+  });
+}
+ */
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth, getCsrfToken } from "../../context/AuthContext";
+import { apiFetch } from "../../api/api";
+
+const deletePost = async ({ postId, accessToken }) => {
+  if (!accessToken) throw new Error("No access token available");
+
+  const csrfToken = await getCsrfToken();
+  if (!csrfToken) throw new Error("CSRF token not ready");
+
+  const res = await apiFetch(`/feed/feed-post/${postId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "csrf-token": csrfToken,
+    },
+  });
+
+  // Returnera postId så att vi kan uppdatera cachen
+  return postId;
+};
+
+export default function useDeleteFeedPost(userId) {
+  const queryClient = useQueryClient();
+  const { authData } = useAuth();
+  const { accessToken } = authData || {};
+
+  return useMutation({
+    mutationFn: ({ postId }) => deletePost({ postId, accessToken }),
+    onSuccess: (deletedPostId) => {
+      console.log("🗑️ Post deleted via React Query hook");
+
+      queryClient.setQueryData(["feedPosts", userId], (oldData) => {
+        if (!Array.isArray(oldData)) return [];
+        return oldData.filter((p) => p.id !== deletedPostId);
+      });
     },
     onError: (error) => {
       console.error(

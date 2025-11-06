@@ -84,7 +84,7 @@ const EditProfile = () => {
     }
 
     try {
-      const url = `http://localhost:5000/api/auth/users`; // Alltid POST
+      const url = `http://localhost:5000/api/userprofile/users`; // Alltid POST
       const method = profile ? "PUT" : "POST"; // 👈 Skilj på nytt vs uppdatering
 
       const body = {

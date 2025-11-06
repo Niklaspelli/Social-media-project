@@ -13,18 +13,17 @@ const Feed = () => {
   const { id: userId } = useParams();
   const isOwnProfile = loggedInUserId === Number(userId);
 
-  const {
-    data: posts = [],
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useUserFeedPosts(userId, accessToken);
+  const { data, isLoading, isError, error, refetch } = useUserFeedPosts(
+    userId,
+    accessToken
+  );
 
   const { mutate: deleteFeedPost, isLoading: isDeleting } = useDeleteFeedPost(
     userId,
     accessToken
   );
+
+  const posts = Array.isArray(data) ? data : data?.posts || [];
 
   // Helper för att extrahera YouTube-ID och rensa bort länken
   const youtubeRegex =

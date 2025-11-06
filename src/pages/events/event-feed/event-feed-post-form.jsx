@@ -1,12 +1,8 @@
 import { useState } from "react";
 import { Button, FormControl, InputGroup } from "react-bootstrap";
-import { useAuth } from "../../../context/AuthContext"; // import auth context
 import useCreateEventFeedPost from "../../../queryHooks/event-feed/useCreateEventFeedPost";
 
 const EventFeedPostForm = ({ eventId, onPostCreated }) => {
-  const { authData, csrfToken } = useAuth();
-  const { accessToken } = authData || {}; // get tokens safely
-
   const [content, setContent] = useState("");
   const {
     mutate: createEventPost,
@@ -20,7 +16,7 @@ const EventFeedPostForm = ({ eventId, onPostCreated }) => {
     if (!content.trim()) return;
 
     createEventPost(
-      { eventId, content, accessToken, csrfToken }, // pass tokens here
+      { eventId, content },
       {
         onSuccess: () => {
           setContent("");

@@ -101,7 +101,7 @@ function ThreadDetail() {
   const handleDeleteResponse = async (responseId) => {
     try {
       const response = await fetch(
-        `${BackendURL}/api/auth/responses/${responseId}`,
+        `${BackendURL}/api/forum/responses/${responseId}`,
         {
           method: "DELETE",
           headers: {
@@ -169,7 +169,7 @@ function ThreadDetail() {
               </Link>
             </Card.Title>
             <Card.Text>{thread.body}</Card.Text>
-            <small className="text-muted">
+            <small className="text-white">
               {new Date(thread.created_at).toLocaleString()}
             </small>
           </Col>
