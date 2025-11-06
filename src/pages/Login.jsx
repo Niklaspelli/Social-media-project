@@ -162,33 +162,75 @@ const Login = ({ onSwitchToSignUp }) => {
 export default Login;
  */
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth, getCsrfToken } from "../context/AuthContext";
 import { apiFetch } from "../api/api";
+import { Container, Row, Col, Form, Button } from "react-bootstrap";
 
-const Login = () => {
+const Login = ({ onSwitchToSignUp }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
-  const { login } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { login, authData } = useAuth();
   const navigate = useNavigate();
+  const errRef = useRef();
+
+  // Hämta CSRF-token direkt när komponenten mountas
+  const [csrfToken, setCsrfToken] = useState(null);
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        const token = await getCsrfToken();
+        setCsrfToken(token);
+      } catch (err) {
+        console.error("Failed to fetch CSRF token:", err);
+      }
+    };
+    fetchToken();
+  }, []);
+
+  useEffect(() => {
+    // Om användaren redan är inloggad, navigera direkt
+    if (authData?.userId) {
+      navigate(`/user/${authData.userId}`);
+    }
+  }, [authData, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     setError(null);
 
+    if (!username || !password) {
+      setError("Username and password are required.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!csrfToken) {
+      setError("CSRF token not ready.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      // 1️⃣ Login
       const data = await apiFetch("/auth/login", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "csrf-token": csrfToken,
+        },
+        credentials: "include",
         body: JSON.stringify({ username, password }),
       });
 
       const { userId, avatar, accessToken } = data;
       login(username, userId, avatar, accessToken);
 
-      // 2️⃣ Update last seen
+      // Uppdatera last seen
       await apiFetch("/friends/update-last-seen", {
         method: "PUT",
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -196,21 +238,76 @@ const Login = () => {
 
       navigate(`/user/${userId}`);
     } catch (err) {
-      setError(err.message || "Login failed");
+      setError(err.message || "Login failed.");
+      if (errRef.current) errRef.current.focus();
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input value={username} onChange={(e) => setUsername(e.target.value)} />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button type="submit">Login</button>
-      {error && <div>{error}</div>}
-    </form>
+    <Container className="mt-5">
+      <Row className="justify-content-center">
+        <Col md={6} lg={7}>
+          {isLoading && <div className="alert alert-info">Logging in...</div>}
+          {error && (
+            <div className="alert alert-danger" ref={errRef} role="alert">
+              {error}
+            </div>
+          )}
+
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-3">
+              <Form.Label htmlFor="username">Username</Form.Label>
+              <Form.Control
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                style={{
+                  backgroundColor: "grey",
+                  color: "white",
+                  border: "2px solid white",
+                }}
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label htmlFor="password">Password</Form.Label>
+              <Form.Control
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                style={{
+                  backgroundColor: "grey",
+                  color: "white",
+                  border: "2px solid white",
+                }}
+              />
+            </Form.Group>
+
+            <div className="d-grid gap-2">
+              <Button variant="dark" type="submit" disabled={isLoading}>
+                {isLoading ? "Logging in..." : "Login"}
+              </Button>
+
+              {onSwitchToSignUp && (
+                <Button
+                  variant="dark"
+                  className="mt-3"
+                  onClick={onSwitchToSignUp}
+                >
+                  Sign up
+                </Button>
+              )}
+            </div>
+          </Form>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 
