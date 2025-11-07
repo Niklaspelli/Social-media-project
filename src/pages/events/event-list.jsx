@@ -1,6 +1,6 @@
 import { useAuth } from "../../context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
-import { Container, Row, Col, Card, Button } from "react-bootstrap";
+import { Container, Row, Col, Card, Button, Image } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 const fetchUserEvents = async (token) => {
@@ -35,6 +35,19 @@ function EventList() {
             <Card>
               <Card.Body>
                 <Card.Title>{event.title}</Card.Title>
+                <Image
+                  src={event.event_image}
+                  alt={event.title || "Eventbild"}
+                  fluid
+                  rounded
+                  className="shadow-lg mb-3 border border-secondary"
+                  style={{
+                    height: "500px",
+                    width: "100%",
+                    objectFit: "cover",
+                    borderRadius: "16px",
+                  }}
+                />
                 <Card.Subtitle className="mb-2 text-muted">
                   {event.relation === "creator"
                     ? "Created by you"

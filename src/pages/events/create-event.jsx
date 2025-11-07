@@ -15,6 +15,7 @@ import {
 import { useAuth } from "../../context/AuthContext"; // Kontrollera att sökvägen är korrekt
 import useCreateEvent from "../../queryHooks/events/useCreateEvent"; // Din event-hook
 import useFriends from "../../queryHooks/friends/useFetchFriends";
+import SuccessDialog from "../../components/SuccessDialog";
 
 import "./event-styling.css";
 
@@ -28,6 +29,7 @@ const CreateEvent = () => {
   const [eventImage, setEventImage] = useState(null);
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [error, setError] = useState(null);
+
   const navigate = useNavigate();
 
   const {
@@ -63,7 +65,6 @@ const CreateEvent = () => {
       {
         onSuccess: (createdEvent) => {
           console.log("Event created:", createdEvent);
-          navigate(`/events/${loggedInUserId}`);
         },
         onError: (error) => {
           console.error("Failed to create event:", error);
@@ -283,9 +284,11 @@ const CreateEvent = () => {
           </div>
 
           {isSuccess && (
-            <Alert variant="success" className="mt-3">
-              Event created successfully!
-            </Alert>
+            <SuccessDialog
+              message="Event created successfully!"
+              navigateTo={`/events/${loggedInUserId}`}
+              delay={2500}
+            />
           )}
           {(isError || error) && (
             <Alert variant="danger" className="mt-3">
