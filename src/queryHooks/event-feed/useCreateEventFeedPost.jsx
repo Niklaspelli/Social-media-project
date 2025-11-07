@@ -83,6 +83,8 @@ export default function useCreateEventFeedPost() {
   return useMutation({
     mutationFn,
     onSuccess: (newPost, variables) => {
+      queryClient.invalidateQueries(["eventFeedPosts"]);
+
       queryClient.setQueryData(
         ["eventFeedPosts", variables.eventId],
         (oldData) => ({

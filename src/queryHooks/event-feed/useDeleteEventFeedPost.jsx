@@ -8,7 +8,7 @@ const deleteEventFeedPost = async ({ postId, accessToken }) => {
   const csrfToken = await getCsrfToken();
   if (!csrfToken) throw new Error("CSRF token not ready");
 
-  return apiFetch(`/eventfeed/events/feed/${postId}`, {
+  return apiFetch(`/eventfeed/event-feed-post/${postId}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -26,6 +26,7 @@ export default function useDeleteEventFeedPost(eventId) {
     mutationFn: ({ postId }) => deleteEventFeedPost({ postId, accessToken }),
     onSuccess: (deletedPostId) => {
       console.log("🗑️ Event feed post deleted");
+      queryClient.invalidateQueries(["eventFeedPosts"]);
 
       // Uppdatera cache direkt
       queryClient.setQueryData(["eventFeedPosts", eventId], (oldData) => {
