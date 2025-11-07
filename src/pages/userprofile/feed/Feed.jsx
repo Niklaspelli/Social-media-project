@@ -9,8 +9,8 @@ import useDeleteFeedPost from "../../../queryHooks/feed/useDeleteFeedPost";
 
 const Feed = () => {
   const { authData } = useAuth();
-  const { userId: loggedInUserId, accessToken } = authData;
   const { id: userId } = useParams();
+  const { userId: loggedInUserId, accessToken } = authData;
   const isOwnProfile = loggedInUserId === Number(userId);
 
   const { data, isLoading, isError, error, refetch } = useUserFeedPosts(

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Form,
   Button,
@@ -19,7 +20,7 @@ import "./event-styling.css";
 
 const CreateEvent = () => {
   const { authData } = useAuth();
-  const { accessToken } = authData || {};
+  const { userId: loggedInUserId, accessToken } = authData; // Inloggad användares ID
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [datetime, setDatetime] = useState("");
@@ -27,6 +28,7 @@ const CreateEvent = () => {
   const [eventImage, setEventImage] = useState(null);
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const {
     mutate,
@@ -47,16 +49,27 @@ const CreateEvent = () => {
       return;
     }
 
-    mutate({
-      title,
-      description,
-      datetime,
-      location,
-      invitedUserIds: selectedFriends,
-      event_image: eventImage,
+    mutate(
+      {
+        title,
+        description,
+        datetime,
+        location,
+        invitedUserIds: selectedFriends,
+        event_image: eventImage,
 
-      accessToken,
-    });
+        accessToken,
+      },
+      {
+        onSuccess: (createdEvent) => {
+          console.log("Event created:", createdEvent);
+          navigate(`/events/${loggedInUserId}`);
+        },
+        onError: (error) => {
+          console.error("Failed to create event:", error);
+        },
+      }
+    );
   };
 
   const uploadToImgBB = async (file) => {
@@ -271,12 +284,12 @@ const CreateEvent = () => {
 
           {isSuccess && (
             <Alert variant="success" className="mt-3">
-              Event skapades framgångsrikt!
+              Event created successfully!
             </Alert>
           )}
           {(isError || error) && (
             <Alert variant="danger" className="mt-3">
-              {mutationError?.message || error || "Något gick fel"}
+              {mutationError?.message || error || "Something went wrong"}
             </Alert>
           )}
         </Form>

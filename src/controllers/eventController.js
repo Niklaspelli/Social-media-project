@@ -201,19 +201,25 @@ export const updateEvent = (req, res) => {
 };
 
 export const deleteEvent = (req, res) => {
-  const eventId = req.params.eventId;
+  const eventId = Number(req.params.id); // Säkerställ att det är ett tal
   const userId = req.user.id;
+
+  console.log("Attempting to delete eventId:", eventId, "by userId:", userId);
 
   const checkOwnerSql = "SELECT creator_id FROM events WHERE id = ?";
 
   db.query(checkOwnerSql, [eventId], (err, results) => {
     if (err) {
-      console.error("Fel vid ägarkontroll:", err);
+      console.error("Error checking event ownership:", err);
       return res.status(500).json({ error: "Internt serverfel" });
     }
+
+    console.log("DB results for event:", results);
+
     if (results.length === 0) {
       return res.status(404).json({ error: "Event hittades inte" });
     }
+
     if (results[0].creator_id !== userId) {
       return res.status(403).json({ error: "Ej behörighet att ta bort event" });
     }
@@ -222,11 +228,13 @@ export const deleteEvent = (req, res) => {
 
     db.query(deleteSql, [eventId], (deleteErr) => {
       if (deleteErr) {
-        console.error("Fel vid borttagning av event:", deleteErr);
+        console.error("Error deleting event:", deleteErr);
         return res
           .status(500)
           .json({ error: "Internt serverfel vid borttagning" });
       }
+
+      console.log(`Event ${eventId} successfully deleted by user ${userId}`);
       res.json({ message: "Event borttaget" });
     });
   });
@@ -374,7 +382,7 @@ export const getEventById = (req, res) => {
   const eventId = req.params.id;
   const eventSql = `
     SELECT 
-      e.id, e.title, e.description, e.datetime, e.location, e.event_image,
+      e.id, e.creator_id, e.title, e.description, e.datetime, e.location, e.event_image,
       u.username AS creator_name, u.avatar AS creator_avatar
     FROM events e
     JOIN users u ON e.creator_id = u.id

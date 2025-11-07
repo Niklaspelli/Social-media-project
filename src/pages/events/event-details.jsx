@@ -1,20 +1,39 @@
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom"; //
 import { Container, Spinner, Image, Accordion, Card } from "react-bootstrap";
 import useEventDetails from "../../queryHooks/events/useEventDetails";
 import useEventInvitees from "../../queryHooks/events/useEventInvitees";
+import useDeleteEvent from "../../queryHooks/events/useDeleteEvent";
 import "./event-styling.css";
 import EventFeedPostForm from "./event-feed/event-feed-post-form";
 import EventFeedList from "./event-feed/event-feed-list";
+import ConfirmDialog from "../../components/ConfirmDialog";
+import DeleteButton from "../../components/DeleteButton";
 
 function EventDetails() {
-  const { id } = useParams();
   const { authData } = useAuth();
-  const token = authData?.accessToken;
+  const { id: eventId } = useParams(); // Eventets ID från URL
+  const navigate = useNavigate(); // ✅ Hook för navigation
+  const [showConfirm, setShowConfirm] = useState(false);
 
-  // Hämta eventdetaljer + attendees
-  const { data: event, isLoading, isError, error } = useEventDetails(id, token);
-  const { data: invitees = [] } = useEventInvitees(id, token);
+  const { userId: loggedInUserId, accessToken } = authData; // Inloggad användares ID
+
+  // Hämta eventdetaljer och invitees
+  const {
+    data: event,
+    isLoading,
+    isError,
+    error,
+  } = useEventDetails(eventId, accessToken);
+  const { data: invitees = [] } = useEventInvitees(eventId, accessToken);
+
+  // Hook för att radera event
+  const { mutate: deleteEvent, isLoading: isDeleting } = useDeleteEvent();
+
+  // Kontrollera om den inloggade användaren äger eventet
+  const isOwnEvent = event && loggedInUserId === event.creator_id;
 
   // Loading state
   if (isLoading)
@@ -40,7 +59,6 @@ function EventDetails() {
       </Container>
     );
 
-  // Dela upp invitees i accepted och alla
   const accepted = invitees.filter((i) => i.status === "accepted");
 
   return (
@@ -54,6 +72,34 @@ function EventDetails() {
             {event.title || "Untitled Event"}
           </h1>
 
+          {/* Delete-knapp visas endast för ägaren */}
+          {isOwnEvent && (
+            <>
+              <DeleteButton
+                onDelete={() => setShowConfirm(true)}
+                disabled={isDeleting}
+              />
+
+              <ConfirmDialog
+                show={showConfirm}
+                title="Delete event"
+                message={`Are you sure you want to delete the event "${event.title}"?`}
+                isLoading={isDeleting}
+                onCancel={() => setShowConfirm(false)}
+                onConfirm={async () => {
+                  deleteEvent(
+                    { eventId: event.id },
+                    {
+                      onSuccess: () => {
+                        setShowConfirm(false);
+                        navigate(`/events/${loggedInUserId}`);
+                      },
+                    }
+                  );
+                }}
+              />
+            </>
+          )}
           <Image
             src={event.event_image}
             alt={event.title || "Eventbild"}
@@ -178,6 +224,7 @@ function EventDetails() {
           </Accordion.Item>
         </Accordion>
       </Card>
+
       <Card
         className="bg-dark border-0 shadow-lg rounded-4 p-4 mx-auto mt-4"
         style={{ maxWidth: "700px" }}

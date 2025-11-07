@@ -11,6 +11,7 @@ import {
   getEventById,
   getUserEvents,
   getEventInvitees,
+  deleteEvent,
 } from "../controllers/eventController.js";
 
 const router = express.Router();
@@ -19,6 +20,7 @@ const router = express.Router();
 router.post("/events", authenticateJWT, verifyCsrfToken, createEvent); // Protected
 router.get("/events", authenticateJWT, getAllEvents);
 router.get("/events/user", authenticateJWT, getUserEvents);
+router.delete("/:id", authenticateJWT, verifyCsrfToken, deleteEvent);
 
 router.get("/events/invitations", authenticateJWT, getIncomingEventInvitations);
 router.get(
