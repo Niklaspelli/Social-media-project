@@ -17,7 +17,7 @@ const router = express.Router();
 
 router.get("/threads", getAllThreads); // Public
 router.get("/threads/:threadId", getThreadWithResponses); // Public
-router.post("/threads", authenticateJWT, verifyCsrfToken, createThread); // Protected
+router.post("/threads", authenticateJWT, createThread); // Protected
 router.post(
   "/threads/:threadId/responses",
   authenticateJWT,

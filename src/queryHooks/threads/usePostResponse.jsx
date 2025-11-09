@@ -1,42 +1,39 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiFetch } from "../../api/api";
+import { useAuth, getCsrfToken } from "../../context/AuthContext";
 
-const postResponse = async ({
-  threadId,
-  responseText,
-  accessToken,
-  csrfToken,
-}) => {
-  const response = await fetch(
-    `http://localhost:5000/api/forum/threads/${threadId}/responses`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-        "csrf-token": csrfToken,
-      },
-      credentials: "include",
-      body: JSON.stringify({ body: responseText }),
-    }
-  );
+const postResponse = async ({ threadId, responseText, accessToken }) => {
+  if (!accessToken) throw new Error("No access token available");
 
-  if (!response.ok) {
-    throw new Error("Failed to post response");
-  }
+  const csrfToken = await getCsrfToken();
+  if (!csrfToken) throw new Error("CSRF token not ready");
 
-  return response.json();
-};
-
-const usePostResponse = () => {
-  return useMutation({
-    mutationFn: postResponse,
-    onError: (error) => {
-      console.error("Error posting response:", error.message);
+  return apiFetch(`/forum/threads/${threadId}/responses`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+      "csrf-token": csrfToken,
     },
-    onSuccess: () => {
-      // Här kan du invalidiera cache eller göra någon annan uppdatering om det behövs
-    },
+    credentials: "include",
+    body: JSON.stringify({ body: responseText }),
   });
 };
 
-export default usePostResponse;
+export default function usePostResponse(threadId) {
+  const queryClient = useQueryClient();
+  const { authData } = useAuth();
+  const { accessToken } = authData || {};
+
+  return useMutation({
+    mutationFn: ({ responseText }) =>
+      postResponse({ threadId, responseText, accessToken }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["threadDetail", threadId]);
+      console.log("✅ Response posted successfully");
+    },
+    onError: (error) => {
+      console.error("❌ Failed to post response:", error.message);
+    },
+  });
+}

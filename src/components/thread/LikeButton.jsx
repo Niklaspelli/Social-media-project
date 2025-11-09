@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth, getCsrfToken } from "../../context/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 
@@ -11,46 +11,37 @@ function LikeButton({
   initialLikeStatus,
   initialLikeCount,
 }) {
-  const { authData } = useAuth();
-  const { accessToken } = authData;
+  const { accessToken } = useAuth().authData;
 
   const [liked, setLiked] = useState(initialLikeStatus);
   const [likeCount, setLikeCount] = useState(initialLikeCount);
   const [error, setError] = useState(null);
 
-  function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
-  }
-
+  // Hämta aktuell like count
   useEffect(() => {
     const fetchLikeCount = async () => {
       try {
         const url = `${BackendURL}/api/forum/responses/${responseId}/like-count`;
-
         const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error("Failed to fetch like count");
-        }
-
+        if (!response.ok) throw new Error("Failed to fetch like count");
         const data = await response.json();
         setLikeCount(data.likeCount);
-      } catch (error) {
-        setError(error.message);
+      } catch (err) {
+        setError(err.message);
       }
     };
-
     fetchLikeCount();
   }, [responseId]);
 
   const toggleLike = async () => {
     try {
-      const csrfToken = getCookie("csrfToken");
+      if (!accessToken) throw new Error("Access token missing. Please log in.");
 
-      if (!accessToken) {
-        throw new Error("Access token is missing. Please log in again.");
-      }
+      // Optimistisk uppdatering
+      setLiked(!liked);
+      setLikeCount(liked ? likeCount - 1 : likeCount + 1);
+
+      const csrfToken = await getCsrfToken();
 
       const url = `${BackendURL}/api/${
         responseId
@@ -69,20 +60,18 @@ function LikeButton({
       });
 
       if (!response.ok) {
-        const errData = await response.json();
-        if (errData?.error === "You have already liked this response.") {
-          setLiked(true);
-          return;
-        }
         throw new Error("Failed to update like");
       }
 
+      // valfritt: uppdatera likeCount från servern
       const data = await response.json();
-      setLiked(!liked);
       setLikeCount(data.likeCount);
-    } catch (error) {
-      console.error("Error during like/unlike:", error);
-      setError(error.message);
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+      // rollback om request misslyckas
+      setLiked(liked);
+      setLikeCount(liked ? likeCount + 1 : likeCount - 1);
     }
   };
 
@@ -95,7 +84,6 @@ function LikeButton({
         size="1x"
       />
       <span style={{ marginLeft: "4px" }}>{likeCount} likes</span>
-
       {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );

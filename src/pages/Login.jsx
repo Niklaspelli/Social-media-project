@@ -238,7 +238,7 @@ const Login = ({ onSwitchToSignUp }) => {
 
       navigate(`/user/${userId}`);
     } catch (err) {
-      setError(err.message || "Login failed.");
+      setError("Username or password is incorrect!.");
       if (errRef.current) errRef.current.focus();
     } finally {
       setIsLoading(false);

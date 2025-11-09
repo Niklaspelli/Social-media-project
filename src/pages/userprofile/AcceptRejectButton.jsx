@@ -3,6 +3,7 @@ import { Button } from "react-bootstrap";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import { apiFetch } from "../../api/api";
 
 function AcceptRejectButton({
   type, // "friend" eller "event"
@@ -24,67 +25,57 @@ function AcceptRejectButton({
   });
 
   const accept = async () => {
-    const endpoint =
-      type === "friend"
-        ? "http://localhost:5000/api/friends/accept"
-        : "http://localhost:5000/api/events/events/invitations/accept";
+    try {
+      const endpoint =
+        type === "friend" ? "/friends/accept" : "/events/invitations/accept";
 
-    const body = type === "friend" ? { senderId: id } : { eventId: id };
+      const body = type === "friend" ? { senderId: id } : { eventId: id };
 
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      credentials: "include",
-      body: JSON.stringify(body),
-    });
+      await apiFetch(endpoint, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: JSON.stringify(body),
+      });
 
-    const data = await response.json();
-    if (response.ok) {
       setStatus({ isPending: false, incomingRequest: false });
+
+      // Uppdatera cachar
       queryClient.invalidateQueries(
         type === "friend"
           ? ["friendRequestCount", loggedInUserId]
           : ["eventInvitationCount"]
       );
-      queryClient.invalidateQueries(["friends", loggedInUserId]); // <--- lägg till detta
-    } else {
-      alert(data.error);
+      queryClient.invalidateQueries(["friends", loggedInUserId]);
+    } catch (err) {
+      alert(err.message || "Something went wrong");
     }
   };
 
   const reject = async () => {
-    const endpoint =
-      type === "friend"
-        ? "http://localhost:5000/api/friends/reject"
-        : "http://localhost:5000/api/events/events/invitations/reject";
+    try {
+      const endpoint =
+        type === "friend" ? "/friends/reject" : "/events/invitations/reject";
 
-    const body =
-      type === "friend" ? { senderId: id, receiverId } : { eventId: id };
+      const body =
+        type === "friend" ? { senderId: id, receiverId } : { eventId: id };
 
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      credentials: "include",
-      body: JSON.stringify(body),
-    });
+      await apiFetch(endpoint, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: JSON.stringify(body),
+      });
 
-    const data = await response.json();
-    if (response.ok) {
       setStatus({ isPending: false, incomingRequest: false });
+
+      // Uppdatera cachar
       queryClient.invalidateQueries(
         type === "friend"
           ? ["friendRequestCount", loggedInUserId]
           : ["eventInvitationCount"]
       );
-      queryClient.invalidateQueries(["friends", loggedInUserId]); // <--- lägg till detta
-    } else {
-      alert(data.error);
+      queryClient.invalidateQueries(["friends", loggedInUserId]);
+    } catch (err) {
+      alert(err.message || "Something went wrong");
     }
   };
 

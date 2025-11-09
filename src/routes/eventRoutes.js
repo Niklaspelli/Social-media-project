@@ -28,18 +28,8 @@ router.get(
   authenticateJWT,
   getIncomingEventInvitationCount
 );
-router.post(
-  "/events/invitations/accept",
-  authenticateJWT,
-  verifyCsrfToken,
-  acceptEventInvitation
-);
-router.post(
-  "/events/invitations/reject",
-  authenticateJWT,
-  verifyCsrfToken,
-  rejectEventInvitation
-);
+router.post("/invitations/accept", authenticateJWT, acceptEventInvitation);
+router.post("/invitations/reject", authenticateJWT, rejectEventInvitation);
 router.get("/events/:id", authenticateJWT, getEventById);
 router.get("/events/:id/invitees", authenticateJWT, getEventInvitees);
 

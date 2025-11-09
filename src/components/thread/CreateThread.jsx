@@ -130,10 +130,10 @@ const inputStyle = {
 };
  */
 
-// components/CreateThread.js
 import { useState } from "react";
 import { Form, Button, Card, Container, Alert, Spinner } from "react-bootstrap";
 import { useAuth } from "../../context/AuthContext"; // Make sure the path is correct
+import SuccessDialog from "../SuccessDialog";
 import useCreateThread from "../../queryHooks/threads/useCreateThread"; // Import your custom hook
 
 const CreateThread = ({ defaultSubjectId }) => {
@@ -142,7 +142,6 @@ const CreateThread = ({ defaultSubjectId }) => {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [error, setError] = useState(null);
-  const [setSuccess] = useState(false);
 
   // Använd React Query hook för att skapa tråd
   const {
@@ -156,7 +155,6 @@ const CreateThread = ({ defaultSubjectId }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setError(null);
-    setSuccess(false);
 
     if (!title || !body) {
       setError("Title and content are required");
@@ -171,6 +169,11 @@ const CreateThread = ({ defaultSubjectId }) => {
       subject_id: defaultSubjectId, // 👈 ensure it's a number
     });
   };
+  if (isSuccess) {
+    return (
+      <SuccessDialog message="Thread created successfully!" delay={2000} />
+    );
+  }
 
   return (
     <Container className="mt-5">
@@ -231,11 +234,6 @@ const CreateThread = ({ defaultSubjectId }) => {
             </Button>
           </div>
 
-          {isSuccess && (
-            <Alert variant="success" className="mt-3">
-              Thread created successfully!
-            </Alert>
-          )}
           {isError && (
             <Alert variant="danger" className="mt-3">
               Error: {mutationError?.message || "Något gick fel"}
