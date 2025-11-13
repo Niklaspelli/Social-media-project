@@ -1,33 +1,16 @@
 import { useState } from "react";
-import { useAuth } from "../../context/AuthContext";
-import { useQuery } from "@tanstack/react-query";
 import { Container, Button } from "react-bootstrap";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
 
 import EventList from "./event-list";
 import UserCalendar from "./user-calendar";
 import "./event-styling.css"; // Lägg till CSS för fade-animation
-
-const fetchUserEvents = async (token) => {
-  const res = await fetch("http://localhost:5000/api/events/user", {
-    headers: { Authorization: `Bearer ${token}` },
-    credentials: "include",
-  });
-
-  if (!res.ok) throw new Error("Failed to fetch events");
-  return res.json();
-};
+import { useUserEvents } from "../../queryHooks/events/useUserEvents";
 
 const EventView = () => {
-  const { authData } = useAuth();
-  const token = authData?.accessToken;
   const [viewMode, setViewMode] = useState("calendar"); // "calendar" eller "list"
 
-  const { data: events = [], isLoading } = useQuery({
-    queryKey: ["userEvents"],
-    queryFn: () => fetchUserEvents(token),
-    enabled: !!token,
-  });
+  const { data: events = [], isLoading } = useUserEvents();
 
   if (isLoading) return <p style={{ color: "white" }}>Loading events...</p>;
 

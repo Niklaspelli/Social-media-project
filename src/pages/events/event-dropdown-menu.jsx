@@ -18,8 +18,6 @@ function EventDropdownMenu({ eventId, event, onDelete }) {
   // Kontrollera om den inloggade användaren äger eventet
   const isOwnEvent = event && loggedInUserId === event.creator_id;
 
-  console.log("own event:", isOwnEvent);
-
   const handleDeleteConfirm = () => {
     deleteEvent(
       { eventId },

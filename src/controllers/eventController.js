@@ -156,7 +156,7 @@ export const getUserEvents = (req, res) => {
 };
 
 export const updateEvent = (req, res) => {
-  const eventId = req.params.eventId;
+  const eventId = req.params.id;
   const userId = req.user.id;
   const { title, description, datetime, location } = req.body;
 

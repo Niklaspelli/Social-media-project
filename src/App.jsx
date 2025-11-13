@@ -19,6 +19,7 @@ import Notifications from "./pages/Notifications.jsx";
 import EventDetails from "./pages/events/event-details.jsx";
 import CreateEvent from "./pages/events/create-event.jsx";
 import EventView from "./pages/events/event-view.jsx";
+import EventUpdate from "./pages/events/event-update.jsx";
 
 function App() {
   return (
@@ -42,6 +43,8 @@ function App() {
           <Route path="/friends/:id" element={<FriendList />} />
           <Route path="/events/event-details/:id" element={<EventDetails />} />
           <Route path="/events/create" element={<CreateEvent />} />
+          <Route path="/events/update/:id" element={<EventUpdate />} />
+
           <Route path="/events/:id" element={<EventView />} />
 
           <Route path="/forum/subject/:id" element={<SubjectPage />} />

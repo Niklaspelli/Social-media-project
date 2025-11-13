@@ -12,6 +12,7 @@ import {
   getUserEvents,
   getEventInvitees,
   deleteEvent,
+  updateEvent,
 } from "../controllers/eventController.js";
 
 const router = express.Router();
@@ -42,4 +43,6 @@ router.get(
   authenticateJWT,
   getIncomingEventInvitationCount
 );
+
+router.put("/events/:id", authenticateJWT, verifyCsrfToken, updateEvent);
 export default router;
