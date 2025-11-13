@@ -24,3 +24,25 @@
     overflow-y: auto;
     margin-top: 1rem;
 }
+
+
+/* user-calendar.css */
+.daily-events-enter {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+.daily-events-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 300ms ease-in-out;
+}
+
+.daily-events-exit {
+    opacity: 1;
+}
+
+.daily-events-exit-active {
+    opacity: 0;
+    transition: opacity 200ms ease-in-out;
+}

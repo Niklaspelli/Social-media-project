@@ -3,12 +3,17 @@ import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
+import { verifyCsrfToken } from "./middleware/csrf.js";
 
 const app = express();
 app.use(helmet());
 
-const allowedOrigins = ["http://localhost:5173", "http://localhost:5000"];
+// ✅ 1. Parse cookies och JSON först
+app.use(cookieParser());
+app.use(express.json());
 
+// ✅ 2. CORS innan dina routes
+const allowedOrigins = ["http://localhost:5173", "http://localhost:5000"];
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -23,18 +28,27 @@ app.use(
   })
 );
 
+// ✅ 3. Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
 });
 app.use(limiter);
 
-app.use(express.json());
-app.use(cookieParser());
+// ✅ 4. Global CSRF-skydd för skrivande metoder
+app.use((req, res, next) => {
+  const protectedMethods = ["POST", "PUT", "PATCH", "DELETE"];
+  if (protectedMethods.includes(req.method)) {
+    return verifyCsrfToken(req, res, next);
+  }
+  next();
+});
 
+// ✅ 5. Dina routes
 const routes = (await import("./routes/index.js")).default;
 app.use("/api", routes);
 
+// ✅ 6. Fallback
 app.use((req, res) => res.status(404).send("Not found"));
 
 export default app;

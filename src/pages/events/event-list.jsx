@@ -1,10 +1,10 @@
-import { useAuth } from "../../context/AuthContext";
+/* import { useAuth } from "../../context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { Container, Row, Col, Card, Button, Image } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 const fetchUserEvents = async (token) => {
-  const res = await fetch("http://localhost:5000/api/events/events/user", {
+  const res = await fetch("http://localhost:5000/api/events/user", {
     headers: { Authorization: `Bearer ${token}` },
     credentials: "include",
   });
@@ -71,6 +71,28 @@ function EventList() {
                 </Link>
               </Card.Body>
             </Card>
+          </Col>
+        ))}
+      </Row>
+    </Container>
+  );
+}
+
+export default EventList;
+ */
+
+import { Container, Row, Col } from "react-bootstrap";
+import EventCard from "./event-card";
+
+function EventList({ events = [], token, handleDelete }) {
+  return (
+    <Container>
+      <Row>
+        {events.length === 0 && <p>No events found</p>}
+
+        {events.map((event) => (
+          <Col key={event.id} xs={12} md={6} lg={4} className="mb-3">
+            <EventCard event={event} token={token} onDelete={handleDelete} />
           </Col>
         ))}
       </Row>

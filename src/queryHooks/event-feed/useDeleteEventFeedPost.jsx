@@ -1,18 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth, getCsrfToken } from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { apiFetch } from "../../api/api";
 
 const deleteEventFeedPost = async ({ postId, accessToken }) => {
   if (!accessToken) throw new Error("No access token available");
 
-  const csrfToken = await getCsrfToken();
-  if (!csrfToken) throw new Error("CSRF token not ready");
-
   return apiFetch(`/eventfeed/event-feed-post/${postId}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${accessToken}`,
-      "csrf-token": csrfToken,
     },
   });
 };

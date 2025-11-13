@@ -57,7 +57,7 @@ export default function useCreateEventFeedPost() {
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "../../api/api";
-import { useAuth, getCsrfToken } from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 export default function useCreateEventFeedPost() {
   const queryClient = useQueryClient();
@@ -65,15 +65,11 @@ export default function useCreateEventFeedPost() {
   const { accessToken } = authData || {};
 
   const mutationFn = async ({ eventId, content }) => {
-    const csrfToken = await getCsrfToken();
-    if (!csrfToken) throw new Error("CSRF token not ready");
-
     return apiFetch(`/eventfeed/events/${eventId}/feed`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
-        "csrf-token": csrfToken,
       },
       credentials: "include",
       body: JSON.stringify({ content }),

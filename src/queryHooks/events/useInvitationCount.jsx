@@ -1,31 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
+import { apiFetch } from "../../api/api";
 
-const fetchEventInvitationCount = async (token) => {
-  const response = await fetch(
-    "http://localhost:5000/api/events/events/invitations/count",
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      credentials: "include",
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch event invitations count");
-  }
-
-  return response.json(); // { count: X }
-};
-
-const useEventInvitationCount = (token) => {
+const useEventInvitationCount = () => {
   return useQuery({
     queryKey: ["eventInvitationCount"],
-    queryFn: () => fetchEventInvitationCount(token),
-    enabled: !!token,
+    queryFn: () => apiFetch("/events/events/invitations/count"), // ✅ hanterar token, CSRF, retries
     staleTime: 1000 * 60 * 2, // cache i 2 minuter
-    refetchInterval: 1000 * 60 * 2, // auto-refresh var 2:e minut
+    refetchOnWindowFocus: false, // hindrar spam vid tab-switch
+    refetchOnReconnect: false,
   });
 };
 

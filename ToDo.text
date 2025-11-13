@@ -1,0 +1,69 @@
+Lösningar
+
+Använd staleTime och cacheTime i React Query för att minska onödiga refetches.
+
+Sätt retry: 0 för känsliga queries om inte retry är nödvändigt.
+
+Debounce eller throttla funktioner som toggleLike och delete-knappar.
+
+Eventuellt öka serverns rate limit om det är rimligt.
+
+
+
+Här är en kortfattad lista över komponenter/endpoints som gav 429 (Too Many Requests) i dina logs:
+
+Forum / Threads
+
+/api/forum/threads/80
+
+/api/forum/responses/147
+
+/api/forum/responses/149
+
+Forum / Subjects
+
+/api/forum/subjects
+
+Friends / Notifications
+
+/api/friends/friends/notifications/31
+
+Events / Invitations
+
+/api/events/events/invitations/count
+
+Kort sagt: trådar, svar, ämnen, vännotiser och event-invitationer.
+
+Om du vill kan jag även ge en snabb strategi för att minska 429 på dessa.
+
+
+
+
+############################################################################
+
+
+Från loggarna du skickade är det tydligt att rate limiting (429 Too Many Requests) triggas på flera ställen i din frontend. Kortfattat är det dessa komponenter/hooks som drabbas:
+
+useGetSubjects → /api/forum/subjects
+
+useThreadDetail → /api/forum/threads/:threadId
+
+useThreads → /api/forum/threads (lista)
+
+DELETE /api/forum/responses/:responseId → från delete response knappar
+
+Orsaken är ofta att:
+
+Flera queries körs samtidigt eller ofta (t.ex. React Query refetches, useEffect utan caching, interval polling).
+
+Rate limitern på backend är satt till t.ex. max: 100 per 15 min vilket kan slås till snabbt om du har många komponenter som hämtar data på mount.
+
+Förslag för att minska 429:
+
+Använd React Query caching ordentligt (staleTime, cacheTime) så att t.ex. subjects inte hämtas onödigt ofta.
+
+Undvik att göra samma fetch flera gånger i snabb följd.
+
+Eventuellt öka rate limit på backend (för lokal utveckling).
+
+Använd apiFetch med retry-logik (som du redan har) för automatiskt återförsök vid 429.

@@ -1,79 +1,46 @@
-/* import { createContext, useContext, useState, useEffect } from "react";
-
-const AuthContext = createContext();
-
-export const useAuth = () => useContext(AuthContext);
-let cachedCsrfToken = null;
-
-export const AuthProvider = ({ children }) => {
-  const [authData, setAuthData] = useState(null);
-  const [csrfToken, setCsrfToken] = useState("");
-
-  const login = (username, userId, avatar, accessToken, csrfToken) => {
-    setAuthData({ username, userId, avatar, accessToken, csrfToken });
-  };
-
-  const logout = () => {
-    setAuthData(null);
-    setCsrfToken("");
-    // här kan du lägga till en fetch till backend /logout om du har en sådan endpoint
-  };
-
-  const fetchCsrfToken = async () => {
-    if (cachedCsrfToken) return cachedCsrfToken; // återanvänd token
-
-    try {
-      const response = await fetch("http://localhost:5000/api/csrf-token", {
-        credentials: "include",
-      });
-      const data = await response.json();
-      if (data.csrfToken) {
-        setCsrfToken(data.csrfToken);
-      }
-    } catch (err) {
-      console.error("Failed to fetch CSRF token", err);
-    }
-  };
-
-  useEffect(() => {
-    fetchCsrfToken();
-  }, []);
-
-  return (
-    <AuthContext.Provider
-      value={{
-        authData,
-        isAuthenticated: !!authData,
-        login,
-        logout,
-        csrfToken,
-        setCsrfToken,
-        fetchCsrfToken,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
-};
- */
-
 import { createContext, useContext, useState } from "react";
 
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
+// 🔐 CSRF-token cache och skydd mot parallella requests
 let cachedCsrfToken = null;
+let pendingCsrfPromise = null;
 
-// Named export så api.js kan importera den direkt
 export async function getCsrfToken() {
+  // ✅ Returnera redan sparad token om den finns
   if (cachedCsrfToken) return cachedCsrfToken;
+  // ✅ Om en request redan pågår — vänta på den
+  if (pendingCsrfPromise) return pendingCsrfPromise;
 
-  const res = await fetch("http://localhost:5000/api/csrf-token", {
+  // 🔄 Annars, hämta ny token
+  pendingCsrfPromise = fetch("http://localhost:5000/api/csrf-token", {
     credentials: "include",
-  });
-  const data = await res.json();
-  cachedCsrfToken = data.csrfToken;
-  return cachedCsrfToken;
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error("Failed to fetch CSRF token");
+      return res.json();
+    })
+    .then((data) => {
+      cachedCsrfToken = data.csrfToken;
+      pendingCsrfPromise = null;
+      return cachedCsrfToken;
+    })
+    .catch((err) => {
+      pendingCsrfPromise = null;
+      throw err;
+    });
+
+  return pendingCsrfPromise;
+}
+
+export function clearCsrfToken() {
+  cachedCsrfToken = null;
+}
+
+// ✅ Exportera accessToken-hämtare på rätt nivå
+export function getAccessToken() {
+  return localStorage.getItem("accessToken");
 }
 
 export const AuthProvider = ({ children }) => {
@@ -86,7 +53,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setAuthData(null);
-    cachedCsrfToken = null;
+    clearCsrfToken();
     localStorage.removeItem("accessToken");
   };
 

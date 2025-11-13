@@ -18,19 +18,28 @@ const router = express.Router();
 
 //events
 router.post("/events", authenticateJWT, verifyCsrfToken, createEvent); // Protected
-router.get("/events", authenticateJWT, getAllEvents);
-router.get("/events/user", authenticateJWT, getUserEvents);
+router.post(
+  "/invitations/accept",
+  authenticateJWT,
+  verifyCsrfToken,
+  acceptEventInvitation
+);
+router.post(
+  "/invitations/reject",
+  authenticateJWT,
+  verifyCsrfToken,
+  rejectEventInvitation
+);
 router.delete("/:id", authenticateJWT, verifyCsrfToken, deleteEvent);
 
+router.get("/events/:id", authenticateJWT, getEventById);
+router.get("/events/:id/invitees", authenticateJWT, getEventInvitees);
+router.get("/events", authenticateJWT, getAllEvents);
+router.get("/user", authenticateJWT, getUserEvents);
 router.get("/events/invitations", authenticateJWT, getIncomingEventInvitations);
 router.get(
   "/events/invitations/count",
   authenticateJWT,
   getIncomingEventInvitationCount
 );
-router.post("/invitations/accept", authenticateJWT, acceptEventInvitation);
-router.post("/invitations/reject", authenticateJWT, rejectEventInvitation);
-router.get("/events/:id", authenticateJWT, getEventById);
-router.get("/events/:id/invitees", authenticateJWT, getEventInvitees);
-
 export default router;

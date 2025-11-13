@@ -1,5 +1,5 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../context/AuthContext";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "../../api/api";
 
 const deleteResponse = async ({ responseId, accessToken }) => {
@@ -13,7 +13,7 @@ const deleteResponse = async ({ responseId, accessToken }) => {
   });
 };
 
-export default function useDeleteResponse() {
+export default function useDeleteResponse(threadId) {
   const queryClient = useQueryClient();
   const { authData } = useAuth();
   const { accessToken } = authData || {};
@@ -21,13 +21,11 @@ export default function useDeleteResponse() {
   return useMutation({
     mutationFn: ({ responseId }) => deleteResponse({ responseId, accessToken }),
     onSuccess: () => {
-      console.log("Response deleted successfully");
-      // Invalidate or refetch relevant queries
-      queryClient.invalidateQueries(["threadDetail"]);
+      queryClient.invalidateQueries(["threadDetail", threadId]);
+      console.log("✅ Response deleted successfully");
     },
     onError: (error) => {
-      console.error("Failed to delete response:", error.message);
-      throw error; // så frontend kan visa felmeddelande
+      console.error("❌ Failed to delete response:", error.message);
     },
   });
 }

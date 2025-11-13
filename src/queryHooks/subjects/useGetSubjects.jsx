@@ -1,22 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
+import { apiFetch } from "../../api/api";
 
-// Function to fetch subjects from your backend
 const fetchSubjects = async () => {
-  const response = await fetch("http://localhost:5000/api/forum/subjects");
-  if (!response.ok) {
-    throw new Error("Failed to fetch subjects");
-  }
-  return response.json();
+  return apiFetch("/forum/subjects"); // CSRF + retry hanteras i apiFetch
 };
 
-// Custom hook to get subjects
-const useGetSubjects = () => {
-  return useQuery({
+const useGetSubjects = () =>
+  useQuery({
     queryKey: ["subjects"],
     queryFn: fetchSubjects,
-    staleTime: 10 * 60 * 1000, // 10 minuter
+    staleTime: 10 * 60 * 1000, // 10 min
     refetchOnWindowFocus: false,
+    retry: 1, // max 1 retry
   });
-};
 
 export default useGetSubjects;

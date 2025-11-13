@@ -35,20 +35,16 @@ export default function useCreateFeedPost() {
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "../../api/api";
-import { useAuth, getCsrfToken } from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 const postFeed = async ({ content, accessToken }) => {
   if (!accessToken) throw new Error("No access token available");
-
-  const csrfToken = await getCsrfToken();
-  if (!csrfToken) throw new Error("CSRF token not ready");
 
   return apiFetch("/feed/feed-post", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
-      "csrf-token": csrfToken,
     },
     body: JSON.stringify({ content }),
   });

@@ -3,10 +3,11 @@ import { useAuth } from "../../context/AuthContext";
 import { useCurrentUserProfile } from "../../queryHooks/users/useCurrentUserProfile";
 
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import { apiFetch } from "../../api/api";
 
 const EditProfile = () => {
   const { authData } = useAuth();
-  const { userId, csrfToken, accessToken } = authData || {};
+  const { userId } = authData || {};
 
   const {
     data: profile,
@@ -84,34 +85,14 @@ const EditProfile = () => {
     }
 
     try {
-      const url = `http://localhost:5000/api/userprofile/users`; // Alltid POST
-      const method = profile ? "PUT" : "POST"; // 👈 Skilj på nytt vs uppdatering
-
-      const body = {
-        ...formData, // innehåller sex, relationship_status, etc.
-        // userId tas från accessToken i backend – ingen user_id behövs här
-      };
-
-      const response = await fetch(url, {
+      const method = profile ? "PUT" : "POST";
+      await apiFetch("/userprofile/users", {
         method,
-        headers: {
-          "Content-Type": "application/json",
-          "csrf-token": csrfToken,
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(body),
+        body: JSON.stringify(formData),
       });
-
-      if (!response.ok) {
-        const errorMsg = await response.text();
-        throw new Error(
-          `HTTP error! status: ${response.status}, message: ${errorMsg}`
-        );
-      }
-
       setSuccess(true);
-      await refetch(); // hämta uppdaterad profil
-      setMode("view"); // byt till visningsläge
+      await refetch();
+      setMode("view");
     } catch (err) {
       console.error("Error saving profile:", err);
       setError(`Error saving profile: ${err.message}`);

@@ -1,20 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth, getCsrfToken } from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { apiFetch } from "../../api/api";
 
 const createEvent = async (
   { title, description, datetime, location, event_image, ...eventData },
   accessToken
 ) => {
-  const csrfToken = await getCsrfToken();
-  if (!csrfToken) throw new Error("CSRF token not ready");
-
   return apiFetch("/events/events", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
-      "csrf-token": csrfToken,
     },
     credentials: "include",
     body: JSON.stringify({

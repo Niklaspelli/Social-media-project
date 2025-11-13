@@ -18,14 +18,18 @@ const fetchFriendRequestCount = async (userId, accessToken) => {
 };
 
 // Hooken använder funktionen ovan
+
 const useGetFriendRequestCount = (userId, accessToken) => {
   return useQuery({
     queryKey: ["friendRequestCount", userId],
-    queryFn: () => fetchFriendRequestCount(userId, accessToken), // ✅ korrekt här
-    enabled: !!userId && !!accessToken, // bara kör om userId finns
-    refetchInterval: 120000, // var 2:a minut istället för 30s
-    staleTime: 120000, // cache i 2 minuter
-    refetchOnWindowFocus: false,
+    queryFn: () => fetchFriendRequestCount(userId, accessToken),
+    enabled: !!userId && !!accessToken,
+
+    // 🧠 Viktigt:
+    staleTime: 5 * 60 * 1000, // cache i 5 minuter
+    refetchInterval: false, // stäng av automatisk polling
+    refetchOnWindowFocus: false, // refetcha inte vid flikbyte
+    refetchOnReconnect: false, // refetcha inte varje reconnect
   });
 };
 

@@ -43,20 +43,16 @@ export default function useDeleteFeedPost(userId, accessToken) {
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth, getCsrfToken } from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { apiFetch } from "../../api/api";
 
 const deletePost = async ({ postId, accessToken }) => {
   if (!accessToken) throw new Error("No access token available");
 
-  const csrfToken = await getCsrfToken();
-  if (!csrfToken) throw new Error("CSRF token not ready");
-
   const res = await apiFetch(`/feed/feed-post/${postId}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${accessToken}`,
-      "csrf-token": csrfToken,
     },
   });
 

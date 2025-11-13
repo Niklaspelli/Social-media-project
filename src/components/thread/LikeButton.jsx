@@ -1,77 +1,79 @@
-import { useState, useEffect } from "react";
-import { useAuth, getCsrfToken } from "../../context/AuthContext";
+/* import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
+import { useLikeCount } from "../../queryHooks/likes/useLikeCount";
+import { useToggleLike } from "../../queryHooks/likes/useToggleLike";
 
-const BackendURL = "http://localhost:5000";
-
-function LikeButton({
-  threadId,
-  responseId,
-  initialLikeStatus,
-  initialLikeCount,
-}) {
-  const { accessToken } = useAuth().authData;
-
-  const [liked, setLiked] = useState(initialLikeStatus);
-  const [likeCount, setLikeCount] = useState(initialLikeCount);
+function LikeButton({ threadId, responseId }) {
   const [error, setError] = useState(null);
 
-  // Hämta aktuell like count
-  useEffect(() => {
-    const fetchLikeCount = async () => {
-      try {
-        const url = `${BackendURL}/api/forum/responses/${responseId}/like-count`;
-        const response = await fetch(url);
-        if (!response.ok) throw new Error("Failed to fetch like count");
-        const data = await response.json();
-        setLikeCount(data.likeCount);
-      } catch (err) {
-        setError(err.message);
-      }
-    };
-    fetchLikeCount();
-  }, [responseId]);
+  // Hämta aktuell like-status och count
+  const { data = { liked: false, likeCount: 0 }, isLoading } = useLikeCount({
+    threadId,
+    responseId,
+  });
 
-  const toggleLike = async () => {
-    try {
-      if (!accessToken) throw new Error("Access token missing. Please log in.");
+  const toggleLikeMutation = useToggleLike({ threadId, responseId });
 
-      // Optimistisk uppdatering
-      setLiked(!liked);
-      setLikeCount(liked ? likeCount - 1 : likeCount + 1);
+  if (isLoading) return <span>Loading...</span>;
 
-      const csrfToken = await getCsrfToken();
+  const handleClick = () => {
+    if (toggleLikeMutation.isLoading) return;
 
-      const url = `${BackendURL}/api/${
-        responseId
-          ? `forum/responses/${responseId}/like`
-          : `threads/${threadId}/like`
-      }`;
+    // Skicka motsatt status → toggla like/unlike
+    toggleLikeMutation.mutate(!data.liked, {
+      onError: (err) => setError(err.message),
+    });
+  };
 
-      const response = await fetch(url, {
-        method: liked ? "DELETE" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-          "CSRF-TOKEN": csrfToken,
-        },
-        credentials: "include",
+  return (
+    <div>
+      <FontAwesomeIcon
+        icon={faThumbsUp}
+        onClick={handleClick}
+        style={{ cursor: "pointer", color: data.liked ? "blue" : "gray" }}
+      />
+      <span style={{ marginLeft: "4px" }}>{data.likeCount} likes</span>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+    </div>
+  );
+}
+
+export default LikeButton;
+ */
+
+import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
+import { useLikeCount } from "../../queryHooks/likes/useLikeCount";
+import { useLikeResponse } from "../../queryHooks/likes/useLikeResponse";
+import { useUnlikeResponse } from "../../queryHooks/likes/useUnlikeResponse";
+
+function LikeButton({ responseId }) {
+  const [error, setError] = useState(null);
+
+  // Hämta likes och status
+  const { data = { liked: false, likeCount: 0 }, isLoading } = useLikeCount({
+    responseId,
+  });
+
+  const likeMutation = useLikeResponse(responseId);
+  const unlikeMutation = useUnlikeResponse(responseId);
+
+  if (isLoading) return <span>Loading...</span>;
+
+  const handleClick = () => {
+    setError(null);
+    if (likeMutation.isLoading || unlikeMutation.isLoading) return;
+
+    if (data.liked) {
+      unlikeMutation.mutate(undefined, {
+        onError: (err) => setError(err.message),
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to update like");
-      }
-
-      // valfritt: uppdatera likeCount från servern
-      const data = await response.json();
-      setLikeCount(data.likeCount);
-    } catch (err) {
-      console.error(err);
-      setError(err.message);
-      // rollback om request misslyckas
-      setLiked(liked);
-      setLikeCount(liked ? likeCount + 1 : likeCount - 1);
+    } else {
+      likeMutation.mutate(undefined, {
+        onError: (err) => setError(err.message),
+      });
     }
   };
 
@@ -79,11 +81,10 @@ function LikeButton({
     <div>
       <FontAwesomeIcon
         icon={faThumbsUp}
-        onClick={toggleLike}
-        style={{ cursor: "pointer", color: liked ? "white" : "white" }}
-        size="1x"
+        onClick={handleClick}
+        style={{ cursor: "pointer", color: data.liked ? "blue" : "gray" }}
       />
-      <span style={{ marginLeft: "4px" }}>{likeCount} likes</span>
+      <span style={{ marginLeft: "4px" }}>{data.likeCount} likes</span>
       {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );

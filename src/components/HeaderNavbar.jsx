@@ -42,7 +42,7 @@ const HeaderNavbar = () => {
     authLogout();
     navigate("/");
   };
-  console.log("Friend request count data:", notificationCountData);
+
   return (
     <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
       <Container>

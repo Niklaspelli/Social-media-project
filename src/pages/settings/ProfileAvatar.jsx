@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button, Modal, Alert } from "react-bootstrap";
 import { useAuth } from "../../context/AuthContext";
+import { apiFetch } from "../../api/api";
 
 const ProfileAvatar = ({ setSelectedPicture }) => {
   const [tempPicture, setTempPicture] = useState("");
@@ -8,8 +9,8 @@ const ProfileAvatar = ({ setSelectedPicture }) => {
   const [error, setError] = useState("");
   const [showPictureModal, setShowPictureModal] = useState(false);
 
-  const { authData, csrfToken } = useAuth();
-  const { userId, accessToken } = authData || {};
+  const { authData } = useAuth();
+  const { userId } = authData || {};
   const openPictureModal = () => {
     setShowPictureModal(true);
     setTempPicture(""); // Reset tempPicture when opening modal
@@ -39,17 +40,12 @@ const ProfileAvatar = ({ setSelectedPicture }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/avatar", {
+      await apiFetch("/auth/avatar", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "csrf-token": csrfToken,
-          Authorization: `Bearer ${accessToken}`,
-        },
+
         body: JSON.stringify({
           avatar: tempPicture,
         }),
-        credentials: "include",
       });
 
       if (!response.ok) {
