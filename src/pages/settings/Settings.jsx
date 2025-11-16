@@ -1,105 +1,82 @@
 import { useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { Button } from "react-bootstrap";
-import ProfileAvatar from "./ProfileAvatar";
 import DeleteAccount from "./DeleteAccount";
 import EditProfile from "./EditProfile";
+import ProfileAvatar from "./ProfileAvatar";
+import { apiFetch } from "../../api/api";
+import { useNavigate } from "react-router-dom";
 
 const Settings = () => {
-  const { authData, csrfToken } = useAuth();
-  const { userId, accessToken } = authData || {};
-  const errRef = useRef();
+  const { authData, logout } = useAuth();
+  const { userId } = authData || {};
+  const navigate = useNavigate();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const errRef = useRef();
   const [errMsg, setErrMsg] = useState("");
-  const [success, setSuccess] = useState(false);
+
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [setShowToast] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (!accessToken || !userId) {
+    if (!userId) {
       setErrMsg("ID or token is missing");
       return;
     }
-    setIsLoading(true);
+
+    setIsDeleting(true);
+
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/userprofile/users/${userId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "csrf-token": csrfToken,
-          },
-          credentials: "include",
-        }
-      );
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.message || res.statusText);
+      const data = await apiFetch(`/auth/${userId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      console.log("Deleted", data);
+      if (!data.ok) {
+        throw new Error(data.message || data.statusText);
       }
 
-      setSuccess(true);
-      setShowToast(true);
-    } catch (e) {
-      setErrMsg(e.message);
+      // Efter lyckad deletion
+      logout();
+      navigate("/auth", { replace: true });
+    } catch (error) {
+      setErrMsg(error.message);
       errRef.current?.focus();
-    } finally {
-      setIsLoading(false);
+      setIsDeleting(false);
     }
   };
 
-  if (isLoading) return <p>Loading…</p>;
-
   return (
     <div>
-      {success ? (
-        <section className="text-center text-white">
-          <h2>Your account is deleted! Welcome back!</h2>
-          <p>
-            <Link to="/auth">Login</Link>
-          </p>
-        </section>
-      ) : (
-        <section>
-          <p
-            ref={errRef}
-            className={errMsg ? "errmsg" : "offscreen"}
-            aria-live="assertive"
-          >
-            {errMsg}
-          </p>
+      <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"}>
+        {errMsg}
+      </p>
 
-          {/* Your existing settings UI */}
-          <EditProfile />
-          <ProfileAvatar setSelectedPicture={() => {}} />
+      <EditProfile />
+      <ProfileAvatar setSelectedPicture={() => {}} />
 
-          <div style={StyleContainer}>
-            {!showConfirmation ? (
-              <Button
-                variant="danger"
-                onClick={() => setShowConfirmation(true)}
-              >
-                Delete Account
-              </Button>
-            ) : (
-              <DeleteAccount
-                isLoading={isLoading}
-                onConfirm={handleDelete}
-                onCancel={() => setShowConfirmation(false)}
-              />
-            )}
-          </div>
-        </section>
-      )}
+      <div style={styleContainer}>
+        {!showConfirmation && !isDeleting ? (
+          <Button variant="danger" onClick={() => setShowConfirmation(true)}>
+            Delete Account
+          </Button>
+        ) : (
+          <DeleteAccount
+            onConfirm={handleDelete}
+            onCancel={() => {
+              setShowConfirmation(false);
+              setIsDeleting(false);
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 };
 
 export default Settings;
 
-const StyleContainer = {
+const styleContainer = {
   margin: "20px",
   display: "flex",
   justifyContent: "center",

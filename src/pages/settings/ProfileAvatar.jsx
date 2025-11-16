@@ -8,12 +8,16 @@ const ProfileAvatar = ({ setSelectedPicture }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPictureModal, setShowPictureModal] = useState(false);
+  const [success, setSuccess] = useState(""); // Ny state för success
 
   const { authData } = useAuth();
   const { userId } = authData || {};
+
   const openPictureModal = () => {
     setShowPictureModal(true);
-    setTempPicture(""); // Reset tempPicture when opening modal
+    setTempPicture("");
+    setError("");
+    setSuccess("");
   };
 
   const handlePictureSelect = () => {
@@ -32,35 +36,29 @@ const ProfileAvatar = ({ setSelectedPicture }) => {
     setSelectedPicture(tempPicture);
     localStorage.setItem("profilePicture", tempPicture);
 
-    if (!accessToken || !userId) {
-      setError("ID or token is missing");
+    if (!userId) {
+      setError("ID is missing");
       return;
     }
 
     setIsLoading(true);
+    setError("");
+    setSuccess("");
 
     try {
-      await apiFetch("/auth/avatar", {
+      const data = await apiFetch("/auth/avatar", {
         method: "PUT",
-
-        body: JSON.stringify({
-          avatar: tempPicture,
-        }),
+        body: JSON.stringify({ avatar: tempPicture }),
       });
 
-      if (!response.ok) {
-        throw new Error(
-          `Failed to update profile picture: ${response.statusText} for user ${userId}`
-        );
-      }
+      setSuccess("Profile picture updated successfully! 🎉");
 
-      // Optionally handle the success response
-      const data = await response.json();
-      console.log(data.message); // Log success message
-
-      // Close modal and reset temp picture
-      setShowPictureModal(false);
-      setTempPicture(""); // Clear the temporary picture
+      // Stäng modal efter kort delay (valfritt)
+      setTimeout(() => {
+        setShowPictureModal(false);
+        setTempPicture("");
+        setSuccess("");
+      }, 1500);
     } catch (error) {
       setError(`Update request failed: ${error.message}`);
     } finally {
@@ -77,12 +75,14 @@ const ProfileAvatar = ({ setSelectedPicture }) => {
         >
           Choose Profile Picture
         </Button>
+
         <Modal
           show={showPictureModal}
           onHide={() => {
             setShowPictureModal(false);
-            setTempPicture(""); // Clear picture when closing modal
-            setError(""); // Reset error when closing
+            setTempPicture("");
+            setError("");
+            setSuccess("");
           }}
           centered
         >
@@ -90,22 +90,36 @@ const ProfileAvatar = ({ setSelectedPicture }) => {
             <Modal.Header closeButton>
               <Modal.Title>Choose a Profile Picture</Modal.Title>
             </Modal.Header>
+
             <Modal.Body>
-              {error && <Alert variant="danger">{error}</Alert>}{" "}
-              {/* Display error message */}
+              {error && <Alert variant="danger">{error}</Alert>}
+              {success && <Alert variant="success">{success}</Alert>}
+
               <img
-                src={tempPicture || "https://i.pravatar.cc/100"} // pravatar works for placeholders
+                src={tempPicture || "https://i.pravatar.cc/100"}
                 alt="Avatar"
-                className="picture"
                 onClick={handlePictureSelect}
                 style={{
                   cursor: "pointer",
                   width: "100px",
                   height: "100px",
                   borderRadius: "50%",
+                  display: "block",
+                  margin: "0 auto",
                 }}
               />
+              <p
+                style={{
+                  textAlign: "center",
+                  marginTop: "10px",
+                  fontSize: "0.9rem",
+                  color: "#555",
+                }}
+              >
+                Click the avatar to randomize
+              </p>
             </Modal.Body>
+
             <Modal.Footer>
               <Button
                 variant="primary"

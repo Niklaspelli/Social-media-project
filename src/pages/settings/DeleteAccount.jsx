@@ -1,53 +1,50 @@
 import { useState } from "react";
-import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import DeleteAccountLoader from "../../components/DeleteAccountLoader";
+import ConfirmDialog from "../../components/ConfirmDialog";
 
-const DeleteAccount = ({ isLoading, onConfirm, onCancel }) => {
+const DeleteAccount = ({ onConfirm, onCancel }) => {
   const navigate = useNavigate();
-  const [setSuccess] = useState(false);
-
   const { logout } = useAuth();
 
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // för knappen i ConfirmDialog
+
   const handleConfirm = async () => {
+    setIsLoading(true);
     try {
-      await onConfirm();
-      setSuccess(true);
-      logout();
-      setTimeout(() => {
-        navigate("/auth", { replace: true });
-      }, 3000); // vänta 3 sek innan navigering
+      await onConfirm(); // kör API-delete
+      setIsDeleting(true); // starta loadern
     } catch (error) {
-      console.error("Failed to delete account:", error);
+      console.error("Delete failed:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  if (isDeleting) {
+    return (
+      <DeleteAccountLoader
+        onFinish={() => {
+          logout();
+          navigate("/auth", { replace: true });
+        }}
+      />
+    );
+  }
+
   return (
-    <div className="confirmation-prompt">
-      <p style={{ marginTop: "20px", color: "red", fontWeight: "bold" }}>
-        Are you sure you want to delete your account?
-      </p>
-      <div className="d-flex justify-content-center mt-2">
-        <Button
-          style={{
-            backgroundColor: "black",
-            marginRight: "10px",
-            border: "none",
-          }}
-          onClick={handleConfirm}
-          disabled={isLoading}
-        >
-          {isLoading ? "Deleting..." : "Yes, Delete"}
-        </Button>
-        <Button
-          style={{ backgroundColor: "#ccc", color: "black", border: "none" }}
-          onClick={onCancel}
-          disabled={isLoading}
-        >
-          No, Cancel
-        </Button>
-      </div>
-    </div>
+    <ConfirmDialog
+      show={true}
+      title="Delete Account"
+      message="Are you sure you want to delete your account?"
+      confirmText="Yes, Delete"
+      cancelText="No, Cancel"
+      onConfirm={handleConfirm}
+      onCancel={onCancel}
+      isLoading={isLoading}
+    />
   );
 };
 

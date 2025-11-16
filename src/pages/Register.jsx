@@ -6,6 +6,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Container, Button, Row, Col, Form } from "react-bootstrap";
+import CreateAccountLoader from "../components/CreateAccountLoader";
 
 const USER_REGEX = /^[A-Öa-ö][A-z0-9-_åäöÅÄÖ]{3,23}$/;
 const PWD_REGEX =
@@ -30,6 +31,7 @@ function Register() {
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
   const [csrfToken, setCsrfToken] = useState(""); // Store the CSRF token
+  const [isCreating, setIsCreating] = useState(false);
 
   // Fetch CSRF token when the component is mounted
   useEffect(() => {
@@ -65,6 +67,8 @@ function Register() {
   }, [password, matchPwd]);
 
   const handleSubmit = async (e) => {
+    setIsCreating(true);
+
     e.preventDefault();
     const v1 = USER_REGEX.test(username);
     const v2 = PWD_REGEX.test(password);
@@ -95,6 +99,8 @@ function Register() {
 
       const data = await response.json();
       console.log(data);
+      await new Promise((resolve) => setTimeout(resolve, 6000));
+
       setSuccess(true);
       setErrMsg("");
     } catch (err) {
@@ -113,7 +119,7 @@ function Register() {
           </p>
         </section>
       ) : (
-        <Form onSubmit={handleSubmit}>
+        <Form>
           <p
             ref={errRef}
             className={errMsg ? "errmsg" : "offscreen"}
@@ -242,7 +248,7 @@ function Register() {
                 </Form.Text>
               </Form.Group>
 
-              <Button
+              {/*   <Button
                 variant="dark"
                 className="mt-4"
                 width={100}
@@ -250,7 +256,17 @@ function Register() {
                 type="submit"
               >
                 <span className="bn31span">Register</span>
-              </Button>
+              </Button> */}
+              {!isCreating ? (
+                <Button
+                  onClick={handleSubmit}
+                  disabled={!validName || !validPwd || !validMatch}
+                >
+                  Create Account
+                </Button>
+              ) : (
+                <CreateAccountLoader />
+              )}
             </Col>
           </Row>
         </Form>
