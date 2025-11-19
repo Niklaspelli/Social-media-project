@@ -98,8 +98,10 @@ function Register() {
       />
 
       {success ? (
-        <section className="text-center">
-          <h2>Lyckad registrering!</h2>
+        <section className="text-center text-white fs-4 font-bold">
+          <h2>
+            Congratulations, your account has been succesfully created, enjoy!{" "}
+          </h2>
           <p>
             <a href="/">Login</a>
           </p>
@@ -124,6 +126,10 @@ function Register() {
             <div className="flipper">
               <div className="login-form-center">
                 <div className="login-box">
+                  <div className="wave-container">
+                    <div className="wave grey-wave"></div>
+                    <div className="wave white-wave"></div>
+                  </div>
                   <Row className="justify-content-center">
                     <Col md={6} lg={7}>
                       {/* Username */}

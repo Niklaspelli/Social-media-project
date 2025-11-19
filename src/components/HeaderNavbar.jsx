@@ -15,6 +15,7 @@ import SearchBar from "./SearchBar";
 import useGetSubjects from "../queryHooks/subjects/useGetSubjects";
 import useGetFriendRequestCount from "../queryHooks/friends/useGetFriendRequestCount";
 import useEventInvitationCount from "../queryHooks/events/useInvitationCount";
+import "./components.css";
 
 const HeaderNavbar = () => {
   const { isAuthenticated, authData, logout: authLogout } = useAuth();
@@ -44,7 +45,7 @@ const HeaderNavbar = () => {
   };
 
   return (
-    <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
+    <Navbar expand="lg" sticky="top" className="custom-navbar">
       <Container>
         <Navbar.Toggle aria-controls="navbar-content" />
         <Navbar.Collapse id="navbar-content">
@@ -56,22 +57,20 @@ const HeaderNavbar = () => {
             ) : (
               <>
                 {currentUser && (
-                  <Nav.Item className="d-flex align-items-center ms-3 m-4">
-                    <span className="text-success me-2">
-                      Welcome, {currentUser}
-                    </span>
+                  <Nav.Item className="d-flex align-items-center ms-3 m-3">
+                    <span className="welcome">Welcome, {currentUser}</span>
                     {NavbarAvatar && (
                       <Image
                         src={NavbarAvatar}
                         roundedCircle
-                        height="32"
-                        width="32"
+                        height="42"
+                        width="42"
                         alt={`${currentUser}'s avatar`}
                       />
                     )}
                   </Nav.Item>
                 )}
-                <Nav.Link as={Link} to={"/feed/:id"}>
+                <Nav.Link as={Link} to={"/feed/:id"} className="text-white">
                   <FontAwesomeIcon icon={faStream} className="me-1" /> Feed
                 </Nav.Link>
                 <Nav.Link as={Link} to={`/notifications/${authData.userId}`}>

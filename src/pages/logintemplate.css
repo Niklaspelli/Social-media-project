@@ -7,12 +7,17 @@
     backdrop-filter: blur(6px);
     font-family: poppins, sans-serif;
     overflow: hidden;
-    background-color: black;
     z-index: 2;
     /* viktigt för blur */
 
     /* så bilden täcker hela boxen */
 
+}
+
+/* Se till att form-elementen ligger över vågen */
+.login-box form {
+    position: relative;
+    z-index: 1;
 }
 
 .login-box>* {
@@ -271,7 +276,7 @@
     /* justera så den hamnar precis under input */
     left: 0;
     width: 100%;
-    background-color: rgba(0, 0, 0, 0.85);
+    background: linear-gradient(#262627, #111111);
     color: white;
     padding: 8px;
     border-radius: 5px;
@@ -279,4 +284,73 @@
     pointer-events: none;
     /* klick går igenom till inputen */
     font-size: 0.9rem;
+}
+
+
+.wave-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 200%;
+    overflow: hidden;
+    pointer-events: none;
+    /* så att du kan klicka på input */
+}
+
+.wave {
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    border-radius: 40%;
+    animation: wave-rotate 15s infinite linear;
+}
+
+.grey-wave {
+    background-color: rgba(42, 35, 44, 0.5);
+    z-index: 1;
+    animation: wave-rotate 25s infinite linear;
+    /* lite snabbare/slut */
+}
+
+.white-wave {
+    background-color: #3e3e64;
+    z-index: 2;
+    animation: wave-rotate 55s infinite linear;
+    /* långsammare, fördröjd rörelse */
+}
+
+/* Animation */
+@keyframes wave-rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes wave-rotate-white {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    50% {
+        transform: rotate(180deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.white-wave {
+    animation: wave-rotate-white 20s infinite linear;
+}
+
+/* Se till att formulär och text ligger över vågen */
+.login-box .login-form-center {
+    position: relative;
+    z-index: 10;
 }

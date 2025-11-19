@@ -20,6 +20,7 @@ import EventDetails from "./pages/events/event-details.jsx";
 import CreateEvent from "./pages/events/create-event.jsx";
 import EventView from "./pages/events/event-view.jsx";
 import EventUpdate from "./pages/events/event-update.jsx";
+import AccountDeleted from "./pages/settings/AccountDeleted.jsx";
 
 function App() {
   return (
@@ -59,6 +60,7 @@ function App() {
             element={<CreateThread />}
           />
         </Route>
+        <Route path="/deleted" element={<AccountDeleted />} />
 
         {/* Fallback for undefined routes */}
         <Route path="*" element={<NotFound />} />

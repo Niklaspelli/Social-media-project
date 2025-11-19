@@ -129,7 +129,7 @@ const EditProfile = () => {
 
   return (
     <>
-      <h1 style={{ textAlign: "center" }}>Inställningar</h1>
+      <h1 style={{ textAlign: "center", color: "white" }}>Settings</h1>
 
       <Container>
         <Form onSubmit={handleSubmit}>

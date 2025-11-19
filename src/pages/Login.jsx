@@ -169,7 +169,7 @@ import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock, faUser } from "@fortawesome/free-solid-svg-icons";
 import { apiFetch } from "../api/api";
-
+import "./waves.css";
 import "./logintemplate.css";
 
 const Login = ({ onSwitchToSignUp }) => {
@@ -257,6 +257,10 @@ const Login = ({ onSwitchToSignUp }) => {
         <div className="flipper">
           <div className="login-form-center">
             <div className="login-box">
+              <div className="wave-container">
+                <div className="wave grey-wave"></div>
+                <div className="wave white-wave"></div>
+              </div>
               <Row className="justify-content-center">
                 <Col md={6} lg={10}>
                   {isLoading && (

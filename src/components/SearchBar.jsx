@@ -95,7 +95,7 @@ const SearchBar = () => {
 
   return (
     <form onSubmit={handleSearchSubmit}>
-      <InputGroup>
+      <InputGroup className="searchbar">
         <FormControl
           type="search"
           placeholder="Search users..."

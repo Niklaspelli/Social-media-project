@@ -8,8 +8,8 @@ const AuthPage = () => {
   const [showSignUp, setShowSignUp] = useState(false);
 
   return (
-    <Container fluid style={logoMaskContainer}>
-      <div style={{ width: "100%", textAlign: "center", position: "relative" }}>
+    <Container fluid className>
+      <div style={{ width: "100%", textAlign: "center" }}>
         {/* Flip container */}
         <motion.div
           className="flip-container"
@@ -82,17 +82,6 @@ const AuthPage = () => {
 };
 
 export default AuthPage;
-
-const logoMaskContainer = {
-  width: "100%",
-  height: "100vh",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  backgroundColor: "rgba(0, 0, 0, 0.6)",
-  backdropFilter: "blur(10px)",
-  WebkitBackdropFilter: "blur(10px)",
-};
 
 const logoMaskedText = {
   fontSize: "10vw",

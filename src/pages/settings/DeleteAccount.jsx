@@ -7,7 +7,7 @@ import ConfirmDialog from "../../components/ConfirmDialog";
 const DeleteAccount = ({ onConfirm, onCancel }) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
-
+  const [success, setSuccess] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isLoading, setIsLoading] = useState(false); // för knappen i ConfirmDialog
 
@@ -15,6 +15,7 @@ const DeleteAccount = ({ onConfirm, onCancel }) => {
     setIsLoading(true);
     try {
       await onConfirm(); // kör API-delete
+
       setIsDeleting(true); // starta loadern
     } catch (error) {
       console.error("Delete failed:", error);
@@ -24,11 +25,19 @@ const DeleteAccount = ({ onConfirm, onCancel }) => {
   };
 
   if (isDeleting) {
-    return (
+    return success ? (
+      <section className="text-center text-white fs-4 font-bold">
+        <h2>Congratulations, your account has been successfully deleted!</h2>
+        <p>
+          <a href="/">Login</a>
+        </p>
+      </section>
+    ) : (
       <DeleteAccountLoader
         onFinish={() => {
+          setSuccess(true);
+          navigate("/deleted", { replace: true });
           logout();
-          navigate("/auth", { replace: true });
         }}
       />
     );
