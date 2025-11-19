@@ -51,7 +51,7 @@ export async function apiFetch(endpoint, options = {}) {
 
   const headers = {
     "Content-Type": "application/json",
-    ...(csrfToken ? { "csrf-token": csrfToken } : {}),
+    ...(csrfToken ? { "CSRF-TOKEN": csrfToken } : {}),
     ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
     ...options.headers,
   };

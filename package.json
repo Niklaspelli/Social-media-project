@@ -28,6 +28,7 @@
     "express-rate-limit": "^7.4.1",
     "fontawesome": "^5.6.3",
     "fortawesome": "^0.0.1-security",
+    "framer-motion": "^12.23.24",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "mysql": "^2.18.1",

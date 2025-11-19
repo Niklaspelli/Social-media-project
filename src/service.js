@@ -38,12 +38,25 @@ app.use(limiter);
 // ✅ 4. Global CSRF-skydd för skrivande metoder
 app.use((req, res, next) => {
   const protectedMethods = ["POST", "PUT", "PATCH", "DELETE"];
+
+  // ❌ Routes som INTE ska kräva CSRF
+  const csrfExempt = [
+    "/api/auth/login",
+    "/api/auth/register",
+    "/api/auth/refresh-token",
+  ];
+
+  if (csrfExempt.includes(req.path)) {
+    return next();
+  }
+
+  // ✔ Endast skydda skrivande metoder som INTE är undantagna
   if (protectedMethods.includes(req.method)) {
     return verifyCsrfToken(req, res, next);
   }
+
   next();
 });
-
 // ✅ 5. Dina routes
 const routes = (await import("./routes/index.js")).default;
 app.use("/api", routes);

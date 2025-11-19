@@ -162,11 +162,15 @@ const Login = ({ onSwitchToSignUp }) => {
 export default Login;
  */
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth, getCsrfToken } from "../context/AuthContext";
-import { apiFetch } from "../api/api";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLock, faUser } from "@fortawesome/free-solid-svg-icons";
+import { apiFetch } from "../api/api";
+
+import "./logintemplate.css";
 
 const Login = ({ onSwitchToSignUp }) => {
   const [username, setUsername] = useState("");
@@ -178,29 +182,10 @@ const Login = ({ onSwitchToSignUp }) => {
   const navigate = useNavigate();
   const errRef = useRef();
 
-  // Hämta CSRF-token direkt när komponenten mountas
-  const [csrfToken, setCsrfToken] = useState(null);
-  useEffect(() => {
-    const fetchToken = async () => {
-      try {
-        const token = await getCsrfToken();
-        setCsrfToken(token);
-      } catch (err) {
-        console.error("Failed to fetch CSRF token:", err);
-      }
-    };
-    fetchToken();
-  }, []);
-
-  useEffect(() => {
-    // Om användaren redan är inloggad, navigera direkt
-    if (authData?.userId) {
-      navigate(`/user/${authData.userId}`);
-    }
-  }, [authData, navigate]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Login button clicked");
+
     setIsLoading(true);
     setError(null);
 
@@ -210,35 +195,34 @@ const Login = ({ onSwitchToSignUp }) => {
       return;
     }
 
-    if (!csrfToken) {
-      setError("CSRF token not ready.");
-      setIsLoading(false);
-      return;
-    }
-
     try {
+      // Login request
       const data = await apiFetch("/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "csrf-token": csrfToken,
         },
-        credentials: "include",
         body: JSON.stringify({ username, password }),
       });
 
+      console.log("Login response:", data);
+
       const { userId, avatar, accessToken } = data;
+
+      // Spara inloggning i context + localStorage
       login(username, userId, avatar, accessToken);
+      localStorage.setItem("accessToken", accessToken);
 
       // Uppdatera last seen
       await apiFetch("/friends/update-last-seen", {
         method: "PUT",
-        headers: { Authorization: `Bearer ${accessToken}` },
       });
 
+      // Navigera till användarsidan
       navigate(`/user/${userId}`);
     } catch (err) {
-      setError("Username or password is incorrect!.");
+      console.error(err);
+      setError("Username or password is incorrect!");
       if (errRef.current) errRef.current.focus();
     } finally {
       setIsLoading(false);
@@ -246,67 +230,118 @@ const Login = ({ onSwitchToSignUp }) => {
   };
 
   return (
-    <Container className="mt-5">
-      <Row className="justify-content-center">
-        <Col md={6} lg={7}>
-          {isLoading && <div className="alert alert-info">Logging in...</div>}
-          {error && (
-            <div className="alert alert-danger" ref={errRef} role="alert">
-              {error}
+    <Container fluid>
+      {/* Overlay */}
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          backgroundColor: "rgba(0, 0, 0, 0.6)",
+          backdropFilter: "blur(23px)",
+          WebkitBackdropFilter: "blur(10px)",
+          zIndex: 0,
+        }}
+      />
+
+      <div
+        style={{
+          zIndex: 2,
+          position: "relative",
+          textAlign: "center",
+          width: "100%",
+        }}
+      >
+        <div className="flipper">
+          <div className="login-form-center">
+            <div className="login-box">
+              <Row className="justify-content-center">
+                <Col md={6} lg={10}>
+                  {isLoading && (
+                    <div className="alert alert-info">Logging in...</div>
+                  )}
+                  {error && (
+                    <div
+                      className="alert alert-danger"
+                      ref={errRef}
+                      role="alert"
+                    >
+                      {error}
+                    </div>
+                  )}
+
+                  <Form onSubmit={handleSubmit}>
+                    <Form.Group className="mb-3">
+                      <div className="input-box">
+                        <div className="input-wrapper">
+                          <FontAwesomeIcon
+                            icon={faUser}
+                            className="input-icon"
+                          />
+                          <Form.Control
+                            id="username"
+                            type="text"
+                            placeholder="username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                          />
+                          <label htmlFor="username">Username</label>
+                          <div className="b-line"></div>
+                        </div>
+                      </div>
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                      <div className="input-box">
+                        <div className="input-wrapper">
+                          <FontAwesomeIcon
+                            icon={faLock}
+                            className="input-icon"
+                          />
+                          <Form.Control
+                            id="password"
+                            type="password"
+                            placeholder="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                          />
+                          <label htmlFor="password">Password</label>
+                          <div className="b-line"></div>
+                        </div>
+                      </div>
+                    </Form.Group>
+
+                    <div className="d-grid gap-2">
+                      <Button
+                        variant="light"
+                        className="btn"
+                        type="submit"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? "Logging in..." : "Login"}
+                      </Button>
+
+                      {onSwitchToSignUp && (
+                        <Button
+                          variant="light"
+                          className="btn mt-3"
+                          onClick={onSwitchToSignUp}
+                        >
+                          Sign up
+                        </Button>
+                      )}
+                    </div>
+                  </Form>
+                </Col>
+              </Row>
             </div>
-          )}
-
-          <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3">
-              <Form.Label htmlFor="username">Username</Form.Label>
-              <Form.Control
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                style={{
-                  backgroundColor: "grey",
-                  color: "white",
-                  border: "2px solid white",
-                }}
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label htmlFor="password">Password</Form.Label>
-              <Form.Control
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                style={{
-                  backgroundColor: "grey",
-                  color: "white",
-                  border: "2px solid white",
-                }}
-              />
-            </Form.Group>
-
-            <div className="d-grid gap-2">
-              <Button variant="dark" type="submit" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Login"}
-              </Button>
-
-              {onSwitchToSignUp && (
-                <Button
-                  variant="dark"
-                  className="mt-3"
-                  onClick={onSwitchToSignUp}
-                >
-                  Sign up
-                </Button>
-              )}
-            </div>
-          </Form>
-        </Col>
-      </Row>
+          </div>
+        </div>
+      </div>
     </Container>
   );
 };

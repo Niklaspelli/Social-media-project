@@ -1,0 +1,282 @@
+.login-box {
+    border: 1px solid white;
+    width: 620px;
+    padding: 30px 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(6px);
+    font-family: poppins, sans-serif;
+    overflow: hidden;
+    background-color: black;
+    z-index: 2;
+    /* viktigt för blur */
+
+    /* så bilden täcker hela boxen */
+
+}
+
+.login-box>* {
+    position: relative;
+    z-index: 10;
+    /* ligger ovanpå ::before */
+    color: #fff;
+    /* säkerställ textfärg */
+}
+
+.login-box::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    filter: blur(6px);
+    /* själva bilden blir suddig */
+    z-index: 0;
+}
+
+.login-box h1 {
+    color: #fff;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 36px;
+}
+
+.login-form-center {
+    display: flex;
+    justify-content: center;
+
+}
+
+
+.login-box .input-box {
+    position: relative;
+    width: 100%;
+    height: 50px;
+    margin: 30px 0;
+}
+
+.input-box input {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 40px;
+    font-size: 16px;
+    color: #fff;
+    padding: 20px 45px 20px 20px;
+}
+
+.login-box input:focus {
+    background-color: rgba(0, 0, 0, 0.5);
+    /* behåll samma som normal */
+    color: white;
+    border-color: white;
+    /* behåll border */
+    outline: none;
+    /* ta bort standard blå outline */
+    box-shadow: none;
+    /* ta bort bootstrap shadow */
+}
+
+.input-box input::placeholder {
+    color: #fff;
+}
+
+.input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.input-wrapper .input-icon {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    /* justera om du vill ha den längre ut */
+    transform: translateY(-50%);
+    z-index: 10;
+    color: #fff;
+    /* ikonfärg */
+    pointer-events: none;
+}
+
+.input-wrapper input {
+    padding-left: 35px !important;
+    /* plats för ikonen */
+}
+
+.login-box .btn {
+    width: 100%;
+    height: 45px;
+    background: #fff;
+    border: none;
+    outline: none;
+    border-radius: 40px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+
+}
+
+.login-box .btn:hover {
+    background: rgba(83, 73, 73, 0.5);
+    color: white;
+    border-color: #fff;
+}
+
+
+/* ================================
+   BUBBLE INPUT + FLYTANDE LABEL
+   ================================*/
+
+.input-box {
+    position: relative;
+}
+
+/* Ikonen (du har detta redan, men viktigt att den ligger rätt) */
+.input-wrapper .input-icon {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    z-index: 10;
+    color: #fff;
+    pointer-events: none;
+}
+
+/* Input bubble (din gamla stil + fixar för effekt) */
+.input-wrapper .form-control {
+    all: unset;
+    /* Tar bort bootstrap */
+    width: 100%;
+    height: 50px;
+    padding: 18px 45px 0 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 40px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    box-sizing: border-box;
+    color: #fff;
+    font-size: 16px;
+    transition: 0.25s;
+}
+
+/* Hover-effekt på bubble */
+.input-wrapper .form-control:hover {
+    border-color: var(--pink);
+    box-shadow: 0 0 10px var(--pink);
+}
+
+/* Focus-effekt */
+.input-wrapper .form-control:focus {
+    border-color: var(--pink);
+    box-shadow: 0 0 12px var(--pink);
+}
+
+/* Döljer placeholder (flytande label kräver detta) */
+.input-wrapper .form-control::placeholder {
+    opacity: 0;
+}
+
+/* Flytande label */
+.input-box label {
+    position: absolute;
+    top: 50%;
+    left: 23px;
+    transform: translateY(-50%);
+    color: #fff;
+    font-size: 1rem;
+    pointer-events: none;
+    transition: 0.25s ease;
+}
+
+/* Label upp vid text eller fokus */
+.input-wrapper .form-control:focus+label,
+.input-wrapper .form-control:not(:placeholder-shown)+label {
+    top: 8px;
+    font-size: 0.75rem;
+    color: var(--pink);
+}
+
+/* Rosa underline (extra effekt) */
+.input-box .b-line {
+    position: absolute;
+    bottom: 0;
+    left: 25px;
+    width: 40%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--pink), transparent);
+    transition: width 0.3s;
+    pointer-events: none;
+}
+
+/* Expanderar vid fokus eller text */
+.input-wrapper .form-control:focus~.b-line,
+.input-wrapper .form-control:not(:placeholder-shown)~.b-line {
+    width: calc(100% - 50px);
+}
+
+.flipper-container {
+    perspective: 1000px;
+    width: 400px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.flipper {
+    width: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    position: relative;
+}
+
+.flipper.flipped {
+    transform: rotateY(180deg);
+}
+
+.front,
+.back {
+    position: absolute;
+    width: 100%;
+    backface-visibility: hidden;
+    top: 0;
+    left: 0;
+}
+
+.front {
+    z-index: 2;
+    pointer-events: auto;
+}
+
+.back {
+    transform: rotateY(180deg);
+    pointer-events: none;
+}
+
+/* När flippad */
+.flipper.flipped .front {
+    pointer-events: none;
+}
+
+.flipper.flipped .back {
+    pointer-events: auto;
+}
+
+
+.input-info {
+    position: absolute;
+    top: 70px;
+    /* justera så den hamnar precis under input */
+    left: 0;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 8px;
+    border-radius: 5px;
+    z-index: 20;
+    pointer-events: none;
+    /* klick går igenom till inputen */
+    font-size: 0.9rem;
+}

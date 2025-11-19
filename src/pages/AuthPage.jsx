@@ -1,62 +1,87 @@
 import { useState } from "react";
 import Login from "./Login";
 import Register from "./Register";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Button } from "react-bootstrap";
+import { motion } from "framer-motion";
 
 const AuthPage = () => {
   const [showSignUp, setShowSignUp] = useState(false);
 
   return (
-    <Container fluid>
-      <Row>
-        {/* Column: Form Section */}
-        <Col
-          md={6}
-          className="d-flex align-items-center justify-content-center"
-          style={{ height: "100vh" }}
+    <Container fluid style={logoMaskContainer}>
+      <div style={{ width: "100%", textAlign: "center", position: "relative" }}>
+        {/* Flip container */}
+        <motion.div
+          className="flip-container"
+          animate={{
+            rotateY: showSignUp ? 180 : 0,
+            boxShadow: showSignUp
+              ? "0 20px 50px rgba(251,50,164,0.4)"
+              : "0 20px 50px rgba(0,0,0,0.4)",
+          }}
+          transition={{
+            duration: 0.8,
+            type: "spring",
+            stiffness: 120,
+            damping: 12,
+          }}
+          style={{
+            margin: "auto",
+            perspective: 1600,
+            width: "620px",
+            transformStyle: "preserve-3d",
+            position: "relative",
+          }}
         >
-          <div style={formContainerStyle}>
-            {showSignUp ? (
-              <Register />
-            ) : (
+          <div
+            className="flipper"
+            style={{
+              width: "100%",
+              transformStyle: "preserve-3d",
+              position: "relative",
+            }}
+          >
+            {/* FRONT – Login */}
+            <div
+              className="front"
+              style={{
+                backfaceVisibility: "hidden",
+                position: "absolute",
+                inset: 0,
+                pointerEvents: showSignUp ? "none" : "auto", // <-- här
+              }}
+            >
               <Login onSwitchToSignUp={() => setShowSignUp(true)} />
-            )}
+            </div>
 
-            {showSignUp && (
+            {/* BACK – Register */}
+            <div
+              className="back"
+              style={{
+                backfaceVisibility: "hidden",
+                position: "absolute",
+                inset: 0,
+                transform: "rotateY(180deg)",
+                pointerEvents: showSignUp ? "auto" : "none", // <-- här
+              }}
+            >
+              <Register />
               <Button
-                variant="dark"
-                style={{ margin: "20px" }}
+                variant="light"
+                className="mt-3"
                 onClick={() => setShowSignUp(false)}
               >
-                Back to login
+                Back to Login
               </Button>
-            )}
+            </div>
           </div>
-        </Col>
-
-        {/* Column: Background Image */}
-        <Col
-          md={6}
-          className="d-flex align-items-center justify-content-center"
-          style={{ height: "100vh" }}
-        >
-          <div style={logoMaskContainer}>
-            <h1 style={logoMaskedText}>Heavy Forum</h1>
-          </div>
-        </Col>
-      </Row>
+        </motion.div>
+      </div>
     </Container>
   );
 };
 
 export default AuthPage;
-
-const formContainerStyle = {
-  width: "100%",
-  backgroundSize: "cover",
-  alignItems: "center",
-  color: "white",
-};
 
 const logoMaskContainer = {
   width: "100%",
@@ -70,12 +95,12 @@ const logoMaskContainer = {
 };
 
 const logoMaskedText = {
-  fontSize: "10vw", // responsive, scales with screen width
+  fontSize: "10vw",
   fontWeight: "bold",
   textTransform: "uppercase",
   textAlign: "center",
   width: "100%",
-  backgroundImage: "url('keyboard.jpg')",
+  backgroundImage: "url('/keyboard.jpg')",
   backgroundSize: "cover",
   backgroundPosition: "center",
   backgroundRepeat: "no-repeat",
