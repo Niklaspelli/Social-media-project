@@ -36,10 +36,10 @@ router.delete("/:id", authenticateJWT, verifyCsrfToken, deleteEvent);
 router.get("/events/:id", authenticateJWT, getEventById);
 router.get("/events/:id/invitees", authenticateJWT, getEventInvitees);
 router.get("/events", authenticateJWT, getAllEvents);
-router.get("/user", authenticateJWT, getUserEvents);
-router.get("/events/invitations", authenticateJWT, getIncomingEventInvitations);
+router.get("/user-events", authenticateJWT, getUserEvents);
+router.get("/invitations", authenticateJWT, getIncomingEventInvitations);
 router.get(
-  "/events/invitations/count",
+  "/invitations/count",
   authenticateJWT,
   getIncomingEventInvitationCount
 );

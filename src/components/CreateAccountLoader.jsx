@@ -39,7 +39,7 @@ const CreateAccountLoader = ({ onFinish }) => {
     const finishTimer = setTimeout(() => {
       clearInterval(progressTimer);
       onFinish();
-      navigate("/home");
+      navigate("/auth/success", { replace: true });
     }, TOTAL_DURATION);
 
     return () => {

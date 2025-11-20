@@ -41,7 +41,7 @@ const HeaderNavbar = () => {
 
   const handleLogout = () => {
     authLogout();
-    navigate("/");
+    navigate("/auth");
   };
 
   return (
@@ -51,7 +51,7 @@ const HeaderNavbar = () => {
         <Navbar.Collapse id="navbar-content">
           <Nav className="ms-auto align-items-center">
             {!isAuthenticated ? (
-              <Nav.Link as={Link} to="/">
+              <Nav.Link as={Link} to="/auth">
                 Sign In / Sign Up
               </Nav.Link>
             ) : (
@@ -137,11 +137,11 @@ const HeaderNavbar = () => {
                 >
                   {subjects.map((subject) => (
                     <NavDropdown.Item
-                      key={subject.id}
+                      key={subject.subject_id}
                       as={Link}
-                      to={`/forum/subject/${subject.id}`}
+                      to={`/forum/subject/${subject.subject_id}`}
                     >
-                      {subject.name}
+                      {subject.title}
                     </NavDropdown.Item>
                   ))}{" "}
                 </NavDropdown>

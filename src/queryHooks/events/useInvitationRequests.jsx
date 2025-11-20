@@ -1,16 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 
 const fetchInvitationRequests = async (token) => {
-  const response = await fetch(
-    "http://localhost:5000/api/events/events/invitations",
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      credentials: "include",
-    }
-  );
+  const response = await fetch("http://localhost:5000/api/events/invitations", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    credentials: "include",
+  });
 
   if (!response.ok) {
     throw new Error("Failed to fetch invitation requests");

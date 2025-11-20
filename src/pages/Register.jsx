@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   faCheck,
   faTimes,
@@ -7,9 +8,11 @@ import {
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import { Container, Button, Row, Col, Form } from "react-bootstrap";
 import CreateAccountLoader from "../components/CreateAccountLoader";
 import "./logintemplate.css";
+import RegistrationSuccess from "./RegistrationSuccess";
 
 const USER_REGEX = /^[A-Öa-ö][A-z0-9-_åäöÅÄÖ]{3,23}$/;
 const PWD_REGEX =
@@ -18,11 +21,11 @@ const PWD_REGEX =
 function Register() {
   const userRef = useRef();
   const errRef = useRef();
+  const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
   const [validName, setValidName] = useState(false);
   const [userFocus, setUserFocus] = useState(false);
-
   const [password, setPassword] = useState("");
   const [validPwd, setValidPwd] = useState(false);
   const [pwdFocus, setPwdFocus] = useState(false);
@@ -33,8 +36,13 @@ function Register() {
 
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
-  const [csrfToken, setCsrfToken] = useState(""); // Store the CSRF token
   const [isCreating, setIsCreating] = useState(false);
+
+  useEffect(() => {
+    if (success) {
+      navigate("/auth/success", { replace: true });
+    }
+  }, [success, navigate]);
 
   useEffect(() => {
     setValidName(USER_REGEX.test(username));
@@ -98,14 +106,7 @@ function Register() {
       />
 
       {success ? (
-        <section className="text-center text-white fs-4 font-bold">
-          <h2>
-            Congratulations, your account has been succesfully created, enjoy!{" "}
-          </h2>
-          <p>
-            <a href="/">Login</a>
-          </p>
-        </section>
+        <RegistrationSuccess />
       ) : (
         <Form>
           <p
@@ -267,18 +268,6 @@ function Register() {
                             </label>
                             <div className="b-line"></div>
                           </div>
-                          {/*   <Form.Text
-                            id="confirmnote"
-                            className={
-                              matchFocus && !validMatch
-                                ? "instructions"
-                                : "offscreen"
-                            }
-                            style={{ color: "white" }}
-                          >
-                            <FontAwesomeIcon icon={faInfoCircle} /> Måste matcha
-                            lösenordet.
-                          </Form.Text> */}
                           {matchFocus && !validMatch && (
                             <div className="input-info">
                               <FontAwesomeIcon icon={faInfoCircle} />
@@ -298,7 +287,14 @@ function Register() {
                           Create Account
                         </Button>
                       ) : (
-                        <CreateAccountLoader />
+                        <CreateAccountLoader
+                          onFinish={() => {
+                            navigate("/auth/success", { replace: true });
+
+                            setIsCreating(false); // döljer loader
+                            setSuccess(true); // visar "account created"-meddelandet
+                          }}
+                        />
                       )}
                     </Col>
                   </Row>

@@ -1,11 +1,13 @@
 import { useState } from "react";
 import Login from "./Login";
 import Register from "./Register";
+import "./logintemplate.css";
 import { Container, Button } from "react-bootstrap";
 import { motion } from "framer-motion";
 
 const AuthPage = () => {
   const [showSignUp, setShowSignUp] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   return (
     <Container fluid className>
@@ -68,8 +70,10 @@ const AuthPage = () => {
               <Register />
               <Button
                 variant="light"
-                className="mt-3"
-                onClick={() => setShowSignUp(false)}
+                className="btn mt-3"
+                onClick={() => {
+                  setShowSignUp(false);
+                }}
               >
                 Back to Login
               </Button>
@@ -82,7 +86,7 @@ const AuthPage = () => {
 };
 
 export default AuthPage;
-
+/* 
 const logoMaskedText = {
   fontSize: "10vw",
   fontWeight: "bold",
@@ -97,4 +101,4 @@ const logoMaskedText = {
   WebkitTextFillColor: "transparent",
   color: "transparent",
   margin: 0,
-};
+}; */

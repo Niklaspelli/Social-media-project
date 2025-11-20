@@ -21,6 +21,7 @@ import CreateEvent from "./pages/events/create-event.jsx";
 import EventView from "./pages/events/event-view.jsx";
 import EventUpdate from "./pages/events/event-update.jsx";
 import AccountDeleted from "./pages/settings/AccountDeleted.jsx";
+import RegistrationSuccess from "./pages/RegistrationSuccess.jsx";
 
 function App() {
   return (
@@ -28,14 +29,7 @@ function App() {
       <HeaderNavbar />
       <Routes>
         {/* Redirect the root route to the login page */}
-        <Route path="/" element={<Navigate to="/auth" />} />
-        <Route path="/auth" element={<AuthPage />} />
-
-        {/* Public routes */}
-        {/*  <Route path="/login" element={<SignIn />} />
-        <Route path="/signup" element={<SignUp />} /> */}
-
-        {/* Protected routes */}
+        <Route path="/auth" element={<AuthPage />} />{" "}
         <Route element={<ProtectedRoute />}>
           <Route path="/feed/:id" element={<AllFeed />} />
           <Route path="/notifications/:id" element={<Notifications />} />
@@ -61,7 +55,7 @@ function App() {
           />
         </Route>
         <Route path="/deleted" element={<AccountDeleted />} />
-
+        <Route path="/auth/success" element={<RegistrationSuccess />} />
         {/* Fallback for undefined routes */}
         <Route path="*" element={<NotFound />} />
       </Routes>
