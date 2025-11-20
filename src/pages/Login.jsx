@@ -184,7 +184,6 @@ const Login = ({ onSwitchToSignUp }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login button clicked");
 
     setIsLoading(true);
     setError(null);
