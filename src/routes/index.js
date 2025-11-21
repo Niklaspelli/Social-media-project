@@ -7,6 +7,8 @@ import friendRoutes from "./friendRoutes.js";
 import feedRoutes from "./feedRoutes.js";
 import eventRoutes from "./eventRoutes.js";
 import eventFeedRoutes from "./eventFeedRoutes.js";
+import activityRoutes from "./activityRoutes.js";
+
 import { getCsrfToken } from "../controllers/authController.js";
 
 const router = express.Router();
@@ -17,6 +19,7 @@ router.use("/auth", authRoutes);
 router.use("/users", userRoutes);
 router.use("/userprofile", userprofileRoutes);
 router.use("/forum", forumRoutes);
+router.use("/activity", activityRoutes);
 router.use("/friends", friendRoutes);
 router.use("/feed", feedRoutes);
 router.use("/events", eventRoutes);

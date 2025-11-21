@@ -13,9 +13,6 @@ export const useLikeResponse = (responseId) => {
 
       return apiFetch(`/forum/responses/${responseId}/like`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
       });
     },
 

@@ -218,7 +218,7 @@ const Login = ({ onSwitchToSignUp }) => {
       });
 
       // Navigera till användarsidan
-      navigate(`/user/${userId}`);
+      navigate("/landing-page");
     } catch (err) {
       console.error(err);
       setError("Username or password is incorrect!");

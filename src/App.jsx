@@ -22,6 +22,7 @@ import EventView from "./pages/events/event-view.jsx";
 import EventUpdate from "./pages/events/event-update.jsx";
 import AccountDeleted from "./pages/settings/AccountDeleted.jsx";
 import RegistrationSuccess from "./pages/RegistrationSuccess.jsx";
+import LandingPage from "./pages/LandingPage.jsx";
 
 function App() {
   return (
@@ -31,6 +32,8 @@ function App() {
         {/* Redirect the root route to the login page */}
         <Route path="/auth" element={<AuthPage />} />{" "}
         <Route element={<ProtectedRoute />}>
+          <Route path="/landing-page" element={<LandingPage />} />
+
           <Route path="/feed/:id" element={<AllFeed />} />
           <Route path="/notifications/:id" element={<Notifications />} />
 
