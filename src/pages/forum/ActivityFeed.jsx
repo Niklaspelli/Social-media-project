@@ -23,12 +23,21 @@ export default function ActivityFeed({ onSelectThread }) {
     onSelectThread(threadId);
   };
 
+  const newThreadCount = data.filter(
+    (item) => item.type === "thread" && item.is_new === 1
+  ).length;
+
   return (
     <div className="p-2 border rounded">
-      <h5>Forumaktivitet</h5>
+      <h5 className="text-white">Forumaktivitet</h5>
+      <p>Latest activity in the forum!</p>
+      <div className="mb-2 text-white">
+        <strong>New threads: {newThreadCount}</strong>
+      </div>
       <ListGroup variant="flush">
         {data.slice(0, visibleCount).map((item) => (
           <ListGroup.Item
+            variant="flush"
             key={`${item.type}-${item.thread_id}-${item.timestamp}`}
             action
             onClick={() => onSelectThread(item.thread_id)}

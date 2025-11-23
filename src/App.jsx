@@ -20,10 +20,10 @@ import EventUpdate from "./pages/events/event-update.jsx";
 import AccountDeleted from "./pages/settings/AccountDeleted.jsx";
 import RegistrationSuccess from "./pages/RegistrationSuccess.jsx";
 import LandingPage from "./pages/LandingPage.jsx";
-import Forum from "./pages/forum/Forum-Landing-Page.jsx";
 import CreateThread from "./pages/forum/thread/CreateThread.jsx";
 import ThreadDetail from "./pages/forum/thread/ThreadDetail.jsx";
 import SubjectPage from "./pages/forum/thread/SubjectPage.jsx";
+import ForumLandingPage from "./pages/forum/Forum-Landing-Page.jsx";
 
 function App() {
   return (
@@ -42,7 +42,7 @@ function App() {
           <Route path="/events/create" element={<CreateEvent />} />
           <Route path="/events/update/:id" element={<EventUpdate />} />
           <Route path="/events/:id" element={<EventView />} />
-          <Route path="/forum" element={<Forum />}>
+          <Route path="/forum" element={<ForumLandingPage />}>
             <Route path="subject/:subjectId" element={<SubjectPage />} />
           </Route>{" "}
           <Route

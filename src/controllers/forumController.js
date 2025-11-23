@@ -49,27 +49,46 @@ export const createThread = (req, res) => {
 }; */
 
 export const getAllThreads = (req, res) => {
+  const userId = req.user?.id || null;
+
   // Parse query parameters
   const limit = parseInt(req.query.limit) > 0 ? parseInt(req.query.limit) : 5;
   const page = parseInt(req.query.page) > 0 ? parseInt(req.query.page) : 1;
   const offset = (page - 1) * limit;
   const sort = req.query.sort === "asc" ? "ASC" : "DESC";
-  const subject_id = req.query.subject_id; // get subject_id from query params
+  const subject_id = req.query.subject_id;
 
   let countSql = "SELECT COUNT(*) AS total FROM threads";
-  let dataSql = `SELECT * FROM threads`;
   const params = [];
 
   // Add WHERE clause if subject_id is provided
   if (subject_id) {
     countSql += " WHERE subject_id = ?";
-    dataSql += " WHERE subject_id = ?";
     params.push(subject_id);
   }
 
-  // Add sorting, limit and offset to the data SQL
-  dataSql += ` ORDER BY created_at ${sort} LIMIT ? OFFSET ?`;
-  params.push(limit, offset);
+  // Main query now includes NEW-flaggen
+  const dataSql = `
+    SELECT t.*,
+      CASE
+        WHEN utv.thread_id IS NULL OR utv.last_viewed < t.created_at
+        THEN 1 ELSE 0
+      END AS is_new
+    FROM threads t
+    LEFT JOIN user_thread_views utv
+      ON utv.thread_id = t.id AND utv.user_id = ?
+    ${subject_id ? "WHERE t.subject_id = ?" : ""}
+    ORDER BY t.created_at ${sort}
+    LIMIT ? OFFSET ?
+  `;
+
+  // Data params: userId + (subject_id?) + limit/offset
+  const dataParams = [
+    userId,
+    ...(subject_id ? [subject_id] : []),
+    limit,
+    offset,
+  ];
 
   // First query: get total count
   db.query(countSql, subject_id ? [subject_id] : [], (err, countResult) => {
@@ -79,7 +98,7 @@ export const getAllThreads = (req, res) => {
     }
 
     // Second query: get threads with pagination
-    db.query(dataSql, params, (err, results) => {
+    db.query(dataSql, dataParams, (err, results) => {
       if (err) {
         console.error("Error fetching threads:", err.message);
         return res.status(500).json({ error: "Internal Server Error" });
@@ -110,6 +129,15 @@ export const getThreadWithResponses = (req, res) => {
     }
 
     const thread = threadResults[0];
+
+    if (req.user?.id) {
+      const markViewedSql = `
+    INSERT INTO user_thread_views (user_id, thread_id, last_viewed)
+    VALUES (?, ?, NOW())
+    ON DUPLICATE KEY UPDATE last_viewed = NOW()
+  `;
+      db.query(markViewedSql, [req.user.id, threadId], () => {});
+    }
 
     // Fetch associated responses along with usernames and avatars
     const responsesQuery = `

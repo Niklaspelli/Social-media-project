@@ -7,7 +7,7 @@ import ThreadDetail from "./thread/ThreadDetail";
 import useGetSubjects from "../../queryHooks/subjects/useGetSubjects";
 import "./forum-styling.css";
 
-const Forum = () => {
+const ForumLandingPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { data: subjects, isLoading, error } = useGetSubjects();
@@ -43,4 +43,4 @@ const Forum = () => {
   );
 };
 
-export default Forum;
+export default ForumLandingPage;

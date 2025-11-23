@@ -34,20 +34,40 @@ function ThreadList({ subjectId }) {
 
   return (
     <div className="thread-list-container">
-      <button
-        onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-      >
-        Sort: {sortOrder === "asc" ? "Oldest First" : "Newest First"}
-      </button>
+      <div className="thread-list-header">
+        <button
+          className="sort-button"
+          onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+          aria-label={`Sort threads by ${
+            sortOrder === "asc" ? "newest" : "oldest"
+          }`}
+        >
+          Sort: {sortOrder === "asc" ? "Oldest First" : "Newest First"}
+        </button>
+      </div>
 
       {threads.map((thread) => (
-        <div key={thread.id} className="thread-item">
-          <h2
-            onClick={() => toggleThread(thread.id)}
-            style={{ cursor: "pointer" }}
-          >
-            {thread.title}
-          </h2>
+        <div
+          key={thread.id}
+          className="thread-item"
+          role="button"
+          tabIndex={0}
+          onClick={() => toggleThread(thread.id)}
+          onKeyPress={(e) => e.key === "Enter" && toggleThread(thread.id)}
+          aria-expanded={selectedThreadId === thread.id}
+        >
+          <div className="thread-header">
+            <img
+              src={thread.avatar || "/default-avatar.jpg"}
+              alt={`${thread.username || "User"} avatar`}
+              className="thread-avatar"
+            />
+            <h2 className="thread-title">{thread.title}</h2>
+          </div>
+          <p className="thread-body">{thread.body}</p>
+          <small className="thread-date">
+            Posted {new Date(thread.created_at).toLocaleDateString()}
+          </small>
 
           {selectedThreadId === thread.id && (
             <ThreadDetail threadId={thread.id} />
@@ -59,6 +79,7 @@ function ThreadList({ subjectId }) {
         <button
           onClick={() => setPage((p) => Math.max(p - 1, 1))}
           disabled={page === 1}
+          aria-label="Previous page"
         >
           Prev
         </button>
@@ -68,6 +89,7 @@ function ThreadList({ subjectId }) {
             if (!isPreviousData && page < totalPages) setPage((p) => p + 1);
           }}
           disabled={isPreviousData || page === totalPages}
+          aria-label="Next page"
         >
           Next
         </button>
