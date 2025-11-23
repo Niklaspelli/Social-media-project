@@ -45,9 +45,9 @@ export default LikeButton;
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
-import { useLikeCount } from "../../queryHooks/likes/useLikeCount";
-import { useLikeResponse } from "../../queryHooks/likes/useLikeResponse";
-import { useUnlikeResponse } from "../../queryHooks/likes/useUnlikeResponse";
+import { useLikeCount } from "../../../queryHooks/likes/useLikeCount";
+import { useLikeResponse } from "../../../queryHooks/likes/useLikeResponse";
+import { useUnlikeResponse } from "../../../queryHooks/likes/useUnlikeResponse";
 
 function LikeButton({ responseId }) {
   const [error, setError] = useState(null);
@@ -82,9 +82,11 @@ function LikeButton({ responseId }) {
       <FontAwesomeIcon
         icon={faThumbsUp}
         onClick={handleClick}
-        style={{ cursor: "pointer", color: data.liked ? "blue" : "gray" }}
+        style={{ cursor: "pointer", color: data.liked ? "green" : "white" }}
       />
-      <span style={{ marginLeft: "4px" }}>{data.likeCount} likes</span>
+      <span style={{ marginLeft: "4px", color: "white" }}>
+        {data.likeCount} likes
+      </span>
       {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );

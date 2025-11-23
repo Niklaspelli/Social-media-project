@@ -9,10 +9,12 @@ const postResponse = async ({ threadId, responseText, accessToken }) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${accessToken}`, // <-- måste vara kvar
     },
-    credentials: "include",
-    body: JSON.stringify({ body: responseText }),
+    body: JSON.stringify({
+      thread_id: threadId, // <-- LÄGG TILL DETTA
+      body: responseText,
+    }),
   });
 };
 

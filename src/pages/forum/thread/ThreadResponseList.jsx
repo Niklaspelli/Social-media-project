@@ -1,22 +1,24 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../../context/AuthContext";
 import { useQueryClient } from "@tanstack/react-query";
+import useDeleteResponse from "../../../queryHooks/threads/useDeleteResponse";
+import DeleteButton from "../../../components/DeleteButton";
 import LikeButton from "./LikeButton";
-import useDeleteResponse from "../../queryHooks/threads/useDeleteResponse";
-import DeleteButton from "../DeleteButton";
+import useThreadDetail from "../../../queryHooks/threads/useThreadDetail";
+import "../forum-styling.css";
 
-const ThreadResponseList = ({ responses = [] }) => {
-  const { threadId } = useParams();
+export default function ThreadResponseList({ responses = [], threadId }) {
   const { authData } = useAuth();
   const { userId } = authData;
-
   const queryClient = useQueryClient();
-  const { mutateAsync: deleteResponse, isLoading: deleteLoading } =
-    useDeleteResponse();
+  const { mutateAsync: deleteResponse } = useDeleteResponse();
   const [deleteErrors, setDeleteErrors] = useState({});
 
-  if (!responses.length) return <p>No responses yet.</p>;
+  // Hämta tråd + responses
+  const { data, isLoading, error } = useThreadDetail(threadId);
+
+  if (isLoading) return <p>Loading responses...</p>;
+  if (error) return <p style={{ color: "red" }}>{error.message}</p>;
 
   const handleDelete = async (responseId) => {
     try {
@@ -32,24 +34,19 @@ const ThreadResponseList = ({ responses = [] }) => {
   };
 
   return (
-    <>
+    <div className="thread-response-list">
       {responses.map((res) => (
-        <div key={res.id} style={responseCard}>
+        <div key={res.id} className="response-card">
           <img
             src={res.avatar || "/default-avatar.jpg"}
             alt="avatar"
-            style={avatarStyle}
+            className="response-avatar"
           />
-          <div style={{ flex: 1 }}>
-            <Link to={`/user/${res.user_id}`}>
-              <strong>{res.username}</strong>
-            </Link>
-            <p>wrote:</p>
+          <div className="response-content">
+            <strong>{res.username}</strong>
             <p>{res.body}</p>
-            <small style={{ color: "#999" }}>
-              {new Date(res.created_at).toLocaleString()}
-            </small>
-            <div style={{ marginTop: "5px", display: "flex", gap: "10px" }}>
+            <small>{new Date(res.created_at).toLocaleString()}</small>
+            <div className="response-actions">
               {res.user_id === userId && (
                 <DeleteButton onDelete={() => handleDelete(res.id)} />
               )}
@@ -66,24 +63,6 @@ const ThreadResponseList = ({ responses = [] }) => {
           </div>
         </div>
       ))}
-    </>
+    </div>
   );
-};
-
-export default ThreadResponseList;
-
-// --- Styles ---
-const avatarStyle = {
-  width: 50,
-  height: 50,
-  borderRadius: "50%",
-  marginRight: "10px",
-};
-const responseCard = {
-  display: "flex",
-  alignItems: "flex-start",
-  padding: "15px",
-  borderRadius: "10px",
-  background: "rgba(50,50,50,0.7)",
-  marginBottom: "15px",
-};
+}

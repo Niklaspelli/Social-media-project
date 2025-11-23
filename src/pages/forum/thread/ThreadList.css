@@ -1,0 +1,97 @@
+.thread-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem;
+}
+
+.thread-item {
+    background: #1e1e2f;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.thread-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.thread-title {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    color: #fff;
+}
+
+.thread-link {
+    color: #7dd3fc;
+    /* ljusblå */
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.thread-link:hover {
+    color: #38bdf8;
+    text-decoration: underline;
+}
+
+.thread-body {
+    color: #ccc;
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+.thread-item p {
+    margin: 0.2rem 0;
+}
+
+.sort-button,
+.pagination-button {
+    background: #2563eb;
+    /* blå knapp */
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.sort-button:hover,
+.pagination-button:hover {
+    background: #1e40af;
+}
+
+.sort-button:disabled,
+.pagination-button:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+}
+
+.pagination-controls {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Responsive styles */
+@media (max-width: 600px) {
+    .thread-item {
+        padding: 15px;
+        /* Adjust padding for smaller screens */
+    }
+
+    .thread-title {
+        font-size: 1.2em;
+        /* Decrease font size on smaller screens */
+    }
+}
+
+@media (max-width: 400px) {
+    .thread-title {
+        font-size: 1em;
+        /* Further decrease font size */
+    }
+}

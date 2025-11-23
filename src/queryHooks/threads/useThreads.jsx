@@ -1,51 +1,48 @@
-/* import { useQuery } from "@tanstack/react-query";
-
-const fetchThreads = async () => {
-  const response = await fetch("http://localhost:5000/api/auth/threads", {
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch threads");
-  }
-
-  return await response.json();
-};
-
-const useThreads = () => {
-  return useQuery({
-    queryKey: ["threads"],
-    queryFn: fetchThreads,
-    staleTime: 1000 * 60, // 1 minut: data anses fräsch
-    cacheTime: 1000 * 60 * 5, // 5 minuter: sparas i cache även om komponenten unmountas
-    retry: 1, // försök bara en gång till vid fel (eller sätt false)
-  });
-};
-
-export default useThreads; */
-
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "../../api/api";
 
-const fetchThreads = async (
+// Fetch-funktion
+const fetchThreads = async ({
   page = 1,
   limit = 10,
   sort = "desc",
-  subjectId = null
-) => {
+  subjectId = null,
+}) => {
   let endpoint = `/forum/threads?page=${page}&limit=${limit}&sort=${sort}`;
   if (subjectId) endpoint += `&subject_id=${subjectId}`;
-  return apiFetch(endpoint); // CSRF + retry + errors
+  return apiFetch(endpoint); // CSRF + retry hanteras i apiFetch
 };
 
-const useThreads = (page, limit, sort, subjectId) =>
-  useQuery({
-    queryKey: ["threads", page, limit, sort, subjectId],
-    queryFn: () => fetchThreads(page, limit, sort, subjectId),
-    keepPreviousData: true,
-    staleTime: 1000 * 60, // 1 min
-    retry: 1,
+// Hook
+const useThreads = ({
+  page = 1,
+  limit = 10,
+  sort = "desc",
+  subjectId = null,
+  shared = false,
+}) => {
+  /*
+    shared: om true → cache delas för alla komponenter med samma subjectId (t.ex. "sidebar senaste trådar")
+            om false → cache per page/sort/limit
+  */
+
+  // Bygg queryKey
+  const queryKey = shared
+    ? ["threads", subjectId] // Delad cache
+    : ["threads", subjectId, page, limit, sort]; // Unik cache per query
+
+  return useQuery({
+    queryKey,
+    queryFn: () => fetchThreads({ page, limit, sort, subjectId }),
+    keepPreviousData: true, // Smooth pagination
+    staleTime: 5 * 60 * 1000, // 5 min innan data anses stale
+    cacheTime: 10 * 60 * 1000, // Cache hålls 10 min
+    retry: 1, // Max 1 retry
     refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchInterval: false,
+    placeholderData: (prev) => prev, // Visar gammal data medan ny fetch sker
   });
+};
 
 export default useThreads;

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { ListGroup, Badge, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import useGetActivity from "../queryHooks/activity/useGetActivity";
+import useGetActivity from "../../queryHooks/activity/useGetActivity";
 
-export default function ActivityFeed() {
+export default function ActivityFeed({ onSelectThread }) {
   const navigate = useNavigate();
   const { data, isLoading, error } = useGetActivity();
   const [visibleCount, setVisibleCount] = useState(5); // visa 5 först
@@ -20,7 +20,7 @@ export default function ActivityFeed() {
   };
 
   const handleNavigateToThread = (threadId) => {
-    navigate(`/threads/${threadId}`);
+    onSelectThread(threadId);
   };
 
   return (
@@ -31,7 +31,7 @@ export default function ActivityFeed() {
           <ListGroup.Item
             key={`${item.type}-${item.thread_id}-${item.timestamp}`}
             action
-            onClick={() => handleNavigateToThread(item.thread_id)}
+            onClick={() => onSelectThread(item.thread_id)}
             className="d-flex justify-content-between align-items-center"
           >
             <div>

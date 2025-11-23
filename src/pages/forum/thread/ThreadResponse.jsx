@@ -1,16 +1,17 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import usePostResponse from "../../queryHooks/threads/usePostResponse";
-import SuccessDialog from "../SuccessDialog";
+import usePostResponse from "../../../queryHooks/threads/usePostResponse";
+import SuccessDialog from "../../../components/SuccessDialog";
+import "../forum-styling.css";
 
-function ThreadResponse() {
-  const { threadId } = useParams();
-
+function ThreadResponse({ threadId }) {
   const queryClient = useQueryClient();
   const [responseText, setResponseText] = useState("");
   const [submitError, setSubmitError] = useState(null);
   const [success, setSuccess] = useState(false);
+
+  console.log("id", threadId);
 
   const {
     mutateAsync: postResponse,
@@ -18,13 +19,12 @@ function ThreadResponse() {
     error: postError,
   } = usePostResponse(threadId);
 
-  // --- Handlers ---
   const handleResponseSubmit = async (e) => {
     e.preventDefault();
     setSubmitError(null);
 
     try {
-      await postResponse({ responseText });
+      await postResponse({ threadId, responseText });
       setResponseText("");
       setSuccess(true);
       queryClient.invalidateQueries(["threadDetail", threadId]);
@@ -34,26 +34,25 @@ function ThreadResponse() {
   };
 
   return (
-    <div style={{ maxWidth: "100%", margin: "40px auto" }}>
+    <div className="thread-response-container">
       {success && (
         <SuccessDialog message="Response posted successfully!" delay={2000} />
       )}
 
-      {/* Response Form */}
-      <form onSubmit={handleResponseSubmit} style={formStyle}>
+      <form onSubmit={handleResponseSubmit} className="thread-response-form">
         <textarea
           value={responseText}
           onChange={(e) => setResponseText(e.target.value)}
           placeholder="Write your response here..."
           required
-          style={textareaStyle}
         />
-        <button type="submit" disabled={postLoading} style={submitBtnStyle}>
+        <button type="submit" disabled={postLoading}>
           {postLoading ? "Posting..." : "Post Response"}
         </button>
-        {submitError && <p style={{ color: "red" }}>{submitError}</p>}
+
+        {submitError && <p className="error-text">{submitError}</p>}
         {postError && (
-          <p style={{ color: "red" }}>Failed to post response. Try again.</p>
+          <p className="error-text">Failed to post response. Try again.</p>
         )}
       </form>
     </div>
@@ -61,28 +60,3 @@ function ThreadResponse() {
 }
 
 export default ThreadResponse;
-
-const formStyle = {
-  display: "flex",
-  flexDirection: "column",
-  marginTop: "20px",
-};
-const textareaStyle = {
-  width: "100%",
-  height: "120px",
-  padding: "10px",
-  borderRadius: "10px",
-  border: "none",
-  marginBottom: "10px",
-  backgroundColor: "#333",
-  color: "white",
-  fontSize: "14px",
-  resize: "none",
-};
-const submitBtnStyle = {
-  padding: "10px",
-  borderRadius: "10px",
-  backgroundColor: "black",
-  color: "white",
-  cursor: "pointer",
-};

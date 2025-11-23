@@ -124,27 +124,10 @@ const HeaderNavbar = () => {
                     Your events
                   </NavDropdown.Item>
                 </NavDropdown>
-
-                <NavDropdown
-                  icon={faComments}
-                  title={
-                    <>
-                      <FontAwesomeIcon icon={faComments} className="me-1" />{" "}
-                      Forum
-                    </>
-                  }
-                  id="basic-nav-dropdown"
-                >
-                  {subjects.map((subject) => (
-                    <NavDropdown.Item
-                      key={subject.subject_id}
-                      as={Link}
-                      to={`/forum/subject/${subject.subject_id}`}
-                    >
-                      {subject.title}
-                    </NavDropdown.Item>
-                  ))}{" "}
-                </NavDropdown>
+                <Nav.Link as={Link} to={`/forum`} className="position-relative">
+                  <FontAwesomeIcon icon={faComments} className="me-1" />
+                  Forum{" "}
+                </Nav.Link>
 
                 <Button
                   variant="outline-light"

@@ -1,0 +1,209 @@
+.forum-navbar {
+    background-color: #1a1a1a;
+    /* mörk bakgrund */
+    padding: 0.5rem 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.forum-navbar .nav-link,
+.forum-navbar .nav-item {
+    color: #ffffff;
+    /* vit text */
+    margin-right: 1rem;
+    transition: color 0.3s, transform 0.2s;
+    cursor: pointer;
+}
+
+.forum-navbar .nav-link:hover,
+.forum-navbar .nav-item:hover {
+    color: #00bfff;
+    /* ljusblå hover */
+    transform: scale(1.05);
+}
+
+.forum-navbar .active {
+    font-weight: bold;
+    border-bottom: 2px solid #00bfff;
+    /* markerar aktiv sida */
+}
+
+
+
+/* CreateThread: */
+
+.create-thread-container {
+    max-width: 700px;
+    margin: 3rem auto;
+
+}
+
+.create-thread-card,
+.create-thread-card .card-body {
+    background-color: #1e1e2f !important;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+
+}
+
+.create-thread-card .form-label {
+    color: #ccc;
+    font-weight: 500;
+}
+
+.create-thread-card .form-control {
+    background-color: #2c2c3c;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 8px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+
+}
+
+.create-thread-card .form-control:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 2px rgba(56, 221, 248, 0.2);
+    background-color: #2c2c3c;
+    color: #fff;
+}
+
+.create-thread-card .btn-submit {
+    background-color: #2563eb;
+    color: white;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.create-thread-card .btn-submit:hover {
+    background-color: #1e40af;
+    transform: translateY(-1px);
+}
+
+.create-thread-card .btn-submit:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.create-thread-card .alert {
+    margin-top: 1rem;
+    border-radius: 8px;
+}
+
+
+/* threadresponseList */
+
+.response-list {
+    margin-top: 1rem;
+}
+
+.response-card {
+    display: flex;
+    align-items: flex-start;
+    padding: 15px;
+    border-radius: 12px;
+    background: rgba(50, 50, 50, 0.7);
+    margin-bottom: 15px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.response-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.response-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 15px;
+}
+
+.response-content {
+    flex: 1;
+}
+
+.response-username {
+    color: #fff;
+    text-decoration: none;
+}
+
+.response-username:hover {
+    text-decoration: underline;
+}
+
+.response-body {
+    margin: 5px 0;
+    color: #ddd;
+}
+
+.response-date {
+    font-size: 0.8em;
+    color: #999;
+}
+
+.response-actions {
+    margin-top: 5px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.error-text {
+    color: red;
+    font-size: 0.85em;
+}
+
+
+
+/* response */
+
+.thread-response-container {
+    margin-top: 20px;
+    max-width: 100%;
+}
+
+.thread-response-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.thread-response-form textarea {
+    width: 100%;
+    height: 120px;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background-color: #333;
+    color: white;
+    font-size: 14px;
+    resize: none;
+}
+
+.thread-response-form textarea:focus {
+    outline: 2px solid #555;
+}
+
+.thread-response-form button {
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    background-color: #000;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.thread-response-form button:hover:not(:disabled) {
+    background-color: #222;
+}
+
+.thread-response-form button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.error-text {
+    color: #ff6b6b;
+    font-size: 0.9em;
+}

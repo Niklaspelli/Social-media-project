@@ -28,8 +28,9 @@ const useGetFriendRequestCount = (userId, accessToken) => {
     // 🧠 Viktigt:
     staleTime: 5 * 60 * 1000, // cache i 5 minuter
     refetchInterval: false, // stäng av automatisk polling
-    refetchOnWindowFocus: false, // refetcha inte vid flikbyte
-    refetchOnReconnect: false, // refetcha inte varje reconnect
+    refetchOnWindowFocus: true, // refetcha inte vid flikbyte
+    refetchOnReconnect: true, // refetcha inte varje reconnect
+    retry: 1,
   });
 };
 
