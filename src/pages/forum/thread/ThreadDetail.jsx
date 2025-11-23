@@ -11,16 +11,15 @@ export default function ThreadDetail({ threadId }) {
   const thread = data.thread;
   const responses = data.responses || []; // <--- Viktigt!
 
-  console.log("id", threadId);
-
   return (
     <div className="thread-detail-card">
-      <p>{thread.body}</p>
-      <p>
-        <strong>Author:</strong> {thread.username}
-      </p>
-      <ThreadResponseList responses={responses} threadId={thread.id} />
-      <ThreadResponse threadId={thread.id} />
+      <div className="p-2 rounded bg-dark small">
+        <p>
+          <strong>Author:</strong> {thread.username}
+        </p>
+        <ThreadResponseList responses={responses} threadId={thread.id} />
+        <ThreadResponse threadId={thread.id} />
+      </div>
     </div>
   );
 }

@@ -58,11 +58,32 @@ export const getActivity = (req, res) => {
     LIMIT 20
   `;
 
-  db.query(sql, [userId], (err, results) => {
+  const threadCountSql = `
+ SELECT COUNT(*) AS totalThreads
+FROM threads
+WHERE user_id = ?
+  `;
+
+  // 1. Fetch activity
+  db.query(sql, [userId], (err, activityResults) => {
     if (err) {
       console.error("Failed to fetch activity:", err);
       return res.status(500).json({ error: "Failed to fetch activity" });
     }
-    res.json(results);
+
+    // 2. Fetch thread count
+    db.query(threadCountSql, [userId], (err, countResults) => {
+      if (err) {
+        return res.status(500).json({ error: "Failed to fetch thread count" });
+      }
+
+      const threadCount = countResults[0].totalThreads;
+
+      // Send final response ONCE
+      res.json({
+        threadCount,
+        activity: activityResults,
+      });
+    });
   });
 };

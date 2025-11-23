@@ -2,14 +2,10 @@ import { useAuth } from "../../context/AuthContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "../../api/api";
 
-const deleteResponse = async ({ responseId, accessToken }) => {
-  if (!accessToken) throw new Error("No access token available");
-
+const deleteResponse = async ({ responseId }) => {
   return apiFetch(`/forum/responses/${responseId}`, {
     method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
+    headers: {},
   });
 };
 

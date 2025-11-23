@@ -1,4 +1,7 @@
+import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { Button } from "react-bootstrap";
 import useThreads from "../../../queryHooks/threads/useThreads";
 import useGetSubjects from "../../../queryHooks/subjects/useGetSubjects";
 import ThreadList from "./ThreadList";
@@ -7,8 +10,7 @@ import CreateThread from "./CreateThread";
 const SubjectPage = () => {
   const { subjectId } = useParams(); // subjectId från URL
   const parsedSubjectId = parseInt(subjectId, 10);
-  console.log("subject id:", subjectId);
-  console.log("parsed subjetct id:", parsedSubjectId);
+  const [showCreate, setShowCreate] = useState(false);
 
   const { data: subjects } = useGetSubjects();
   const subject = subjects?.find((s) => s.subject_id === parsedSubjectId);
@@ -21,9 +23,24 @@ const SubjectPage = () => {
 
   return (
     <div style={{ color: "white" }}>
-      <h1>{subject.title}</h1>
-      <h4>{subject.description}</h4> <ThreadList subjectId={parsedSubjectId} />
-      <CreateThread defaultSubjectId={parsedSubjectId} />
+      <div style={{ textAlign: "center" }}>
+        <h1>{subject.title}</h1>
+        <p>{subject.description}</p>
+        <Button
+          variant="light"
+          style={{ backgroundColor: "black", color: "white" }}
+          onClick={() => setShowCreate(true)}
+        >
+          Create thread
+        </Button>
+      </div>
+      {showCreate && (
+        <CreateThread
+          defaultSubjectId={parsedSubjectId}
+          onClose={() => setShowCreate(false)}
+        />
+      )}
+      <ThreadList subjectId={parsedSubjectId} />
     </div>
   );
 };

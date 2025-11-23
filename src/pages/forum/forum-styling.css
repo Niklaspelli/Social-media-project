@@ -1,8 +1,6 @@
 .forum-navbar {
-    background-color: #1a1a1a;
     /* mörk bakgrund */
     padding: 0.5rem 1rem;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .forum-navbar .nav-link,

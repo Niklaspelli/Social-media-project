@@ -70,7 +70,9 @@ function ThreadList({ subjectId }) {
           </small>
 
           {selectedThreadId === thread.id && (
-            <ThreadDetail threadId={thread.id} />
+            <div onClick={(e) => e.stopPropagation()}>
+              <ThreadDetail threadId={thread.id} />
+            </div>
           )}
         </div>
       ))}

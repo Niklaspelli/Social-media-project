@@ -25,16 +25,22 @@ const ForumLandingPage = () => {
 
   return (
     <Container fluid>
-      <ForumNavbar subjects={subjects} />
+      {/* NAVBAR – centrerad i egen rad */}
+      <Row className="my-3">
+        <Col className="d-flex justify-content-center">
+          <ForumNavbar subjects={subjects} />
+        </Col>
+      </Row>
 
-      <Row>
-        {/* Vänster: ActivityFeed */}
-        <Col lg={3} md={12}>
+      {/* MAIN LAYOUT – ActivityFeed + ThreadDetail bredvid varandra */}
+      <Row className="align-items-start">
+        {/* Left: ActivityFeed */}
+        <Col lg={2} md={6} sm={12}>
           <ActivityFeed onSelectThread={setSelectedThreadId} />
         </Col>
 
-        {/* Höger: Navbar + SubjectPage via Outlet */}
-        <Col lg={9} md={12}>
+        {/* Right: Main content + Thread detail */}
+        <Col lg={8} md={6} sm={12}>
           <Outlet />
           {selectedThreadId && <ThreadDetail threadId={selectedThreadId} />}
         </Col>

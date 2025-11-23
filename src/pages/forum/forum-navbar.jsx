@@ -15,11 +15,9 @@ const ForumNavbar = ({ subjects }) => {
 
   return (
     <>
-      <Navbar expand="lg" sticky="top" className="forum-navbar">
+      <Navbar expand="lg" className="forum-navbar">
         <Nav>
-          <Nav.Item>
-            <FontAwesomeIcon icon={faComments} className="me-2" />
-          </Nav.Item>
+          <Nav.Item></Nav.Item>
           {subjects.map((subject) => (
             <Nav.Item
               key={subject.subject_id}

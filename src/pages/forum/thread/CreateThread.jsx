@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Form, Button, Card, Container, Alert, Spinner } from "react-bootstrap";
+import CloseButton from "react-bootstrap/CloseButton";
 import { useAuth } from "../../../context/AuthContext"; // Make sure the path is correct
 import SuccessDialog from "../../../components/SuccessDialog";
 import useCreateThread from "../../../queryHooks/threads/useCreateThread"; // Import your custom hook
 import "../forum-styling.css";
 
-const CreateThread = ({ defaultSubjectId }) => {
+const CreateThread = ({ defaultSubjectId, onClose }) => {
   const { authData } = useAuth();
   const { username, accessToken } = authData;
   const [title, setTitle] = useState("");
@@ -49,6 +50,7 @@ const CreateThread = ({ defaultSubjectId }) => {
       <h3 className="text-center text-white mb-4">Create New Thread</h3>
 
       <Card className="create-thread-card">
+        <CloseButton variant="white" aria-label="Hide" onClick={onClose} />
         <Card.Body>
           <Form onSubmit={handleSubmit}>
             <Form.Group controlId="threadTitle" className="mb-3">

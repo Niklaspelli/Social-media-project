@@ -58,7 +58,11 @@ const HeaderNavbar = () => {
               <>
                 {currentUser && (
                   <Nav.Item className="d-flex align-items-center ms-3 m-3">
-                    <span className="welcome">Welcome, {currentUser}</span>
+                    <Navbar.Text className="text-white">
+                      Signed in as:{" "}
+                      <span className="welcome"> {currentUser}</span>
+                    </Navbar.Text>
+
                     {NavbarAvatar && (
                       <Image
                         src={NavbarAvatar}
