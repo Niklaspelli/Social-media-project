@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom"; //
 import { Container, Spinner, Image, Accordion, Card } from "react-bootstrap";
 import useEventDetails from "../../queryHooks/events/useEventDetails";
 import useEventInvitees from "../../queryHooks/events/useEventInvitees";
+import { useEventOverview } from "../../queryHooks/events/useEventOverview";
 import useDeleteEvent from "../../queryHooks/events/useDeleteEvent";
 import "./event-styling.css";
 import EventFeedPostForm from "./event-feed/event-feed-post-form";
@@ -19,15 +20,17 @@ function EventDetails() {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const { userId: loggedInUserId, accessToken } = authData; // Inloggad användares ID
+  const { data, isLoading, isError } = useEventOverview({
+    eventId: Number(eventId),
+    feedLimit: 10,
+    feedOffset: 0,
+  });
 
-  // Hämta eventdetaljer och invitees
-  const {
-    data: event,
-    isLoading,
-    isError,
-    error,
-  } = useEventDetails(eventId, accessToken);
-  const { data: invitees = [] } = useEventInvitees(eventId, accessToken);
+  const event = data?.event;
+  const invitees = data?.invitees || [];
+  const feedPosts = data?.feed?.posts || [];
+
+  console.log("event overview", data);
 
   // Hook för att radera event
   const { mutate: deleteEvent, isLoading: isDeleting } = useDeleteEvent();
@@ -47,7 +50,7 @@ function EventDetails() {
   if (isError)
     return (
       <Container className="text-center mt-5">
-        <p>Error: {error?.message || "Something went wrong."}</p>
+        <p>Error: {isError?.message || "Something went wrong."}</p>
       </Container>
     );
 

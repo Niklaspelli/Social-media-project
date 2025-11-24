@@ -21,7 +21,7 @@ const router = express.Router();
 /* NY EVENT ROUTE
  */
 
-router.get("/events/overview", authenticateJWT, getEventOverview);
+router.get("/:eventId/overview", authenticateJWT, getEventOverview);
 
 //events
 router.post("/events", authenticateJWT, verifyCsrfToken, createEvent); // Protected
