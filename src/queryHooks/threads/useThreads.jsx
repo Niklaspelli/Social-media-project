@@ -37,9 +37,9 @@ const useThreads = ({
     keepPreviousData: true, // Smooth pagination
     staleTime: 5 * 60 * 1000, // 5 min innan data anses stale
     cacheTime: 10 * 60 * 1000, // Cache hålls 10 min
-    retry: 1, // Max 1 retry
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
+    retry: 0, // ingen retry
+    refetchOnWindowFocus: false, // ingen refetch vid flikbyte
+    refetchOnReconnect: false, // ingen refetch vid reconnect
     refetchInterval: false,
     placeholderData: (prev) => prev, // Visar gammal data medan ny fetch sker
   });

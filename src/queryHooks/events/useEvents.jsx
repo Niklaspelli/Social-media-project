@@ -20,7 +20,13 @@ const useEvents = (accessToken) => {
     queryKey: ["events"],
     queryFn: fetchEvents,
     enabled: !!accessToken, // kör bara om token finns
-    staleTime: 1000 * 60 * 5,
+    keepPreviousData: true,
+    staleTime: 5 * 60 * 1000, // 5 min
+    cacheTime: 10 * 60 * 1000, // 10 min
+    retry: 0, // Ingen retry
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchInterval: false,
   });
 };
 

@@ -60,7 +60,7 @@ export const useCurrentUserProfile = () => {
       }),
     enabled: !!accessToken && !!userId, // ✅ Kör endast när CSRF-token är redo
     staleTime: 5 * 60 * 1000,
-    retry: 3,
+    retry: 0,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 3000),
     refetchOnWindowFocus: false,
   });

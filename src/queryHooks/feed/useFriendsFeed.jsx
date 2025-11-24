@@ -24,7 +24,10 @@ export default function useFriendsFeed(accessToken) {
     queryFn: () => fetchFriendsFeed(accessToken),
     enabled: !!accessToken,
     staleTime: 60000,
-    refetchOnWindowFocus: false,
+    retry: 0, // ingen retry
+    refetchOnWindowFocus: false, // ingen refetch vid flikbyte
+    refetchOnReconnect: false, // ingen refetch vid reconnect
+    refetchInterval: false,
     onSuccess: () => {
       console.log("✅ Friends feed fetched via React Query hook");
     },

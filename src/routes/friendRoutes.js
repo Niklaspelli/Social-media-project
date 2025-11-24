@@ -12,6 +12,8 @@ import {
   getFriendCount,
   unfollowFriend,
   updateLastSeen,
+  getMutualFriends,
+  getPeopleYouMayKnow,
 } from "../controllers/friendController.js";
 
 const router = express.Router();
@@ -44,5 +46,12 @@ router.get(
   authenticateJWT,
   getIncomingFriendRequestCount
 );
+router.get(
+  "/mutual-friends/:userId1/:userId2",
+  authenticateJWT,
+  getMutualFriends
+);
+
+router.get("/people-you-may-know", authenticateJWT, getPeopleYouMayKnow);
 
 export default router;

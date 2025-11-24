@@ -5,9 +5,11 @@ const useEventInvitationCount = () => {
   return useQuery({
     queryKey: ["eventInvitationCount"],
     queryFn: () => apiFetch("/events/invitations/count"), // ✅ hanterar token, CSRF, retries
-    staleTime: 1000 * 60 * 2, // cache i 2 minuter
-    refetchOnWindowFocus: false, // hindrar spam vid tab-switch
-    refetchOnReconnect: false,
+    staleTime: 5 * 60 * 1000, // 5 min
+    cacheTime: 10 * 60 * 1000, // 10 min
+    retry: 0,
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
   });
 };
 

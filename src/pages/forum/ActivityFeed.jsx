@@ -10,8 +10,6 @@ export default function ActivityFeed({ onSelectThread }) {
   const { data, isLoading, error } = useGetActivity();
   const [visibleCount, setVisibleCount] = useState(5); // visa 5 först
 
-  console.log("antal trådar användaren skapat", data.threadCount); // antal trådar användaren skapat
-  console.log(data.activity); // själva activity-feed
   if (isLoading) return <p>Laddar...</p>;
   if (error) return <p>Något gick fel...</p>;
 

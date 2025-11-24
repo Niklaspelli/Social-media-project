@@ -11,9 +11,14 @@ import {
   unlikeResponse,
   getLikeCountForResponse,
   getSubjects,
+  getForumOverview,
 } from "../controllers/forumController.js";
 
 const router = express.Router();
+
+/* Ny endpoint för trådar och svar etc */
+
+router.get("/threads/overview", authenticateJWT, getForumOverview);
 
 router.get("/threads", getAllThreads); // Public
 router.get("/threads/:threadId", getThreadWithResponses); // Public

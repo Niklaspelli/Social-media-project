@@ -10,8 +10,10 @@ const useGetSubjects = () =>
     queryKey: ["subjects"],
     queryFn: fetchSubjects,
     staleTime: 10 * 60 * 1000, // 10 min
-    refetchOnWindowFocus: false,
-    retry: 1, // max 1 retry
+    retry: 0, // ingen retry
+    refetchOnWindowFocus: false, // ingen refetch vid flikbyte
+    refetchOnReconnect: false, // ingen refetch vid reconnect
+    refetchInterval: false,
   });
 
 export default useGetSubjects;

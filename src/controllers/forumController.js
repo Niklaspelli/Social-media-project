@@ -354,3 +354,68 @@ export const getSubjects = (req, res) => {
     res.status(200).json(results);
   });
 };
+
+export const getForumOverview = (req, res) => {
+  const { page = 1, limit = 10, sort = "desc" } = req.query;
+  const offset = (page - 1) * limit;
+
+  // 1️⃣ Hämta alla subjects
+  const subjectsQuery = "SELECT * FROM subjects";
+
+  db.query(subjectsQuery, (err, subjects) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    // 2️⃣ Hämta threads med pagination
+    const threadsQuery = `
+      SELECT * FROM threads
+      ORDER BY created_at ${sort}
+      LIMIT ? OFFSET ?
+    `;
+
+    db.query(
+      threadsQuery,
+      [parseInt(limit), parseInt(offset)],
+      (err, threads) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        if (threads.length === 0) return res.json({ subjects, threads: [] });
+
+        // 3️⃣ Hämta responses + like counts för dessa threads
+        const threadIds = threads.map((t) => t.id);
+        const responsesQuery = `
+        SELECT r.*, u.username, u.avatar,
+          (SELECT COUNT(*) FROM response_likes rl WHERE rl.response_id = r.id) AS likeCount
+        FROM responses r
+        JOIN users u ON r.user_id = u.id
+        WHERE r.thread_id IN (?)
+        ORDER BY r.created_at ASC
+      `;
+
+        db.query(responsesQuery, [threadIds], (err, responses) => {
+          if (err) return res.status(500).json({ error: err.message });
+
+          // Gruppera responses per thread
+          const responsesPerThread = {};
+          responses.forEach((r) => {
+            if (!responsesPerThread[r.thread_id])
+              responsesPerThread[r.thread_id] = [];
+            responsesPerThread[r.thread_id].push(r);
+          });
+
+          // Lägg till responses i varje thread
+          const threadsWithResponses = threads.map((t) => ({
+            ...t,
+            responses: responsesPerThread[t.id] || [],
+          }));
+
+          res.json({
+            subjects,
+            threads: threadsWithResponses,
+            page: parseInt(page),
+            limit: parseInt(limit),
+          });
+        });
+      }
+    );
+  });
+};

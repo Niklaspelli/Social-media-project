@@ -1,18 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "../../api/api";
-import { useAuth } from "../../context/AuthContext";
 
 export const useLikeCount = ({ responseId }) => {
-  const { authData } = useAuth();
-  const accessToken = authData?.accessToken;
-
   return useQuery({
     queryKey: ["likeCount", responseId],
     queryFn: async () => {
-      if (!accessToken) throw new Error("Access token missing");
-      return apiFetch(`/forum/responses/${responseId}/like`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
+      return apiFetch(`/forum/responses/${responseId}/likes`); // ✅ korrekt endpoint
     },
+    staleTime: 5 * 60 * 1000, // cache 5 min
+    retry: 0, // ingen retry
+    refetchOnWindowFocus: false, // ingen refetch vid flikbyte
+    refetchOnReconnect: false, // ingen refetch vid reconnect
+    refetchInterval: false,
   });
 };

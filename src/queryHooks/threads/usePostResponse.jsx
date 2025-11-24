@@ -17,6 +17,7 @@ export default function usePostResponse(threadId) {
 
   return useMutation({
     mutationFn: ({ responseText }) => postResponse({ threadId, responseText }),
+    retry: 0,
     onSuccess: () => {
       queryClient.invalidateQueries(["threadDetail", threadId]);
       console.log("✅ Response posted successfully");

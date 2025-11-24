@@ -19,7 +19,7 @@ function Notifications() {
     incomingFriendRequests.length > 0 || incomingEventInvitations.length > 0;
 
   return (
-    <Container className="mt-4">
+    <Container className="mt-4 text-white text-center">
       <h1>Notifications</h1>
 
       {!hasNotifications && <p>No notifications!</p>}

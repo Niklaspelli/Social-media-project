@@ -25,6 +25,10 @@ const useReceivedRequests = (token) => {
     queryFn: () => fetchReceivedRequests(token),
     enabled: !!token,
     staleTime: 1000 * 60 * 1, // cache i 1 min
+    retry: 0, // ingen retry
+    refetchOnWindowFocus: false, // ingen refetch vid flikbyte
+    refetchOnReconnect: false, // ingen refetch vid reconnect
+    refetchInterval: false,
   });
 };
 

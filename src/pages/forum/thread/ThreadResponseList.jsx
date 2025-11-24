@@ -4,7 +4,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import useDeleteResponse from "../../../queryHooks/threads/useDeleteResponse";
 import DeleteButton from "../../../components/DeleteButton";
 import LikeButton from "./LikeButton";
-import useThreadDetail from "../../../queryHooks/threads/useThreadDetail";
 import "../forum-styling.css";
 
 export default function ThreadResponseList({ responses = [], threadId }) {
@@ -13,12 +12,6 @@ export default function ThreadResponseList({ responses = [], threadId }) {
   const queryClient = useQueryClient();
   const { mutateAsync: deleteResponse } = useDeleteResponse();
   const [deleteErrors, setDeleteErrors] = useState({});
-
-  // Hämta tråd + responses
-  const { data, isLoading, error } = useThreadDetail(threadId);
-
-  if (isLoading) return <p>Loading responses...</p>;
-  if (error) return <p style={{ color: "red" }}>{error.message}</p>;
 
   const handleDelete = async (responseId) => {
     try {

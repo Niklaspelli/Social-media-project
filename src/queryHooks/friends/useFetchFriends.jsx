@@ -21,6 +21,10 @@ const useFriends = (loggedInUserId, token) => {
     queryFn: fetchFriends,
     enabled: !!token && !!loggedInUserId,
     staleTime: 1000 * 60 * 5, // 5 min
+    retry: 0, // ingen retry
+    refetchOnWindowFocus: false, // ingen refetch vid flikbyte
+    refetchOnReconnect: false, // ingen refetch vid reconnect
+    refetchInterval: false,
   });
 };
 

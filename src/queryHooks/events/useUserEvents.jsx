@@ -14,5 +14,9 @@ export const useUserEvents = () => {
     queryKey: ["userEvents"],
     queryFn: fetchUserEvents,
     enabled: !!token,
+    retry: 0, // ingen retry
+    refetchOnWindowFocus: false, // ingen refetch vid flikbyte
+    refetchOnReconnect: false, // ingen refetch vid reconnect
+    refetchInterval: false,
   });
 };

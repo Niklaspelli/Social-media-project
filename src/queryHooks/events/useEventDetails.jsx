@@ -16,6 +16,10 @@ const useEventDetails = (id, token) => {
     queryFn: () => fetchEventDetails(id, token),
     enabled: !!id && !!token,
     staleTime: 1000 * 60 * 2, // cache 2 min
+    retry: 0, // ingen retry
+    refetchOnWindowFocus: false, // ingen refetch vid flikbyte
+    refetchOnReconnect: false, // ingen refetch vid reconnect
+    refetchInterval: false,
   });
 };
 

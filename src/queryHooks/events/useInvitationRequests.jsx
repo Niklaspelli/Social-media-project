@@ -22,7 +22,10 @@ const useInvitationRequests = (token) => {
     queryFn: () => fetchInvitationRequests(token),
     enabled: !!token,
     staleTime: 1000 * 60 * 1, // cache i 1 min
-    refetchOnWindowFocus: true,
+    retry: 0, // ingen retry
+    refetchOnWindowFocus: false, // ingen refetch vid flikbyte
+    refetchOnReconnect: false, // ingen refetch vid reconnect
+    refetchInterval: false,
   });
 };
 

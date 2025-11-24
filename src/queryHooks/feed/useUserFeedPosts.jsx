@@ -22,6 +22,9 @@ export default function useUserFeedPosts(userId, accessToken) {
     queryFn: () => fetchUserFeedPosts({ userId, accessToken }),
     enabled: !!userId && !!accessToken,
     staleTime: 60000, // rekommenderat: cachea i 60 sek
-    refetchOnWindowFocus: false,
+    retry: 0, // ingen retry
+    refetchOnWindowFocus: false, // ingen refetch vid flikbyte
+    refetchOnReconnect: false, // ingen refetch vid reconnect
+    refetchInterval: false,
   });
 }

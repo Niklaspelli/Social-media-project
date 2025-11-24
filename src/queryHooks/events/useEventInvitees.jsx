@@ -23,6 +23,10 @@ const useEventInvitees = (eventId, token) => {
     queryFn: () => fetchEventInvitees(eventId, token),
     enabled: !!eventId && !!token,
     staleTime: 1000 * 60 * 2, // cache 2 min
+    retry: 0, // ingen retry
+    refetchOnWindowFocus: false, // ingen refetch vid flikbyte
+    refetchOnReconnect: false, // ingen refetch vid reconnect
+    refetchInterval: false,
   });
 };
 

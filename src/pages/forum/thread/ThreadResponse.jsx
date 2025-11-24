@@ -11,8 +11,6 @@ function ThreadResponse({ threadId }) {
   const [submitError, setSubmitError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  console.log("id", threadId);
-
   const {
     mutateAsync: postResponse,
     isLoading: postLoading,

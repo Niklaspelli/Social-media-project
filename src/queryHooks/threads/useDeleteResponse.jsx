@@ -16,6 +16,7 @@ export default function useDeleteResponse(threadId) {
 
   return useMutation({
     mutationFn: ({ responseId }) => deleteResponse({ responseId, accessToken }),
+    retry: 0,
     onSuccess: () => {
       queryClient.invalidateQueries(["threadDetail", threadId]);
       console.log("✅ Response deleted successfully");

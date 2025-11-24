@@ -320,3 +320,102 @@ export const unfollowFriend = (req, res) => {
       .json({ message: "Friendship removed successfully." });
   });
 };
+
+export const getMutualFriends = (req, res) => {
+  const { userId1, userId2 } = req.params;
+
+  if (!userId1 || !userId2) {
+    return res
+      .status(400)
+      .json({ error: "Both userId1 and userId2 are required." });
+  }
+
+  const sql = `
+    SELECT u.id, u.username, u.avatar
+    FROM users u
+    JOIN friend_requests fr1 
+      ON (
+        (fr1.sender_id = u.id AND fr1.receiver_id = ?) OR
+        (fr1.receiver_id = u.id AND fr1.sender_id = ?)
+      )
+      AND fr1.status = 'accepted'
+    JOIN friend_requests fr2
+      ON (
+        (fr2.sender_id = u.id AND fr2.receiver_id = ?) OR
+        (fr2.receiver_id = u.id AND fr2.sender_id = ?)
+      )
+      AND fr2.status = 'accepted'
+  `;
+
+  db.query(sql, [userId1, userId1, userId2, userId2], (err, results) => {
+    if (err) {
+      console.error("Error fetching mutual friends:", err.message);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    res.status(200).json(results);
+  });
+};
+
+export const getPeopleYouMayKnow = (req, res) => {
+  const loggedInUserId = req.user.id;
+
+  const sql = `
+    SELECT 
+      u.id,
+      u.username,
+      u.avatar,
+      COUNT(*) AS mutualCount
+    FROM friend_requests fr1
+    JOIN friend_requests fr2
+      ON (
+        (fr1.sender_id = ? AND fr1.receiver_id = fr2.receiver_id) OR
+        (fr1.sender_id = ? AND fr1.receiver_id = fr2.sender_id) OR
+        (fr1.receiver_id = ? AND fr1.sender_id = fr2.receiver_id) OR
+        (fr1.receiver_id = ? AND fr1.sender_id = fr2.sender_id)
+      )
+      AND fr1.status = 'accepted'
+      AND fr2.status = 'accepted'
+    JOIN users u ON (
+        u.id = fr2.sender_id OR u.id = fr2.receiver_id
+    )
+    WHERE 
+      u.id != ?
+      AND u.id NOT IN (
+        SELECT 
+          CASE 
+            WHEN fr.sender_id = ? THEN fr.receiver_id
+            ELSE fr.sender_id
+          END
+        FROM friend_requests fr
+        WHERE 
+          (fr.sender_id = ? OR fr.receiver_id = ?) 
+          AND fr.status IN ('accepted', 'pending')
+      )
+    GROUP BY u.id
+    HAVING mutualCount > 0
+    LIMIT 12;
+  `;
+
+  db.query(
+    sql,
+    [
+      loggedInUserId,
+      loggedInUserId,
+      loggedInUserId,
+      loggedInUserId,
+      loggedInUserId,
+      loggedInUserId,
+      loggedInUserId,
+      loggedInUserId,
+    ],
+    (err, results) => {
+      if (err) {
+        console.error("Error fetching PYMK:", err);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+
+      res.json(results);
+    }
+  );
+};

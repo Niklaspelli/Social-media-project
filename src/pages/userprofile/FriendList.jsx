@@ -33,7 +33,7 @@ function FriendList() {
 
   return (
     <Container style={{ color: "white" }}>
-      <h2 className="mt-5">Your Friends</h2>
+      <h2 className="mt-4 text-center">Your Friends</h2>
       <Row>
         {uniqueFriends.map((friend, index) => (
           <Col

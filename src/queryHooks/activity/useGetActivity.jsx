@@ -10,10 +10,11 @@ const useGetActivity = () =>
   useQuery({
     queryKey: ["activity"],
     queryFn: fetchActivity,
-    staleTime: 60 * 1000, // 1 minut
-    refetchOnWindowFocus: true,
-    retry: 1, // max 1 retry
-    onError: (err) => console.error("Error fetching activity:", err),
+    staleTime: 2 * 60 * 1000, // 2 min
+    cacheTime: 5 * 60 * 1000, // 5 min
+    retry: 0,
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
   });
 
 export default useGetActivity;

@@ -22,6 +22,7 @@ const useCreateThread = () => {
 
   return useMutation({
     mutationFn: (newThread) => createThread({ ...newThread, username }),
+    retry: 0,
     onSuccess: (data) => {
       console.log("Thread created successfully:", data);
       queryClient.invalidateQueries(["threads"]);

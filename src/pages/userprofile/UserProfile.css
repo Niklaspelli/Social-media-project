@@ -1,5 +1,38 @@
 /* Profile.css */
 
+
+.card {
+    border-radius: 12px !important;
+}
+
+.card-title {
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+img.shadow {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Better spacing & readability */
+p,
+span,
+strong {
+    font-size: 0.95rem;
+    color: "white";
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    }
+}
+
 .profile-container {
     max-width: 800px;
     /* Set max width for larger screens */

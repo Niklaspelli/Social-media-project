@@ -27,8 +27,11 @@ export const useUserProfile = (userId) => {
     queryFn: () => fetchUserProfile(userId, accessToken),
     enabled: !!userId && !!accessToken,
     staleTime: 5 * 60 * 1000,
-    retry: 3,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 3000),
     refetchOnWindowFocus: false,
+    retry: 0, // ingen retry
+    refetchOnWindowFocus: false, // ingen refetch vid flikbyte
+    refetchOnReconnect: false, // ingen refetch vid reconnect
+    refetchInterval: false,
   });
 };

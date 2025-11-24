@@ -11,8 +11,6 @@ import "./forum-styling.css";
 const ForumNavbar = ({ subjects }) => {
   const { subjectId } = useParams();
 
-  console.log("sub id,", subjectId);
-
   return (
     <>
       <Navbar expand="lg" className="forum-navbar">

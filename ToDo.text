@@ -67,3 +67,37 @@ Undvik att göra samma fetch flera gånger i snabb följd.
 Eventuellt öka rate limit på backend (för lokal utveckling).
 
 Använd apiFetch med retry-logik (som du redan har) för automatiskt återförsök vid 429.
+
+
+
+// ---- 1. GET requests (läs-data) ----
+// Generös, eftersom användaren kan navigera runt och pollning används
+export const getLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minuter
+  max: 300,                  // max 300 requests per IP per window
+  message: "Too many requests from this IP, please try again later.",
+});
+
+// ---- 2. Mutationer (POST/PUT/DELETE) ----
+// Striktare, för att skydda mot spam
+export const mutationLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minuter
+  max: 10,                   // max 10 requests per IP per window
+  message: "Too many write requests from this IP, please try again later.",
+});
+
+
+
+
+ChatGPT sade:
+
+Här är bara förslagen på staleTime för dina hooks:
+
+// Trådar / subjects / forumlista
+staleTime: 5 * 60 * 1000, // 5 minuter
+
+// Activity feed / vänners inlägg
+staleTime: 30 * 1000, // 30 sekunder
+
+// Notiser / friend requests
+staleTime: 1 * 60 * 1000, // 1 minut

@@ -31,13 +31,27 @@ const CreateThread = ({ defaultSubjectId, onClose }) => {
       return;
     }
 
-    mutate({
-      title,
-      body,
-      username,
-      accessToken,
-      subject_id: defaultSubjectId, // 👈 ensure it's a number
-    });
+    mutate(
+      {
+        title,
+        body,
+        username,
+        accessToken,
+        subject_id: defaultSubjectId,
+      },
+      {
+        onSuccess: () => {
+          // Reset form fields
+          setTitle("");
+          setBody("");
+
+          // Visa dialog i några sekunder
+          setTimeout(() => {
+            onClose?.(); // Stänger formuläret automatiskt, valfritt
+          }, 2000);
+        },
+      }
+    );
   };
   if (isSuccess) {
     return (
