@@ -13,9 +13,15 @@ import {
   getEventInvitees,
   deleteEvent,
   updateEvent,
+  getEventOverview,
 } from "../controllers/eventController.js";
 
 const router = express.Router();
+
+/* NY EVENT ROUTE
+ */
+
+router.get("/events/overview", authenticateJWT, getEventOverview);
 
 //events
 router.post("/events", authenticateJWT, verifyCsrfToken, createEvent); // Protected

@@ -445,3 +445,89 @@ export const getEventInvitees = (req, res) => {
     res.status(200).json(results);
   });
 };
+
+/* NY ENDPOINT FÖR EVENT
+ */
+
+export const getEventOverview = (req, res) => {
+  const eventId = req.params.eventId;
+  const feedLimit = parseInt(req.query.feedLimit) || 10;
+  const feedOffset = parseInt(req.query.feedOffset) || 0;
+
+  // 1️⃣ Hämta själva eventet + creator info
+  const eventSql = `
+    SELECT 
+      e.id, e.creator_id, e.title, e.description, e.datetime, e.location, e.event_image,
+      u.username AS creator_name, u.avatar AS creator_avatar
+    FROM events e
+    JOIN users u ON e.creator_id = u.id
+    WHERE e.id = ?
+  `;
+
+  db.query(eventSql, [eventId], (err, eventResult) => {
+    if (err) {
+      console.error("Error fetching event:", err);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+
+    if (eventResult.length === 0)
+      return res.status(404).json({ error: "Event not found" });
+
+    const event = eventResult[0];
+
+    // 2️⃣ Hämta inbjudna användare
+    const inviteesSql = `
+      SELECT u.id, u.username, u.avatar, ei.status
+      FROM event_invitations ei
+      JOIN users u ON ei.invited_user_id = u.id
+      WHERE ei.event_id = ?
+    `;
+
+    db.query(inviteesSql, [eventId], (err2, inviteesResult) => {
+      if (err2) {
+        console.error("Error fetching invitees:", err2);
+        return res.status(500).json({ error: "Internal server error" });
+      }
+
+      // 3️⃣ Hämta feedPosts med pagination
+      const feedSql = `
+        SELECT em.id, em.user_id, em.content, em.created_at,
+               u.username, u.avatar
+        FROM event_messages em
+        JOIN users u ON em.user_id = u.id
+        WHERE em.event_id = ?
+        ORDER BY em.created_at DESC
+        LIMIT ? OFFSET ?
+      `;
+
+      db.query(feedSql, [eventId, feedLimit, feedOffset], (err3, feedPosts) => {
+        if (err3) {
+          console.error("Error fetching feed posts:", err3);
+          return res.status(500).json({ error: "Internal server error" });
+        }
+
+        // ✅ Totalt antal feedPosts för frontend pagination
+        const countSql = `SELECT COUNT(*) AS total FROM event_messages WHERE event_id = ?`;
+        db.query(countSql, [eventId], (err4, countResult) => {
+          if (err4) {
+            console.error("Error counting feed posts:", err4);
+            return res.status(500).json({ error: "Internal server error" });
+          }
+
+          const totalFeedPosts = countResult[0].total;
+
+          res.status(200).json({
+            event,
+            invitees: inviteesResult,
+            feed: {
+              total: totalFeedPosts,
+              limit: feedLimit,
+              offset: feedOffset,
+              posts: feedPosts,
+            },
+          });
+        });
+      });
+    });
+  });
+};
