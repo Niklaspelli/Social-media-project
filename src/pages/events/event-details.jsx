@@ -32,7 +32,6 @@ function EventDetails() {
 
   console.log("event overview", data);
 
-  // Hook för att radera event
   const { mutate: deleteEvent, isLoading: isDeleting } = useDeleteEvent();
 
   // Kontrollera om den inloggade användaren äger eventet
