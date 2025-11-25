@@ -3,7 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 import { apiFetch } from "../../api/api";
 
 const createThread = async ({ title, body, username, subject_id }) => {
-  return apiFetch("/forum/threads", {
+  return apiFetch("/threads", {
     method: "POST",
 
     body: JSON.stringify({

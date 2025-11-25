@@ -4,19 +4,21 @@ import { Container, Row, Col } from "react-bootstrap";
 import ActivityFeed from "./ActivityFeed";
 import ForumNavbar from "./forum-navbar";
 import ThreadDetail from "./thread/ThreadDetail";
-import useGetSubjects from "../../queryHooks/subjects/useGetSubjects";
+import { useForumOverview } from "../../queryHooks/threads/useForumOverview";
 import "./forum-styling.css";
 
 const ForumLandingPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { data: subjects, isLoading, error } = useGetSubjects();
   const [selectedThreadId, setSelectedThreadId] = useState(null);
 
-  if (isLoading) return <p>Loading subjects...</p>;
+  // Hämta forum overview (inklusive subjects och threads)
+  const { data, isLoading, error } = useForumOverview();
+  const { subjects, threads } = data;
+  if (isLoading) return <p>Loading forum...</p>;
   if (error) return <p style={{ color: "red" }}>{error.message}</p>;
 
-  // Navigera automatiskt till första subject **endast om vi är på /forum**
+  // Navigera automatiskt till första subject om vi är på /forum
   useEffect(() => {
     if (subjects?.length > 0 && location.pathname === "/forum") {
       navigate(`subject/${subjects[0].subject_id}`);
@@ -25,7 +27,7 @@ const ForumLandingPage = () => {
 
   return (
     <Container fluid>
-      {/* NAVBAR – centrerad i egen rad */}
+      {/* NAVBAR */}
       <Row className="my-3">
         <Col className="d-flex justify-content-center">
           <ForumNavbar subjects={subjects} />

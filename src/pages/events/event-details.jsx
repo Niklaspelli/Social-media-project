@@ -5,13 +5,13 @@ import { useNavigate } from "react-router-dom"; //
 import { Container, Spinner, Image, Accordion, Card } from "react-bootstrap";
 import useEventDetails from "../../queryHooks/events/useEventDetails";
 import useEventInvitees from "../../queryHooks/events/useEventInvitees";
-import { useEventOverview } from "../../queryHooks/events/useEventOverview";
 import useDeleteEvent from "../../queryHooks/events/useDeleteEvent";
 import "./event-styling.css";
 import EventFeedPostForm from "./event-feed/event-feed-post-form";
 import EventFeedList from "./event-feed/event-feed-list";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import DeleteButton from "../../components/DeleteButton";
+import { useEventOverview } from "../../queryHooks/events/useEventOverView";
 
 function EventDetails() {
   const { authData } = useAuth();

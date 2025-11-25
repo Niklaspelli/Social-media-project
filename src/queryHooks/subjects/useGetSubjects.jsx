@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "../../api/api";
 
 const fetchSubjects = async () => {
-  return apiFetch("/forum/subjects"); // CSRF + retry hanteras i apiFetch
+  return apiFetch("/subjects"); // CSRF + retry hanteras i apiFetch
 };
 
 const useGetSubjects = () =>
