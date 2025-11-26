@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "../../api/api";
 
 const deleteResponse = async ({ responseId }) => {
-  return apiFetch(`/forum/responses/${responseId}`, {
+  return apiFetch(`/responses/${responseId}`, {
     method: "DELETE",
     headers: {},
   });

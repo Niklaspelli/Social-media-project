@@ -3,7 +3,7 @@ import { apiFetch } from "../../api/api";
 
 const fetchThreadDetail = async (threadId) => {
   if (!threadId) throw new Error("Thread ID is required");
-  return apiFetch(`/forum/threads/${threadId}`);
+  return apiFetch(`/threads/${threadId}`);
 };
 
 const useThreadDetail = (threadId) => {

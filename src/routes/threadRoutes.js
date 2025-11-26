@@ -13,7 +13,7 @@ const router = express.Router();
 
 // Skapa ny thread (protected)
 router.post(
-  "/threads",
+  "/create-thread",
   authenticateJWT,
   verifyCsrfToken,
   createThreadController

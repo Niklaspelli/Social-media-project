@@ -14,16 +14,16 @@ const ForumLandingPage = () => {
 
   // Hämta forum overview (inklusive subjects och threads)
   const { data, isLoading, error } = useForumOverview();
-  const { subjects, threads } = data;
   if (isLoading) return <p>Loading forum...</p>;
   if (error) return <p style={{ color: "red" }}>{error.message}</p>;
+  const subjects = data?.subjects || [];
 
   // Navigera automatiskt till första subject om vi är på /forum
-  useEffect(() => {
+  /*   useEffect(() => {
     if (subjects?.length > 0 && location.pathname === "/forum") {
       navigate(`subject/${subjects[0].subject_id}`);
     }
-  }, [subjects, navigate, location.pathname]);
+  }, [subjects, navigate, location.pathname]); */
 
   return (
     <Container fluid>

@@ -31,13 +31,17 @@ import ThreadResponseList from "./ThreadResponseList";
 export default function ThreadDetail({ thread }) {
   if (!thread) return <p>Thread not found.</p>;
 
+  console.log("thread i threaddeatil", thread);
+
   const responses = thread.responses || [];
+
+  console.log("responses", thread.responses);
 
   return (
     <div className="thread-detail-card">
       <div className="p-2 rounded bg-dark small">
         <p>
-          <strong>Author:</strong> {thread.username}
+          <strong>Author:</strong> {thread.user.username}
         </p>
         <p>{thread.body}</p>
         <small className="thread-date">

@@ -13,6 +13,7 @@ export default function ThreadResponseList({ responses = [], threadId }) {
   const { mutateAsync: deleteResponse } = useDeleteResponse();
   const [deleteErrors, setDeleteErrors] = useState({});
 
+  console.log("resp:", responses);
   const handleDelete = async (responseId) => {
     try {
       await deleteResponse({ responseId });
@@ -31,16 +32,16 @@ export default function ThreadResponseList({ responses = [], threadId }) {
       {responses.map((res) => (
         <div key={res.id} className="response-card">
           <img
-            src={res.avatar || "/default-avatar.jpg"}
+            src={res.user.avatar || "/default-avatar.jpg"}
             alt="avatar"
             className="response-avatar"
           />
           <div className="response-content">
-            <strong>{res.username}</strong>
+            <strong>{res.user.username}</strong>
             <p>{res.body}</p>
             <small>{new Date(res.created_at).toLocaleString()}</small>
             <div className="response-actions">
-              {res.user_id === userId && (
+              {res.user.id === userId && (
                 <DeleteButton onDelete={() => handleDelete(res.id)} />
               )}
               <LikeButton

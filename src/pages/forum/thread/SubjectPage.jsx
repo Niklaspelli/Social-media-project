@@ -11,11 +11,11 @@ const SubjectPage = () => {
   const [showCreate, setShowCreate] = useState(false);
 
   // ✅ Använd det nya hooket
-  const { data, isLoading, error } = useForumOverview(1, 10, "desc");
+  const { data, isLoading, error } = useForumOverview({ page: 1, limit: 10 });
 
   if (isLoading) return <p>Loading threads...</p>;
   if (error) return <p style={{ color: "red" }}>{error.message}</p>;
-
+  console.log("data i sub", data);
   // ✅ Hämta ämnet från datat
   const subject = data?.subjects?.find((s) => s.subject_id === parsedSubjectId);
   if (!subject) return <p>Subject not found</p>;

@@ -162,8 +162,8 @@ function ThreadList({ subjectId }) {
         >
           <div className="thread-header">
             <img
-              src={thread.avatar || "/default-avatar.jpg"}
-              alt={`${thread.username || "User"} avatar`}
+              src={thread.user.avatar || "/default-avatar.jpg"}
+              alt={`${thread.user.username || "User"} avatar`}
               className="thread-avatar"
             />
             <h2 className="thread-title">{thread.title}</h2>

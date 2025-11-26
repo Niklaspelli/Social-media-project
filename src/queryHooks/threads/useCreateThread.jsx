@@ -1,31 +1,22 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "../../context/AuthContext";
 import { apiFetch } from "../../api/api";
 
-const createThread = async ({ title, body, username, subject_id }) => {
-  return apiFetch("/threads", {
+const createThread = async ({ title, body, subject_id }) => {
+  return apiFetch("/threads/create-thread", {
     method: "POST",
-
-    body: JSON.stringify({
-      title,
-      body,
-      author: username,
-      subject_id,
-    }),
+    body: JSON.stringify({ title, body, subject_id }),
   });
 };
 
 const useCreateThread = () => {
   const queryClient = useQueryClient();
-  const { authData } = useAuth();
-  const { username } = authData || {};
 
   return useMutation({
-    mutationFn: (newThread) => createThread({ ...newThread, username }),
+    mutationFn: createThread,
     retry: 0,
     onSuccess: (data) => {
       console.log("Thread created successfully:", data);
-      queryClient.invalidateQueries(["threads"]);
+      queryClient.invalidateQueries(["threads"]); // eller ["threads", subject_id] om du vill ha per ämne
     },
     onError: (error) => {
       console.error("Failed to create thread:", error.message);

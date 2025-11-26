@@ -2,12 +2,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "../../api/api";
 
 const postResponse = async ({ threadId, responseText }) => {
-  return apiFetch(`/forum/threads/${threadId}/responses`, {
+  return apiFetch(`/responses/${threadId}`, {
     method: "POST",
-
     body: JSON.stringify({
-      thread_id: threadId, // <-- LÄGG TILL DETTA
-      body: responseText,
+      body: responseText, // <-- matchar backend
+      thread_id: threadId, // <-- backend kan använda om du vill
     }),
   });
 };
@@ -23,7 +22,7 @@ export default function usePostResponse(threadId) {
       console.log("✅ Response posted successfully");
     },
     onError: (error) => {
-      console.error("❌ Failed to post response:", error.message);
+      console.error("❌ Failed to post response:", error?.message || error);
     },
   });
 }

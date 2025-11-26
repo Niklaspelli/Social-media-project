@@ -9,27 +9,31 @@ import {
 // --------------------------------------------------------
 export const postResponseController = async (req, res) => {
   try {
-    const thread_id = req.params.threadId;
-    const user_id = req.user?.id;
+    const threadId = req.params.threadId;
+    const userId = req.user?.id;
     const { body } = req.body;
 
-    if (!user_id) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-    if (!body || !thread_id) {
-      return res.status(400).json({ message: "Body and thread ID required" });
-    }
+    if (!userId)
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    if (!body)
+      return res
+        .status(400)
+        .json({ success: false, message: "Response body is required" });
 
-    const responseId = await createResponse({ thread_id, body, user_id });
+    const responseId = await createResponse({
+      thread_id: threadId,
+      body,
+      user_id: userId,
+    });
 
     res.status(201).json({
       success: true,
-      message: "Response posted",
-      responseId,
+      message: "Response posted successfully",
+      data: { responseId, threadId, body, userId },
     });
   } catch (err) {
     console.error("Error posting response:", err);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
@@ -38,18 +42,19 @@ export const postResponseController = async (req, res) => {
 // --------------------------------------------------------
 export const getResponsesByThreadController = async (req, res) => {
   try {
-    const thread_id = req.params.threadId;
+    const threadId = req.params.threadId;
 
-    const responses = await getResponsesByThreadId(thread_id);
+    const responses = await getResponsesByThreadId(threadId);
 
-    res.json({
+    res.status(200).json({
       success: true,
-      thread_id,
+      threadId,
+      count: responses.length,
       responses,
     });
   } catch (err) {
     console.error("Error fetching responses:", err);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
@@ -61,24 +66,26 @@ export const deleteResponseController = async (req, res) => {
     const responseId = req.params.responseId;
     const userId = req.user?.id;
 
-    if (!userId) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
+    if (!userId)
+      return res.status(401).json({ success: false, message: "Unauthorized" });
 
     const deleted = await deleteResponseById(responseId, userId);
 
     if (!deleted) {
-      return res
-        .status(404)
-        .json({ message: "Response not found or not allowed" });
+      return res.status(404).json({
+        success: false,
+        message:
+          "Response not found or you do not have permission to delete it",
+      });
     }
 
-    res.json({
+    res.status(200).json({
       success: true,
-      message: "Response deleted",
+      message: "Response deleted successfully",
+      responseId,
     });
   } catch (err) {
     console.error("Error deleting response:", err);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import usePostResponse from "../../../queryHooks/threads/usePostResponse";
 import SuccessDialog from "../../../components/SuccessDialog";
@@ -22,7 +21,7 @@ function ThreadResponse({ threadId }) {
     setSubmitError(null);
 
     try {
-      await postResponse({ threadId, responseText });
+      await postResponse({ responseText }); // <-- bara responseText
       setResponseText("");
       setSuccess(true);
       queryClient.invalidateQueries(["threadDetail", threadId]);
