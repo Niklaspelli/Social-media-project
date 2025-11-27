@@ -61,17 +61,13 @@ import { useAuth } from "../../context/AuthContext";
 
 export default function useCreateEventFeedPost() {
   const queryClient = useQueryClient();
-  const { authData } = useAuth();
-  const { accessToken } = authData || {};
 
   const mutationFn = async ({ eventId, content }) => {
-    return apiFetch(`/eventfeed/events/${eventId}/feed`, {
+    return apiFetch(`/events/${eventId}/feed`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
       },
-      credentials: "include",
       body: JSON.stringify({ content }),
     });
   };
@@ -79,7 +75,7 @@ export default function useCreateEventFeedPost() {
   return useMutation({
     mutationFn,
     onSuccess: (newPost, variables) => {
-      queryClient.invalidateQueries(["eventFeedPosts"]);
+      queryClient.invalidateQueries(["eventFeedPosts", variables.eventId]);
 
       queryClient.setQueryData(
         ["eventFeedPosts", variables.eventId],

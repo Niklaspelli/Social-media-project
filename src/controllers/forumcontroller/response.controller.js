@@ -41,23 +41,17 @@ export const postResponseController = async (req, res) => {
 // GET /responses/:threadId
 // --------------------------------------------------------
 export const getResponsesByThreadController = async (req, res) => {
+  const thread_id = req.params.threadId;
+  const user_id = req.user?.id || 0;
+
   try {
-    const threadId = req.params.threadId;
-
-    const responses = await getResponsesByThreadId(threadId);
-
-    res.status(200).json({
-      success: true,
-      threadId,
-      count: responses.length,
-      responses,
-    });
+    const responses = await getResponsesByThreadId(thread_id, user_id);
+    res.json({ success: true, thread_id, responses });
   } catch (err) {
-    console.error("Error fetching responses:", err);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    console.error(err);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
-
 // --------------------------------------------------------
 // DELETE /responses/:responseId
 // --------------------------------------------------------

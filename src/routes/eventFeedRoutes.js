@@ -1,27 +1,27 @@
 import express from "express";
 import { authenticateJWT } from "../middleware/authMiddleware.js";
 import { verifyCsrfToken } from "../middleware/csrf.js";
+
 import {
-  createEventFeedPost,
-  getEventFeedPosts,
-  deleteEventFeedPost,
-} from "../controllers/eventFeedController.js";
+  getEventFeedController,
+  createEventFeedController,
+  deleteEventFeedController,
+} from "../controllers/eventcontroller/event-feed.controller.js";
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
+router.get("/:eventId/feed", authenticateJWT, getEventFeedController);
 router.post(
-  "/events/:eventId/feed",
+  "/:eventId/feed",
   authenticateJWT,
   verifyCsrfToken,
-  createEventFeedPost
+  createEventFeedController
 );
-
-router.get("/events/:eventId/feed", authenticateJWT, getEventFeedPosts);
 router.delete(
-  "/event-feed-post/:postId",
+  "/feed/:postId",
   authenticateJWT,
   verifyCsrfToken,
-  deleteEventFeedPost
+  deleteEventFeedController
 );
 
 export default router;

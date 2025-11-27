@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button, FormControl, InputGroup } from "react-bootstrap";
 import useCreateEventFeedPost from "../../../queryHooks/event-feed/useCreateEventFeedPost";
 
-const EventFeedPostForm = ({ eventId, onPostCreated }) => {
+const EventFeedPostForm = ({ eventId }) => {
   const [content, setContent] = useState("");
   const {
     mutate: createEventPost,
@@ -15,15 +15,7 @@ const EventFeedPostForm = ({ eventId, onPostCreated }) => {
     e.preventDefault();
     if (!content.trim()) return;
 
-    createEventPost(
-      { eventId, content },
-      {
-        onSuccess: () => {
-          setContent("");
-          onPostCreated?.();
-        },
-      }
-    );
+    createEventPost({ eventId, content }, { onSuccess: () => setContent("") });
   };
 
   return (
@@ -46,7 +38,11 @@ const EventFeedPostForm = ({ eventId, onPostCreated }) => {
       >
         {isLoading ? "Posting..." : "Post"}
       </Button>
-      {isError && <p style={{ color: "red" }}>{error.message}</p>}
+      {isError && (
+        <p style={{ color: "red" }}>
+          {error?.message || "Something went wrong"}
+        </p>
+      )}
     </form>
   );
 };

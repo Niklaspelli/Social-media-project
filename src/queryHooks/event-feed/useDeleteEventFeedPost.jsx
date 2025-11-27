@@ -2,36 +2,41 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../context/AuthContext";
 import { apiFetch } from "../../api/api";
 
-const deleteEventFeedPost = async ({ postId, accessToken }) => {
-  if (!accessToken) throw new Error("No access token available");
-
-  return apiFetch(`/eventfeed/event-feed-post/${postId}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-};
-
 export default function useDeleteEventFeedPost(eventId) {
   const queryClient = useQueryClient();
   const { authData } = useAuth();
   const { accessToken } = authData || {};
 
+  const mutationFn = async ({ postId }) => {
+    return apiFetch(`/events/feed/${postId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+  };
+
   return useMutation({
-    mutationFn: ({ postId }) => deleteEventFeedPost({ postId, accessToken }),
-    onSuccess: (deletedPostId) => {
+    mutationFn,
+    onSuccess: (_, variables) => {
       console.log("🗑️ Event feed post deleted");
-      queryClient.invalidateQueries(["eventFeedPosts"]);
 
       // Uppdatera cache direkt
-      queryClient.setQueryData(["eventFeedPosts", eventId], (oldData) => {
-        if (!oldData || !Array.isArray(oldData.posts))
-          return { posts: [], total: 0 };
+      queryClient.setQueryData(["eventOverview", eventId], (oldData) => {
+        if (!oldData) return oldData;
+
+        const updatedPosts = oldData.feed.posts.filter(
+          (p) => p.id !== variables.postId
+        );
+
         return {
           ...oldData,
-          posts: oldData.posts.filter((p) => p.id !== deletedPostId),
-          total: Math.max(oldData.total - 1, 0),
+          feed: {
+            ...oldData.feed,
+            posts: updatedPosts,
+            total: Math.max(oldData.feed.total - 1, 0),
+          },
         };
       });
     },

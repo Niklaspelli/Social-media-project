@@ -10,9 +10,12 @@ import { useUserEvents } from "../../queryHooks/events/useUserEvents";
 const EventView = () => {
   const [viewMode, setViewMode] = useState("calendar"); // "calendar" eller "list"
 
-  const { data: events = [], isLoading } = useUserEvents();
+  const { data: events = [], isLoading, isError } = useUserEvents();
 
-  if (isLoading) return <p style={{ color: "white" }}>Loading events...</p>;
+  if (isLoading) return <p>Loading events...</p>;
+  if (isError) return <p>Error fetching events</p>;
+
+  console.log("events från NYA backend:", events); // alla events kopplade till användaren
 
   return (
     <Container style={{ color: "white" }}>

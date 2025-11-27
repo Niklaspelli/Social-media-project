@@ -6,7 +6,7 @@ const deleteEventApi = async ({ eventId, accessToken }) => {
   if (!accessToken) throw new Error("No access token available");
 
   // apiFetch lägger automatiskt till CSRF-token
-  const res = await apiFetch(`/events/${eventId}`, {
+  const res = await apiFetch(`/events/user/${eventId}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${accessToken}`,

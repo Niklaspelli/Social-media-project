@@ -19,7 +19,7 @@ function EventDetails() {
   const navigate = useNavigate(); // ✅ Hook för navigation
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const { userId: loggedInUserId, accessToken } = authData; // Inloggad användares ID
+  const { userId: loggedInUserId } = authData; // Inloggad användares ID
   const { data, isLoading, isError } = useEventOverview({
     eventId: Number(eventId),
     feedLimit: 10,
@@ -233,7 +233,7 @@ function EventDetails() {
       >
         <h4 className="text-white mb-3">Event Feed</h4>
         <EventFeedPostForm eventId={event.id} />
-        <EventFeedList eventId={event.id} />
+        <EventFeedList eventOverviewData={data} />
       </Card>
     </Container>
   );

@@ -1,54 +1,30 @@
 import express from "express";
 import { authenticateJWT } from "../middleware/authMiddleware.js";
 import { verifyCsrfToken } from "../middleware/csrf.js";
+
 import {
-  createEvent,
-  getAllEvents,
-  getIncomingEventInvitations,
-  getIncomingEventInvitationCount,
-  acceptEventInvitation,
-  rejectEventInvitation,
-  getEventById,
-  getUserEvents,
-  getEventInvitees,
-  deleteEvent,
-  updateEvent,
-  getEventOverview,
-} from "../controllers/eventController.js";
+  createEventController,
+  getUserEventsController,
+  getEventController,
+  updateEventController,
+  deleteEventController,
+} from "../controllers/eventcontroller/event.controller.js";
 
 const router = express.Router();
 
-/* NY EVENT ROUTE
- */
+// Skapa nytt event (protected)
+router.post("/", authenticateJWT, verifyCsrfToken, createEventController);
 
-router.get("/:eventId/overview", authenticateJWT, getEventOverview);
+// Hämta alla events för inloggad användare (protected)
+router.get("/", authenticateJWT, getUserEventsController);
 
-//events
-router.post("/events", authenticateJWT, verifyCsrfToken, createEvent); // Protected
-router.post(
-  "/invitations/accept",
-  authenticateJWT,
-  verifyCsrfToken,
-  acceptEventInvitation
-);
-router.post(
-  "/invitations/reject",
-  authenticateJWT,
-  verifyCsrfToken,
-  rejectEventInvitation
-);
-router.delete("/:id", authenticateJWT, verifyCsrfToken, deleteEvent);
+// Hämta ett specifikt event via ID (protected)
+router.get("/:id", authenticateJWT, getEventController);
 
-router.get("/events/:id", authenticateJWT, getEventById);
-router.get("/events/:id/invitees", authenticateJWT, getEventInvitees);
-router.get("/events", authenticateJWT, getAllEvents);
-router.get("/user-events", authenticateJWT, getUserEvents);
-router.get("/invitations", authenticateJWT, getIncomingEventInvitations);
-router.get(
-  "/invitations/count",
-  authenticateJWT,
-  getIncomingEventInvitationCount
-);
+// Uppdatera ett event (protected)
+router.put("/:id", authenticateJWT, verifyCsrfToken, updateEventController);
 
-router.put("/events/:id", authenticateJWT, verifyCsrfToken, updateEvent);
+// Ta bort ett event (protected)
+router.delete("/:id", authenticateJWT, verifyCsrfToken, deleteEventController);
+
 export default router;

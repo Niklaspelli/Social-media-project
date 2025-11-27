@@ -3,7 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 import { apiFetch } from "../../api/api";
 
 const fetchUserEvents = async () => {
-  return apiFetch("/events/user-events");
+  return apiFetch("/events/user");
 };
 
 export const useUserEvents = () => {

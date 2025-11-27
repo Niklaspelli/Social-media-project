@@ -9,7 +9,7 @@ const createEvent = async ({
   event_image,
   ...eventData
 }) => {
-  return apiFetch("/events/events", {
+  return apiFetch("/events/user", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "../../api/api";
 
 const updateEvent = async ({ id, ...eventData }) => {
-  return apiFetch(`/events/events/${id}`, {
+  return apiFetch(`/events/user/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

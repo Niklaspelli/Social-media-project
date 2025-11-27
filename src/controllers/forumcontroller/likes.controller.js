@@ -1,57 +1,60 @@
-import { toggleLike, getLikeCount } from "../../models/likes.model.js";
+import {
+  toggleLike,
+  getLikeCount,
+  userHasLiked,
+} from "../../models/likes.model.js";
 
-// --------------------------------------------------------
-// POST /responses/:responseId/like
 // Toggle like/unlike
-// --------------------------------------------------------
 export const toggleLikeController = async (req, res) => {
+  const user_id = req.user?.id;
+  const { responseId } = req.params;
+
+  if (!user_id) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  if (!responseId) {
+    return res.status(400).json({ error: "Missing responseId" });
+  }
+
   try {
-    const user_id = req.user?.id;
-    const response_id = req.params.responseId;
+    // Toggle like
+    const result = await toggleLike(user_id, responseId);
 
-    if (!user_id) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    if (!response_id) {
-      return res.status(400).json({ message: "Response ID required" });
-    }
-
-    const liked = await toggleLike(user_id, response_id);
-    const likeCount = await getLikeCount(response_id);
+    // Fetch updated like count
+    const likeCount = await getLikeCount(responseId);
 
     res.json({
-      success: true,
-      liked,
+      liked: result.liked,
       likeCount,
     });
   } catch (err) {
-    console.error("Error toggling like:", err);
-    res.status(500).json({ message: "Internal server error" });
+    console.error("Toggle like error:", err);
+    res.status(500).json({ error: "Failed to toggle like" });
   }
 };
 
-// --------------------------------------------------------
-// GET /responses/:responseId/like-count
-// Get total likes for a response
-// --------------------------------------------------------
+// Get total like count
 export const getLikeCountController = async (req, res) => {
+  const { responseId } = req.params;
+
+  if (!responseId) {
+    return res.status(400).json({ error: "Missing responseId" });
+  }
+
   try {
-    const response_id = req.params.responseId;
+    const likeCount = await getLikeCount(responseId);
 
-    if (!response_id) {
-      return res.status(400).json({ message: "Response ID required" });
-    }
-
-    const likeCount = await getLikeCount(response_id);
+    const user_id = req.user?.id;
+    const userLiked = user_id ? await userHasLiked(user_id, responseId) : false;
 
     res.json({
-      success: true,
-      response_id,
+      responseId,
       likeCount,
+      userLiked,
     });
   } catch (err) {
-    console.error("Error fetching like count:", err);
-    res.status(500).json({ message: "Internal server error" });
+    console.error("Like count error:", err);
+    res.status(500).json({ error: "Failed to fetch like count" });
   }
 };
