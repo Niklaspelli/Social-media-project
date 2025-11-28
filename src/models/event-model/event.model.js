@@ -25,15 +25,35 @@ export const createEvent = ({
   });
 };
 
-// Hämta alla events som skapats av en användare
-export const getUserCreatedEvents = (userId) => {
+// Hämta alla events som användaren skapat och tacka ja till.
+export const getUserEvents = (userId) => {
   const sql = `
-    SELECT * FROM events
-    WHERE creator_id = ?
-    ORDER BY datetime ASC
+    -- Events användaren har skapat
+    SELECT 
+      e.*,
+      u.username AS creator_name,
+      'creator' AS relation
+    FROM events e
+    JOIN users u ON e.creator_id = u.id
+    WHERE e.creator_id = ?
+
+    UNION ALL
+
+    -- Events användaren tackat ja till
+    SELECT 
+      e.*,
+      u.username AS creator_name,
+      'attendee' AS relation
+    FROM events e
+    JOIN event_invitations ei ON e.id = ei.event_id
+    JOIN users u ON e.creator_id = u.id
+    WHERE ei.invited_user_id = ? AND ei.status = 'accepted'
+
+    ORDER BY datetime ASC;
   `;
+
   return new Promise((resolve, reject) => {
-    db.query(sql, [userId], (err, results) => {
+    db.query(sql, [userId, userId], (err, results) => {
       if (err) return reject(err);
       resolve(results);
     });
@@ -83,6 +103,22 @@ export const deleteEvent = (eventId) => {
     db.query(sql, [eventId], (err, result) => {
       if (err) return reject(err);
       resolve(result.affectedRows);
+    });
+  });
+};
+
+export const inviteUsers = (eventId, inviteeIds, invitedBy) => {
+  const sql = `
+    INSERT INTO event_invitations (event_id, invited_user_id, status)
+    VALUES ?
+  `;
+
+  const values = inviteeIds.map((id) => [eventId, id, "pending"]);
+
+  return new Promise((resolve, reject) => {
+    db.query(sql, [values], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
     });
   });
 };

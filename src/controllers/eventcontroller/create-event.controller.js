@@ -1,15 +1,23 @@
 import {
   createEvent,
-  getUserCreatedEvents,
+  getUserEvents,
   getEventById,
   updateEvent,
   deleteEvent,
 } from "../../models/event-model/event.model.js";
+import { inviteUsers } from "../../models/event-model/event.model.js";
 
 // Skapa nytt event
 export const createEventController = async (req, res) => {
   try {
-    const { title, description, datetime, location, event_image } = req.body;
+    const {
+      title,
+      description,
+      datetime,
+      location,
+      event_image,
+      invitedUserIds,
+    } = req.body;
     const creator_id = req.user.id;
 
     if (!title || !datetime || !location) {
@@ -18,6 +26,7 @@ export const createEventController = async (req, res) => {
         .json({ error: "Title, datetime och location krävs!" });
     }
 
+    // 1️⃣ Skapa event
     const eventId = await createEvent({
       creator_id,
       title,
@@ -27,7 +36,31 @@ export const createEventController = async (req, res) => {
       event_image,
     });
 
-    res.status(201).json({ message: "Event skapades!", eventId });
+    // 2️⃣ Skapa inbjudningar om några valdes
+    if (Array.isArray(invitedUserIds) && invitedUserIds.length > 0) {
+      try {
+        await inviteUsers(eventId, invitedUserIds, creator_id);
+      } catch (invErr) {
+        console.error("Fel vid inbjudningar:", invErr);
+        return res.status(500).json({
+          error: "Event skapades men kunde inte bjuda in alla användare",
+        });
+      }
+    }
+
+    res.status(201).json({
+      message: "Event skapades!",
+      event: {
+        id: eventId,
+        title,
+        description,
+        datetime,
+        location,
+        event_image,
+        creator_id,
+        invitedUserIds: invitedUserIds || [],
+      },
+    });
   } catch (err) {
     console.error("Error creating event:", err);
     res.status(500).json({ error: "Internt serverfel vid eventskapande" });
@@ -38,7 +71,7 @@ export const createEventController = async (req, res) => {
 export const getUserEventsController = async (req, res) => {
   try {
     const userId = req.user.id;
-    const events = await getUserCreatedEvents(userId);
+    const events = await getUserEvents(userId);
     res.json(events);
   } catch (err) {
     console.error("Error fetching user events:", err);

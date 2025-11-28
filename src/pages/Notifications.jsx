@@ -15,6 +15,8 @@ function Notifications() {
   // Event invitations
   const { data: incomingEventInvitations = [] } = useInvitationRequests(token);
 
+  console.log("incoming event invitations:", incomingEventInvitations);
+
   const hasNotifications =
     incomingFriendRequests.length > 0 || incomingEventInvitations.length > 0;
 

@@ -7,7 +7,8 @@ import feedRoutes from "./feedRoutes.js";
 import eventOverviewRoutes from "./eventOverviewRoutes.js";
 import eventRoutes from "./eventRoutes.js";
 import eventFeedRoutes from "./eventFeedRoutes.js";
-
+import eventInviteesRoutes from "./eventInviteesRoutes.js";
+import eventInvitationRoutes from "./eventInvitationRoutes.js";
 import activityRoutes from "./activityRoutes.js";
 
 import threadRoutes from "./threadRoutes.js";
@@ -43,5 +44,8 @@ router.use("/activity", activityRoutes);
 
 router.use("/events", eventOverviewRoutes);
 router.use("/events/user", eventRoutes);
-router.use("/events/", eventFeedRoutes);
+router.use("/events", eventFeedRoutes);
+router.use("/events", eventInviteesRoutes);
+router.use("/events/invitations", eventInvitationRoutes);
+
 export default router;
