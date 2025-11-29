@@ -14,8 +14,13 @@ export const createResponse = async ({ thread_id, body, user_id }) => {
   });
 };
 
-// Hämta alla responses till en tråd inkl. username, avatar, likes och userHasLiked
-export const getResponsesByThreadId = async (thread_id, user_id) => {
+// Hämta responses till en tråd inkl. username, avatar, likes och userHasLiked, med pagination
+export const getResponsesByThreadId = async (
+  thread_id,
+  user_id,
+  offset = 0,
+  limit = 5
+) => {
   const sql = `
     SELECT 
       r.id, r.thread_id, r.body, r.user_id, r.created_at,
@@ -35,10 +40,11 @@ export const getResponsesByThreadId = async (thread_id, user_id) => {
     JOIN users u ON r.user_id = u.id
     WHERE r.thread_id = ?
     ORDER BY r.created_at ASC
+    LIMIT ? OFFSET ?
   `;
 
   return new Promise((resolve, reject) => {
-    db.query(sql, [user_id, thread_id], (err, rows) => {
+    db.query(sql, [user_id, thread_id, limit, offset], (err, rows) => {
       if (err) return reject(err);
 
       const formatted = rows.map((row) => ({

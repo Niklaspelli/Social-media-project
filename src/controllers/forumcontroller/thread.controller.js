@@ -67,16 +67,22 @@ export const getThreadController = async (req, res) => {
 export const getLatestThreadsController = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
-    const offset = ((parseInt(req.query.page) || 1) - 1) * limit;
+    const page = parseInt(req.query.page) || 1;
+    const offset = (page - 1) * limit;
+    const subjectId = req.query.subjectId || req.query.subject_id;
 
-    const threads = await getLatestThreads(limit, offset);
-    const total = await countAllThreads();
+    const sort = req.query.sort || "desc"; // <-- NY
+
+    const threads = await getLatestThreads(limit, offset, sort, subjectId);
+    const total = await countAllThreads(subjectId);
 
     res.json({
       threads,
       total,
       page: Math.floor(offset / limit) + 1,
       limit,
+      sort,
+      subjectId,
     });
   } catch (err) {
     console.error("Error fetching latest threads:", err);

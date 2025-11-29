@@ -13,7 +13,7 @@ export default function ThreadResponseList({ responses = [], threadId }) {
   const { mutateAsync: deleteResponse } = useDeleteResponse();
   const [deleteErrors, setDeleteErrors] = useState({});
 
-  console.log("resp:", responses);
+  console.log("resp:", responses, "threadid:", threadId);
   const handleDelete = async (responseId) => {
     try {
       await deleteResponse({ responseId });

@@ -12,41 +12,42 @@ const ForumLandingPage = () => {
   const location = useLocation();
   const [selectedThreadId, setSelectedThreadId] = useState(null);
 
-  // Hämta forum overview (inklusive subjects och threads)
-  const { data, isLoading, error } = useForumOverview();
-  if (isLoading) return <p>Loading forum...</p>;
-  if (error) return <p style={{ color: "red" }}>{error.message}</p>;
+  // This hook must ALWAYS run
+  const { data, isLoading, error } = useForumOverview({});
+
   const subjects = data?.subjects || [];
 
-  // Navigera automatiskt till första subject om vi är på /forum
-  /*   useEffect(() => {
-    if (subjects?.length > 0 && location.pathname === "/forum") {
+  useEffect(() => {
+    if (!isLoading && subjects.length > 0 && location.pathname === "/forum") {
       navigate(`subject/${subjects[0].subject_id}`);
     }
-  }, [subjects, navigate, location.pathname]); */
+  }, [subjects, navigate, location.pathname, isLoading]);
 
   return (
     <Container fluid>
-      {/* NAVBAR */}
-      <Row className="my-3">
-        <Col className="d-flex justify-content-center">
-          <ForumNavbar subjects={subjects} />
-        </Col>
-      </Row>
+      {isLoading && <p>Loading forum...</p>}
+      {error && <p style={{ color: "red" }}>{error.message}</p>}
 
-      {/* MAIN LAYOUT – ActivityFeed + ThreadDetail bredvid varandra */}
-      <Row className="align-items-start">
-        {/* Left: ActivityFeed */}
-        <Col lg={2} md={6} sm={12}>
-          <ActivityFeed onSelectThread={setSelectedThreadId} />
-        </Col>
+      {!isLoading && !error && (
+        <>
+          <Row className="my-3">
+            <Col className="d-flex justify-content-center">
+              <ForumNavbar subjects={subjects} />
+            </Col>
+          </Row>
 
-        {/* Right: Main content + Thread detail */}
-        <Col lg={8} md={6} sm={12}>
-          <Outlet />
-          {selectedThreadId && <ThreadDetail threadId={selectedThreadId} />}
-        </Col>
-      </Row>
+          <Row className="align-items-start">
+            <Col lg={2} md={6} sm={12}>
+              <ActivityFeed onSelectThread={setSelectedThreadId} />
+            </Col>
+
+            <Col lg={8} md={6} sm={12}>
+              <Outlet />
+              {selectedThreadId && <ThreadDetail threadId={selectedThreadId} />}
+            </Col>
+          </Row>
+        </>
+      )}
     </Container>
   );
 };

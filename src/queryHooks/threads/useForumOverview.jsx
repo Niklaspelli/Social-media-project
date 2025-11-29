@@ -1,19 +1,23 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "../../api/api";
 
-export const useForumOverview = ({ page = 1, limit = 10 } = {}) => {
+export const useForumOverview = ({
+  page = 1,
+  limit = 6,
+  sort = "desc",
+  subjectId,
+} = {}) => {
   return useQuery({
-    queryKey: ["forumOverview", page, limit],
+    queryKey: ["forumOverview", page, limit, sort, subjectId],
     queryFn: async () => {
-      const params = new URLSearchParams({ page, limit });
-      const data = await apiFetch(`/overview?${params.toString()}`);
+      const params = new URLSearchParams({ page, limit, sort });
+      if (subjectId) params.append("subjectId", subjectId);
 
-      // Data från backend: { subjects, threads, totalThreads }
-      // Varje thread innehåller responses array med likeCount
+      const data = await apiFetch(`/overview?${params.toString()}`);
       return data;
     },
-    staleTime: 5 * 60 * 1000, // 5 minuter caching
-    refetchOnWindowFocus: false, // Inget refetch vid fönsterfokus
-    retry: 0, // Ingen automatisk retry
+    staleTime: 15 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    keepPreviousData: true,
   });
 };

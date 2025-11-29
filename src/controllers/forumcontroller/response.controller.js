@@ -43,9 +43,16 @@ export const postResponseController = async (req, res) => {
 export const getResponsesByThreadController = async (req, res) => {
   const thread_id = req.params.threadId;
   const user_id = req.user?.id || 0;
+  const offset = parseInt(req.query.offset) || 0;
+  const limit = parseInt(req.query.limit) || 5; // standard 5 per load
 
   try {
-    const responses = await getResponsesByThreadId(thread_id, user_id);
+    const responses = await getResponsesByThreadId(
+      thread_id,
+      user_id,
+      offset,
+      limit
+    );
     res.json({ success: true, thread_id, responses });
   } catch (err) {
     console.error(err);
