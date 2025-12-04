@@ -1,66 +1,28 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForumOverview } from "../../../queryHooks/threads/useForumOverview";
-import { apiFetch } from "../../../api/api";
 import ThreadDetail from "./ThreadDetail";
 import "./ThreadList.css";
 
 function ThreadList({ subjectId }) {
   const [page, setPage] = useState(1);
   const [sortOrder, setSortOrder] = useState("desc");
-  const [threads, setThreads] = useState([]);
   const [selectedThreadId, setSelectedThreadId] = useState(null);
 
   const { data, isLoading, error } = useForumOverview({
     page,
-    limit: 6,
+    limit: 10,
     sort: sortOrder,
-    subjectId: subjectId || "",
+    subjectId,
   });
 
-  useEffect(() => {
-    if (data?.threads) setThreads(data.threads);
-  }, [data]);
+  if (isLoading) return <p>Loading threads...</p>;
+  if (error) return <p style={{ color: "red" }}>{error.message}</p>;
 
   const toggleThread = (threadId) => {
     setSelectedThreadId(selectedThreadId === threadId ? null : threadId);
   };
 
-  const loadMoreResponses = async (thread) => {
-    try {
-      const offset = thread.responses.length;
-      const data = await apiFetch(
-        `/responses/${thread.id}?offset=${offset}&limit=10`
-      );
-
-      // Om backend skickar { responses: [...] } eller direkt array
-      const newResponsesRaw = data.responses || data;
-
-      // Säkerställ att varje response har ett user-objekt
-      const newResponses = newResponsesRaw.map((r) => ({
-        ...r,
-        user: r.user || {
-          id: r.user_id || null,
-          username: r.username || "Unknown",
-          avatar: r.avatar || "/default-avatar.jpg",
-        },
-      }));
-
-      setThreads((prev) =>
-        prev.map((t) =>
-          t.id === thread.id
-            ? { ...t, responses: [...t.responses, ...newResponses] }
-            : t
-        )
-      );
-    } catch (err) {
-      console.error("Failed to load more responses:", err);
-    }
-  };
-
-  if (isLoading) return <p>Loading threads...</p>;
-  if (error) return <p style={{ color: "red" }}>{error.message}</p>;
-
-  const totalPages = Math.ceil(data.totalThreads / 6);
+  const totalPages = Math.ceil(data.totalThreads / data.limit);
 
   return (
     <div className="thread-list-container">
@@ -73,7 +35,7 @@ function ThreadList({ subjectId }) {
         </button>
       </div>
 
-      {threads.map((thread) => (
+      {data.threads.map((thread) => (
         <div
           key={thread.id}
           className="thread-item"
@@ -91,22 +53,20 @@ function ThreadList({ subjectId }) {
           </div>
           <p className="thread-body">{thread.body}</p>
           <p className="thread-date">{thread.total_responses} have responded</p>
-
           <small className="thread-date">
             Posted {new Date(thread.created_at).toLocaleDateString()}
           </small>
 
+          {thread.last_response && (
+            <div className="thread-last-response">
+              <strong>Last response:</strong> {thread.last_response.body} by{" "}
+              {thread.last_response.user.username}
+            </div>
+          )}
+
           {selectedThreadId === thread.id && (
             <div onClick={(e) => e.stopPropagation()}>
               <ThreadDetail thread={thread} />
-              {thread.responses.length < thread.total_responses && (
-                <button
-                  onClick={() => loadMoreResponses(thread)}
-                  className="read-more-button"
-                >
-                  Read more
-                </button>
-              )}
             </div>
           )}
         </div>

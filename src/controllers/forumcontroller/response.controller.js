@@ -2,6 +2,7 @@ import {
   createResponse,
   getResponsesByThreadId,
   deleteResponseById,
+  getTotalResponsesByThreadId,
 } from "../../models/response.model.js";
 
 // --------------------------------------------------------
@@ -47,18 +48,29 @@ export const getResponsesByThreadController = async (req, res) => {
   const limit = parseInt(req.query.limit) || 5; // standard 5 per load
 
   try {
+    // Hämta batch av responses
     const responses = await getResponsesByThreadId(
       thread_id,
       user_id,
       offset,
       limit
     );
-    res.json({ success: true, thread_id, responses });
+
+    // Hämta totalt antal responses för denna tråd
+    const totalResponses = await getTotalResponsesByThreadId(thread_id);
+
+    res.json({
+      success: true,
+      thread_id,
+      totalResponses,
+      responses,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 // --------------------------------------------------------
 // DELETE /responses/:responseId
 // --------------------------------------------------------

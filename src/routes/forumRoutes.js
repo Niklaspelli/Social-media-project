@@ -1,4 +1,4 @@
-import express from "express";
+/* import express from "express";
 import { authenticateJWT } from "../middleware/authMiddleware.js";
 import { verifyCsrfToken } from "../middleware/csrf.js";
 import {
@@ -16,7 +16,7 @@ import {
 
 const router = express.Router();
 
-/* Ny endpoint för trådar och svar etc */
+Ny endpoint för trådar och svar etc 
 
 router.get("/threads/overview", authenticateJWT, getForumOverview);
 
@@ -55,3 +55,4 @@ router.delete(
 router.get("/responses/:responseId/like-count", getLikeCountForResponse);
 
 export default router;
+*/

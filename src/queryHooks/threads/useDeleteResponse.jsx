@@ -5,24 +5,42 @@ import { apiFetch } from "../../api/api";
 const deleteResponse = async ({ responseId }) => {
   return apiFetch(`/responses/${responseId}`, {
     method: "DELETE",
-    headers: {},
   });
 };
 
 export default function useDeleteResponse(threadId) {
   const queryClient = useQueryClient();
-  const { authData } = useAuth();
-  const { accessToken } = authData || {};
 
   return useMutation({
-    mutationFn: ({ responseId }) => deleteResponse({ responseId, accessToken }),
+    mutationFn: ({ responseId }) => deleteResponse({ responseId }),
     retry: 0,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["threadDetail", threadId]);
-      console.log("✅ Response deleted successfully");
+
+    // Optimistisk uppdatering
+    onMutate: async ({ responseId }) => {
+      // Avbryt pågående fetch för samma query
+      await queryClient.cancelQueries(["responses", threadId]);
+
+      // Spara tidigare data
+      const previousData = queryClient.getQueryData(["responses", threadId]);
+
+      // Ta bort svaret direkt från cache
+      queryClient.setQueryData(["responses", threadId], (old = []) =>
+        old.filter((r) => r.id !== responseId)
+      );
+
+      return { previousData };
     },
-    onError: (error) => {
-      console.error("❌ Failed to delete response:", error.message);
+
+    // Backa vid fel
+    onError: (err, variables, context) => {
+      console.error("❌ Failed to delete response:", err?.message || err);
+      if (context?.previousData) {
+        queryClient.setQueryData(["responses", threadId], context.previousData);
+      }
+    },
+
+    onSuccess: () => {
+      console.log("✅ Response deleted successfully (optimistic)");
     },
   });
 }

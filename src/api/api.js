@@ -66,6 +66,7 @@ export async function apiFetch(endpoint, options = {}) {
     const text = await res.text();
     throw new Error(`Request failed (${res.status}): ${text}`);
   }
+  console.log("API FETCH:", endpoint);
 
   const contentType = res.headers.get("content-type");
   return contentType?.includes("application/json") ? res.json() : null;

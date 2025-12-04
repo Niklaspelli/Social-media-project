@@ -18,6 +18,7 @@ export const useForumOverview = ({
     },
     staleTime: 15 * 60 * 1000,
     refetchOnWindowFocus: false,
+
     keepPreviousData: true,
   });
 };

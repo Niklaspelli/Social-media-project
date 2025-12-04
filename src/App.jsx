@@ -31,6 +31,7 @@ function App() {
       <HeaderNavbar />
       <Routes>
         {/* Redirect the root route to the login page */}
+        <Route path="/" element={<Navigate to="/auth" replace />} />
         <Route path="/auth" element={<AuthPage />} />{" "}
         <Route element={<ProtectedRoute />}>
           <Route path="/landing-page" element={<LandingPage />} />

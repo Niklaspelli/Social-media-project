@@ -30,6 +30,7 @@ export async function getCsrfToken() {
       pendingCsrfPromise = null;
       throw err;
     });
+  console.log("GET CSRF TOKEN");
 
   return pendingCsrfPromise;
 }

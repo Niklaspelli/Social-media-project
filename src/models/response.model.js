@@ -57,6 +57,16 @@ export const getResponsesByThreadId = async (
   });
 };
 
+export const getTotalResponsesByThreadId = async (thread_id) => {
+  const sql = "SELECT COUNT(*) AS total FROM responses WHERE thread_id = ?";
+  return new Promise((resolve, reject) => {
+    db.query(sql, [thread_id], (err, rows) => {
+      if (err) return reject(err);
+      resolve(rows[0].total);
+    });
+  });
+};
+
 // Ta bort en response (endast ägaren)
 export const deleteResponseById = async (responseId, userId) => {
   const sql = `DELETE FROM responses WHERE id = ? AND user_id = ?`;

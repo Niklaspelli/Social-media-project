@@ -1,58 +1,46 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "../../context/AuthContext";
 import { apiFetch } from "../../api/api";
 
 export default function useToggleLike(threadId) {
-  const { authData } = useAuth();
-  const accessToken = authData?.accessToken;
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({ responseId }) => {
-      if (!accessToken) throw new Error("Missing access token");
-
-      return apiFetch(`/likes/${responseId}/like`, {
-        method: "POST",
-      });
+      return apiFetch(`/likes/${responseId}/like`, { method: "POST" });
     },
 
-    // Optimistic UI
+    // Optimistisk UI: uppdatera bara lokalt
     onMutate: async ({ responseId }) => {
-      const key = ["threadDetail", threadId];
-
+      const key = ["responses", threadId];
       await queryClient.cancelQueries({ queryKey: key });
+      const previous = queryClient.getQueryData(key);
 
-      const previousThread = queryClient.getQueryData(key);
+      if (!previous) return;
 
-      if (!previousThread) return;
+      const newData = previous.map((r) => {
+        if (r.id === responseId) {
+          return {
+            ...r,
+            userHasLiked: !r.userHasLiked,
+            likeCount: r.likeCount + (r.userHasLiked ? -1 : 1),
+          };
+        }
+        return r;
+      });
 
-      const newThread = structuredClone(previousThread);
+      queryClient.setQueryData(key, newData);
 
-      const response = newThread.responses.find((r) => r.id === responseId);
-
-      if (response) {
-        response.userHasLiked = !response.userHasLiked;
-        response.likeCount += response.userHasLiked ? 1 : -1;
-      }
-
-      queryClient.setQueryData(key, newThread);
-
-      return { previousThread };
+      return { previous };
     },
 
-    // Backa om det felar
+    // Backa vid fel
     onError: (_err, _vars, context) => {
-      if (context?.previousThread) {
-        queryClient.setQueryData(
-          ["threadDetail", threadId],
-          context.previousThread
-        );
+      if (context?.previous) {
+        queryClient.setQueryData(["responses", threadId], context.previous);
       }
     },
 
-    // Always revalidate with real backend data
-    onSettled: () => {
-      queryClient.invalidateQueries(["threadDetail", threadId]);
-    },
+    // Vi **invalidate** inte hela listan längre → minskar risk för 429
+    onSettled: () => {},
   });
 }
