@@ -27,7 +27,7 @@ const Settings = () => {
     setIsDeleting(true);
 
     try {
-      const data = await apiFetch(`/auth/${userId}`, {
+      const data = await apiFetch(`/users/${userId}`, {
         method: "DELETE",
         credentials: "include",
       });

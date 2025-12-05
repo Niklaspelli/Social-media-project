@@ -168,27 +168,6 @@ export const logout = (req, res) => {
   return res.status(200).json({ message: "Logout successful" });
 };
 
-/* export const deleteUser = (req, res) => {
-  const userId = req.params.userId;
-  console.log(`Received DELETE request for user ID: ${userId}`);
-
-  const sql = "DELETE FROM users WHERE id = ?";
-  db.query(sql, [userId], (err, result) => {
-    if (err) {
-      console.error("Error deleting user:", err.message);
-      return res.status(500).json({ error: "Internal Server Error" });
-    }
-
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    return res.status(200).json({ message: "User deleted successfully" });
-  });
-}; */
-
-// src/controllers/authController.js
-
 const query = promisify(db.query).bind(db);
 
 export const deleteUser = async (req, res) => {

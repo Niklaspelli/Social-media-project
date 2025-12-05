@@ -6,6 +6,7 @@ import {
   faInfoCircle,
   faLock,
   faUser,
+  faEnvelope,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -18,9 +19,13 @@ const USER_REGEX = /^[A-Öa-ö][A-z0-9-_åäöÅÄÖ]{3,23}$/;
 const PWD_REGEX =
   /^(?=.*[a-zåäö])(?=.*[A-ÖÅÄÖ])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 function Register() {
   const userRef = useRef();
   const errRef = useRef();
+  const emailRef = useRef();
+
   const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
@@ -29,6 +34,9 @@ function Register() {
   const [password, setPassword] = useState("");
   const [validPwd, setValidPwd] = useState(false);
   const [pwdFocus, setPwdFocus] = useState(false);
+  const [email, setEmail] = useState("");
+  const [validEmail, setValidEmail] = useState(false);
+  const [emailFocus, setEmailFocus] = useState(false);
 
   const [matchPwd, setMatchPwd] = useState("");
   const [validMatch, setValidMatch] = useState(false);
@@ -49,6 +57,10 @@ function Register() {
   }, [username]);
 
   useEffect(() => {
+    setValidEmail(EMAIL_REGEX.test(email));
+  }, [email]);
+
+  useEffect(() => {
     setValidPwd(PWD_REGEX.test(password));
     setValidMatch(password === matchPwd);
   }, [password, matchPwd]);
@@ -59,7 +71,9 @@ function Register() {
     e.preventDefault();
     const v1 = USER_REGEX.test(username);
     const v2 = PWD_REGEX.test(password);
-    if (!v1 || !v2) {
+    const v3 = EMAIL_REGEX.test(email);
+
+    if (!v1 || !v2 || !v3) {
       setErrMsg("Invalid Entry");
       return;
     }
@@ -70,7 +84,7 @@ function Register() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, email }),
       });
 
       if (!response.ok) {
@@ -133,6 +147,46 @@ function Register() {
                   </div>
                   <Row className="justify-content-center">
                     <Col md={6} lg={7}>
+                      {/* email */}
+                      <Form.Group className="mb-3">
+                        <div className="input-box">
+                          {" "}
+                          <div className="input-wrapper">
+                            <FontAwesomeIcon
+                              icon={faEnvelope}
+                              className="input-icon"
+                            />
+                            <Form.Label>
+                              <span className={validEmail ? "valid" : "hide"}>
+                                <FontAwesomeIcon icon={faCheck} />
+                              </span>
+                              <span
+                                className={
+                                  validEmail || !email ? "hide" : "invalid"
+                                }
+                              >
+                                <FontAwesomeIcon icon={faTimes} />
+                              </span>
+                            </Form.Label>
+                            <Form.Control
+                              id="register-email"
+                              type="text"
+                              placeholder="username"
+                              ref={emailRef}
+                              autoComplete="off"
+                              onChange={(e) => setEmail(e.target.value)}
+                              required
+                              aria-invalid={validEmail ? "false" : "true"}
+                              aria-describedby="uidnote"
+                              onFocus={() => setEmailFocus(true)}
+                              onBlur={() => setEmailFocus(false)}
+                            />
+                            <label htmlFor="register-email">Email</label>
+                            <div className="b-line"></div>
+                          </div>{" "}
+                        </div>{" "}
+                      </Form.Group>
+
                       {/* Username */}
                       <Form.Group className="mb-3">
                         <div className="input-box">

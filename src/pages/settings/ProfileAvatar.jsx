@@ -46,7 +46,7 @@ const ProfileAvatar = ({ setSelectedPicture }) => {
     setSuccess("");
 
     try {
-      const data = await apiFetch("/auth/avatar", {
+      const data = await apiFetch("/users/avatar", {
         method: "PUT",
         body: JSON.stringify({ avatar: tempPicture }),
       });
