@@ -1,30 +1,30 @@
 import { useQuery } from "@tanstack/react-query";
 
-const useFriends = (loggedInUserId, token) => {
+const useFriends = (userId, token) => {
   const fetchFriends = async () => {
-    const response = await fetch(
-      `http://localhost:5000/api/friends/friends/${loggedInUserId}`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const res = await fetch(`http://localhost:5000/api/friends/list/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch friends");
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || "Failed to fetch friends");
     }
 
-    return response.json();
+    const data = await res.json();
+
+    // extra safeguard: only return accepted friends
+    return data.filter((f) => f.status !== "pending");
   };
 
   return useQuery({
-    queryKey: ["friends", loggedInUserId],
+    queryKey: ["friends", userId],
     queryFn: fetchFriends,
-    enabled: !!token && !!loggedInUserId,
-    staleTime: 1000 * 60 * 5, // 5 min
-    retry: 0, // ingen retry
-    refetchOnWindowFocus: false, // ingen refetch vid flikbyte
-    refetchOnReconnect: false, // ingen refetch vid reconnect
-    refetchInterval: false,
+    enabled: !!userId && !!token,
+    staleTime: 1000 * 60 * 5,
+    retry: false,
   });
 };
 

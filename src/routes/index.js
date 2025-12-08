@@ -16,6 +16,7 @@ import subjectRoutes from "./subjectRoutes.js";
 import likesRoutes from "./likesRoutes.js";
 import responsesRoutes from "./responsesRoutes.js";
 import overviewRoutes from "./overviewRoutes.js";
+import friendRequestRoutes from "./friendRequestRoutes.js";
 
 import { getCsrfToken } from "../controllers/authController.js";
 
@@ -28,7 +29,7 @@ router.use("/users", userRoutes);
 router.use("/userprofile", userprofileRoutes);
 /* router.use("/forum", forumRoutes);
  */
-router.use("/friends", friendRoutes);
+/* router.use("/friends", friendRoutes); */
 router.use("/feed", feedRoutes);
 
 ///Nya routes forum
@@ -47,5 +48,9 @@ router.use("/events/user", eventRoutes);
 router.use("/events", eventFeedRoutes);
 router.use("/events", eventInviteesRoutes);
 router.use("/events/invitations", eventInvitationRoutes);
+
+//Nya friend routes
+
+router.use("/friends", friendRequestRoutes);
 
 export default router;

@@ -161,26 +161,6 @@ export const getFriendshipStatus = (req, res) => {
   });
 };
 
-// PUT /api/auth/unfollow
-/* export const unfollowFriend = (req, res) => {
-  const { senderId, receiverId } = req.body; // Assuming these are passed in the request body
-
-  const sql = `
-    UPDATE friend_requests
-    SET status = 'none'  -- Or 'unfollowed', depending on your schema
-    WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)
-  `;
-
-  db.query(sql, [senderId, receiverId, receiverId, senderId], (err) => {
-    if (err) {
-      console.error("Error ending friendship:", err.message);
-      return res.status(500).json({ error: "Internal Server Error" });
-    }
-
-    return res.status(200).json({ message: "Friendship ended successfully." });
-  });
-}; */
-
 export const getFriendsList = (req, res) => {
   const loggedInUserId = req.user?.id;
 
