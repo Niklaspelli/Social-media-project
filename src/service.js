@@ -44,6 +44,8 @@ app.use((req, res, next) => {
     "/api/auth/login",
     "/api/auth/register",
     "/api/auth/refresh-token",
+    "/api/auth/forgot-password",
+    "/api/auth/reset-password",
   ];
 
   if (csrfExempt.includes(req.path)) {

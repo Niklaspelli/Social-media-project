@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth, getCsrfToken } from "../context/AuthContext";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock, faUser } from "@fortawesome/free-solid-svg-icons";
@@ -174,6 +174,12 @@ const Login = ({ onSwitchToSignUp }) => {
                         </Button>
                       )}
                     </div>
+                    <Link
+                      to="/forgot-password"
+                      className="text-decoration-none mt-2 d-block text-light"
+                    >
+                      Forgot password?
+                    </Link>
                   </Form>
                 </Col>
               </Row>

@@ -24,6 +24,8 @@ import CreateThread from "./pages/forum/thread/CreateThread.jsx";
 import ThreadDetail from "./pages/forum/thread/ThreadDetail.jsx";
 import SubjectPage from "./pages/forum/thread/SubjectPage.jsx";
 import ForumLandingPage from "./pages/forum/Forum-Landing-Page.jsx";
+import ForgotPassword from "./pages/ForgotPassword.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
 
 function App() {
   return (
@@ -33,6 +35,8 @@ function App() {
         {/* Redirect the root route to the login page */}
         <Route path="/" element={<Navigate to="/auth" replace />} />
         <Route path="/auth" element={<AuthPage />} />{" "}
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/landing-page" element={<LandingPage />} />
           <Route path="/feed/:id" element={<AllFeed />} />
