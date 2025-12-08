@@ -189,13 +189,14 @@ export const getFriendsList = (req, res) => {
   }
 
   const sql = `
-SELECT u.id, u.username, u.avatar, u.last_seen
-FROM users u
-JOIN friend_requests fr ON (
-  (fr.sender_id = u.id AND fr.receiver_id = ?) OR
-  (fr.receiver_id = u.id AND fr.sender_id = ?)
-)
-WHERE u.id != ?
+    SELECT u.id, u.username, u.avatar, u.last_seen
+    FROM users u
+    JOIN friend_requests fr ON (
+      (fr.sender_id = u.id AND fr.receiver_id = ?) OR
+      (fr.receiver_id = u.id AND fr.sender_id = ?)
+    )
+    WHERE u.id != ?
+      AND fr.status = 'accepted'
   `;
 
   db.query(

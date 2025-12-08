@@ -115,7 +115,7 @@ function Register() {
           backdropFilter: "blur(23px)",
           WebkitBackdropFilter: "blur(10px)",
           zIndex: 0,
-          position: "fixed", // måste vara positionerad
+          position: "fixed",
         }}
       />
 

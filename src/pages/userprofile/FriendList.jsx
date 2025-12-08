@@ -15,10 +15,14 @@ function FriendList() {
     error,
   } = useFriends(userId, token);
 
+  console.log("vänner:", friends);
+
   const isOnline = (lastSeen) => {
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
     return new Date(lastSeen) > fiveMinutesAgo;
   };
+
+  const acceptedFriends = friends.filter((f) => f.status === "accepted");
 
   if (isLoading) return <div>🔄 Laddar vänlista...</div>;
   if (isError)
