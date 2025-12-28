@@ -34,7 +34,7 @@ router.get(
   friendController.getIncomingCount
 );
 
-router.delete(
+router.put(
   "/unfollow",
   authenticateJWT,
   verifyCsrfToken,

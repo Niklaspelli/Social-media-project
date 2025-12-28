@@ -1,16 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 
 const fetchReceivedRequests = async (token) => {
-  const response = await fetch(
-    "http://localhost:5000/api/friends/received-requests",
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      credentials: "include",
-    }
-  );
+  const response = await fetch("http://localhost:5000/api/friends/incoming", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    credentials: "include",
+  });
 
   if (!response.ok) {
     throw new Error("Failed to fetch received requests");

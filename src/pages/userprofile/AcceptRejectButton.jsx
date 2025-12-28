@@ -32,20 +32,24 @@ function AcceptRejectButton({
       const body = type === "friend" ? { senderId: id } : { eventId: id };
 
       await apiFetch(endpoint, {
-        method: "POST",
+        method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: JSON.stringify(body),
       });
 
       setStatus({ isPending: false, incomingRequest: false });
 
-      // Uppdatera cachar
-      queryClient.invalidateQueries(
-        type === "friend"
-          ? ["friendRequestCount", loggedInUserId]
-          : ["eventInvitationCount"]
-      );
-      queryClient.invalidateQueries(["friends", loggedInUserId]);
+      // ✅ Uppdatera cachar med v5 syntax
+      if (type === "friend") {
+        queryClient.invalidateQueries({
+          queryKey: ["friendRequestCount", loggedInUserId],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["friends", loggedInUserId],
+        });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["eventInvitationCount"] });
+      }
     } catch (err) {
       alert(err.message || "Something went wrong");
     }
@@ -60,20 +64,24 @@ function AcceptRejectButton({
         type === "friend" ? { senderId: id, receiverId } : { eventId: id };
 
       await apiFetch(endpoint, {
-        method: "POST",
+        method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: JSON.stringify(body),
       });
 
       setStatus({ isPending: false, incomingRequest: false });
 
-      // Uppdatera cachar
-      queryClient.invalidateQueries(
-        type === "friend"
-          ? ["friendRequestCount", loggedInUserId]
-          : ["eventInvitationCount"]
-      );
-      queryClient.invalidateQueries(["friends", loggedInUserId]);
+      // ✅ Uppdatera cachar med v5 syntax
+      if (type === "friend") {
+        queryClient.invalidateQueries({
+          queryKey: ["friendRequestCount", loggedInUserId],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["friends", loggedInUserId],
+        });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["eventInvitationCount"] });
+      }
     } catch (err) {
       alert(err.message || "Something went wrong");
     }

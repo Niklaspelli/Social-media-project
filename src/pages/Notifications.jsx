@@ -11,6 +11,7 @@ function Notifications() {
 
   // Friend requests
   const { data: incomingFriendRequests = [] } = useReceivedRequests(token);
+  console.log("incoming friend requests:", incomingFriendRequests);
 
   // Event invitations
   const { data: incomingEventInvitations = [] } = useInvitationRequests(token);

@@ -82,8 +82,11 @@ export const friendController = {
   },
 
   getIncoming(req, res) {
+    console.log("Logged in userId:", req.user.id); // <--- lägg till denna rad
+
     FriendRequest.incoming(req.user.id, (err, results) => {
       if (err) return res.status(500).json({ error: "Database error" });
+      console.log("Incoming friend requests:", results); // <--- och denna
 
       res.json(results);
     });

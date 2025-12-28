@@ -16,7 +16,7 @@ const useFriends = (userId, token) => {
     const data = await res.json();
 
     // extra safeguard: only return accepted friends
-    return data.filter((f) => f.status !== "pending");
+    return data.filter((f) => f.status !== "accepted");
   };
 
   return useQuery({
