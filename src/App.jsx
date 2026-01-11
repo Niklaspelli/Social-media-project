@@ -1,6 +1,7 @@
 import { AuthProvider } from "./context/AuthContext"; // Import the context
 
 import { Routes, Route, Navigate } from "react-router-dom"; // Add Navigate for redirection
+import { useAuth } from "./context/AuthContext";
 
 import AuthPage from "./pages/AuthPage.jsx";
 import Settings from "./pages/settings/Settings.jsx";
@@ -26,39 +27,48 @@ import SubjectPage from "./pages/forum/thread/SubjectPage.jsx";
 import ForumLandingPage from "./pages/forum/Forum-Landing-Page.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
+import MainLayout from "./components/MainLayout.jsx";
+import NavigateToProfile from "./components/NavigateToProfile.jsx";
 
 function App() {
+  const { authData } = useAuth();
+
   return (
     <AuthProvider>
-      <HeaderNavbar />
       <Routes>
-        {/* Redirect the root route to the login page */}
-        <Route path="/" element={<Navigate to="/auth" replace />} />
+        <Route path="/" element={<NavigateToProfile />} />
         <Route path="/auth" element={<AuthPage />} />{" "}
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route element={<ProtectedRoute />}>
-          <Route path="/landing-page" element={<LandingPage />} />
-          <Route path="/feed/:id" element={<AllFeed />} />
-          <Route path="/notifications/:id" element={<Notifications />} />
-          <Route path="/user/:id" element={<UserProfile />} />
-          <Route path="/friends/:id" element={<FriendList />} />
-          <Route path="/events/event-details/:id" element={<EventDetails />} />
-          <Route path="/events/create" element={<CreateEvent />} />
-          <Route path="/events/update/:id" element={<EventUpdate />} />
-          <Route path="/events/:id" element={<EventView />} />
-          <Route path="/forum" element={<ForumLandingPage />}>
-            <Route path="subject/:subjectId" element={<SubjectPage />} />
-          </Route>{" "}
-          <Route
-            path="/subjects/:subjectId/create"
-            element={<CreateThread />}
-          />
-          <Route path="/threads/:threadId" element={<ThreadDetail />} />
-          {/* Ensure UserProfile is imported */}
-          <Route path="/settings/:id" element={<Settings />} />
-          <Route path="/create-profile" element={<CreateProfile />} />
-          <Route path="/settings/edit-profile/:id" element={<EditProfile />} />
+          <Route element={<MainLayout />}>
+            <Route path="/feed/:id" element={<AllFeed />} />
+            <Route path="/notifications/:id" element={<Notifications />} />
+            <Route path="/user/:id" element={<UserProfile />} />
+            <Route path="/friends/:id" element={<FriendList />} />
+            <Route
+              path="/events/event-details/:id"
+              element={<EventDetails />}
+            />
+            <Route path="/events/create" element={<CreateEvent />} />
+            <Route path="/events/update/:id" element={<EventUpdate />} />
+            <Route path="/events/:id" element={<EventView />} />
+            <Route path="/forum" element={<ForumLandingPage />}>
+              <Route path="subject/:subjectId" element={<SubjectPage />} />
+            </Route>{" "}
+            <Route
+              path="/subjects/:subjectId/create"
+              element={<CreateThread />}
+            />
+            <Route path="/threads/:threadId" element={<ThreadDetail />} />
+            {/* Ensure UserProfile is imported */}
+            <Route path="/settings/:id" element={<Settings />} />
+            <Route path="/create-profile" element={<CreateProfile />} />
+            <Route
+              path="/settings/edit-profile/:id"
+              element={<EditProfile />}
+            />
+          </Route>
         </Route>
         <Route path="/deleted" element={<AccountDeleted />} />
         <Route path="/auth/success" element={<RegistrationSuccess />} />

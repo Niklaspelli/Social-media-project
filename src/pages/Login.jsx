@@ -14,7 +14,7 @@ const Login = ({ onSwitchToSignUp }) => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { login, authData } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
   const errRef = useRef();
 
@@ -49,7 +49,7 @@ const Login = ({ onSwitchToSignUp }) => {
       localStorage.setItem("accessToken", accessToken);
 
       // Uppdatera last seen
-      await apiFetch("/friends/update-last-seen", {
+      await apiFetch("/friends/last-seen", {
         method: "PUT",
       });
 

@@ -45,23 +45,28 @@ export function getAccessToken() {
 }
 
 export const AuthProvider = ({ children }) => {
-  const [authData, setAuthData] = useState(null);
+  // Läs user-data från localStorage vid init
+  const [authData, setAuthData] = useState(() => {
+    const savedUser = localStorage.getItem("userData");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
 
   const login = (username, userId, avatar, accessToken) => {
-    setAuthData({ username, userId, avatar, accessToken });
+    const data = { username, userId, avatar, accessToken };
+    setAuthData(data);
     localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("userData", JSON.stringify(data));
   };
 
   const logout = () => {
     setAuthData(null);
     clearCsrfToken();
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("userData");
   };
 
   return (
-    <AuthContext.Provider
-      value={{ authData, isAuthenticated: !!authData, login, logout }}
-    >
+    <AuthContext.Provider value={{ authData, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

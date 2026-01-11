@@ -7,7 +7,6 @@ import { motion } from "framer-motion";
 
 const AuthPage = () => {
   const [showSignUp, setShowSignUp] = useState(false);
-  const [success, setSuccess] = useState(false);
 
   return (
     <Container fluid className>

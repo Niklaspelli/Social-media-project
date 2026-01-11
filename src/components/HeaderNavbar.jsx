@@ -18,7 +18,7 @@ import useEventInvitationCount from "../queryHooks/events/useInvitationCount";
 import "./components.css";
 
 const HeaderNavbar = () => {
-  const { isAuthenticated, authData, logout: authLogout } = useAuth();
+  const { authData, logout: authLogout } = useAuth();
   const navigate = useNavigate();
   const currentUser = authData?.username;
   const NavbarAvatar = authData?.avatar;
@@ -50,7 +50,7 @@ const HeaderNavbar = () => {
         <Navbar.Toggle aria-controls="navbar-content" />
         <Navbar.Collapse id="navbar-content">
           <Nav className="ms-auto align-items-center">
-            {!isAuthenticated ? (
+            {!authData ? (
               <Nav.Link as={Link} to="/auth">
                 Sign In / Sign Up
               </Nav.Link>
