@@ -66,8 +66,15 @@ export const friendController = {
   },
 
   getFriends(req, res) {
-    FriendRequest.getFriends(req.user.id, (err, results) => {
-      if (err) return res.status(500).json({ error: "Database error" });
+    // 1. Prioritera ID från URL:en (:id), annars använd den inloggade (req.user.id)
+    const targetUserId = req.params.id || req.user.id;
+
+    // 2. Skicka med det dynamiska ID:t till din Model
+    FriendRequest.getFriends(targetUserId, (err, results) => {
+      if (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({ error: "Database error" });
+      }
 
       res.json(results);
     });

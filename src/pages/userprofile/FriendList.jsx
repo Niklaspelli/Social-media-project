@@ -1,19 +1,23 @@
 import { useAuth } from "../../context/AuthContext";
+import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { Container, Row, Col, Image } from "react-bootstrap";
 import useFriends from "../../queryHooks/friends/useFetchFriends";
 
 function FriendList() {
   const { authData } = useAuth();
+
+  const { id } = useParams();
   const token = authData?.accessToken;
-  const userId = authData?.userId;
+
+  const targetUserId = id || authData?.userId;
 
   const {
     data: friends = [],
     isLoading,
     isError,
     error,
-  } = useFriends(userId, token);
+  } = useFriends(targetUserId, token);
 
   console.log("friendlist friends:", friends);
   const isOnline = (lastSeen) => {
@@ -58,12 +62,12 @@ function FriendList() {
                 {isOnline(friend.last_seen)
                   ? "Online"
                   : `Last seen ${new Date(
-                      friend.last_seen
+                      friend.last_seen,
                     ).toLocaleTimeString()}`}
               </small>
               <span
                 style={{
-                  position: "absolute",
+                  position: "relative",
                   bottom: 5,
                   right: 5,
                   width: 15,

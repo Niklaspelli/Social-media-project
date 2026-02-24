@@ -2,11 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 
 const useFriends = (userId, token) => {
   const fetchFriends = async () => {
-    const res = await fetch(`http://localhost:5000/api/friends/list/`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
+    const res = await fetch(
+      `http://localhost:5000/api/friends/list/${userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    });
+    );
 
     if (!res.ok) {
       const msg = await res.text();

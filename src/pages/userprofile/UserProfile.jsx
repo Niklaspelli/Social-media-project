@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { Container, Row, Col, Image, Card } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -33,7 +33,7 @@ function UserProfile() {
   const { data: mutualFriends = [] } = useMutualFriends(
     authData?.userId, // logged in user
     receiverId, // the profile user you’re viewing
-    authData?.accessToken // JWT
+    authData?.accessToken, // JWT
   );
 
   // ⚡ Decide which profile to use
@@ -80,7 +80,29 @@ function UserProfile() {
 
               <Row className="text-start">
                 <Col xs={12} className="mb-2">
-                  <strong>Friends:</strong> {profile.numberOfFriends || 0}
+                  <div className="d-flex justify-content-between align-items-center bg-dark p-2 rounded border border-secondary shadow-sm">
+                    <div style={{ fontSize: "0.95rem" }}>
+                      <strong className="text-secondary">Friends:</strong>
+                      <span className="ms-2 fw-bold">
+                        {profile.numberOfFriends || 0}
+                      </span>
+                    </div>
+
+                    <Link
+                      to={`/friends/${receiverId}`}
+                      style={{
+                        textDecoration: "none",
+                        color: "#fdf917",
+                        fontSize: "0.85rem",
+                        fontWeight: "600",
+                        letterSpacing: "0.5px",
+                        textTransform: "uppercase",
+                      }}
+                      className="show-all-link px-2"
+                    >
+                      Show all →
+                    </Link>
+                  </div>
                 </Col>
                 {!isOwnProfile && mutualFriends.length > 0 && (
                   <Card className="mb-3 shadow-sm">

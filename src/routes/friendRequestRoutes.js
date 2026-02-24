@@ -37,7 +37,7 @@ router.put(
   friendController.updateLastSeen,
 );
 
-router.get("/list", authenticateJWT, friendController.getFriends);
+router.get("/list/:id", authenticateJWT, friendController.getFriends);
 router.get("/count/:userId", friendController.getFriendCount);
 router.get("/suggestions", authenticateJWT, friendController.getSuggestions);
 
