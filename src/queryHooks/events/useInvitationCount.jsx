@@ -4,7 +4,7 @@ import { apiFetch } from "../../api/api";
 const useEventInvitationCount = () => {
   return useQuery({
     queryKey: ["eventInvitationCount"],
-    queryFn: () => apiFetch("/events/invitations/count"), // ✅ hanterar token, CSRF, retries
+    queryFn: () => apiFetch("/events/invitations/incoming/count"), // ✅ hanterar token, CSRF, retries
     staleTime: 5 * 60 * 1000, // 5 min
     cacheTime: 10 * 60 * 1000, // 10 min
     retry: 0,

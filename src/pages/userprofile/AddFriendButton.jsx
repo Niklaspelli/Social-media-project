@@ -22,7 +22,10 @@ const AddFriendButton = ({ receiverId, token }) => {
         headers: { Authorization: `Bearer ${token}` },
         body: JSON.stringify({ receiverId }),
       }),
-    onSuccess: () => queryClient.invalidateQueries(["friends", senderId]),
+    onSuccess: () => {
+      (queryClient.invalidateQueries(["friends", senderId]),
+        queryClient.invalidateQueries({ queryKey: ["peopleYouMayKnow"] }));
+    },
     onError: (err) => console.error("Add friend failed", err),
   });
 

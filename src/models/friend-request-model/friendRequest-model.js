@@ -89,4 +89,51 @@ export const FriendRequest = {
     `;
     db.query(sql, [userId], callback);
   },
+
+  // Lägg till denna i din FriendRequest-model
+  getPeopleYouMayKnow(userId, callback) {
+    const sql = `
+    SELECT 
+      u.id, 
+      u.username, 
+      u.avatar, 
+      COUNT(*) AS mutualCount
+    FROM friend_requests fr1
+    -- Steg 1: Hitta mina vänner
+    JOIN friend_requests fr2 ON (
+      (fr2.sender_id = IF(fr1.sender_id = ?, fr1.receiver_id, fr1.sender_id) OR 
+       fr2.receiver_id = IF(fr1.sender_id = ?, fr1.receiver_id, fr1.sender_id))
+    )
+    -- Steg 2: Koppla till User-tabellen för att få profilinfo
+    JOIN users u ON (
+      u.id = IF(fr2.sender_id = IF(fr1.sender_id = ?, fr1.receiver_id, fr1.sender_id), fr2.receiver_id, fr2.sender_id)
+    )
+    WHERE (fr1.sender_id = ? OR fr1.receiver_id = ?)
+      AND fr1.status = 'accepted'
+      AND fr2.status = 'accepted'
+      AND u.id != ? -- Inte jag själv
+      AND u.id NOT IN (
+        -- Steg 3: Exkludera befintliga vänner eller väntande förfrågningar
+        SELECT IF(sender_id = ?, receiver_id, sender_id)
+        FROM friend_requests
+        WHERE (sender_id = ? OR receiver_id = ?)
+      )
+    GROUP BY u.id
+    ORDER BY mutualCount DESC
+    LIMIT 12
+  `;
+
+    const params = [
+      userId,
+      userId,
+      userId,
+      userId,
+      userId,
+      userId,
+      userId,
+      userId,
+      userId,
+    ];
+    db.query(sql, params, callback);
+  },
 };

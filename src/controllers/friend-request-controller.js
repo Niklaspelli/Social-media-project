@@ -119,4 +119,16 @@ export const friendController = {
       res.sendStatus(200);
     });
   },
+
+  getSuggestions(req, res) {
+    const userId = req.user.id;
+
+    FriendRequest.getPeopleYouMayKnow(userId, (err, results) => {
+      if (err) {
+        console.error("Error fetching suggestions:", err);
+        return res.status(500).json({ error: "Database error" });
+      }
+      res.json(results);
+    });
+  },
 };

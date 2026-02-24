@@ -1,18 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 
 // Denna funktion hämtar faktiskt datan
-const fetchFriendRequestCount = async (userId, accessToken) => {
-  const res = await fetch(
-    `http://localhost:5000/api/friends/friends/notifications/${userId}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-      credentials: "include", // 🛠 Skicka med cookies
-    }
-  );
+const fetchFriendRequestCount = async (accessToken) => {
+  const res = await fetch(`http://localhost:5000/api/friends/incoming/count`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    credentials: "include", // 🛠 Skicka med cookies
+  });
   if (!res.ok) throw new Error("Failed to fetch");
   return res.json();
 };
@@ -22,8 +19,8 @@ const fetchFriendRequestCount = async (userId, accessToken) => {
 const useGetFriendRequestCount = (userId, accessToken) => {
   return useQuery({
     queryKey: ["friendRequestCount", userId],
-    queryFn: () => fetchFriendRequestCount(userId, accessToken),
-    enabled: !!userId && !!accessToken,
+    queryFn: () => fetchFriendRequestCount(accessToken),
+    enabled: !!accessToken,
 
     // 🧠 Viktigt:
     staleTime: 5 * 60 * 1000, // cache i 5 minuter

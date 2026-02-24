@@ -24,6 +24,18 @@ function AcceptRejectButton({
     incomingRequest: propIncomingRequest,
   });
 
+  // En gemensam funktion för att rensa cachen för både accept och reject
+  const invalidateAllRelatedQueries = () => {
+    if (type === "friend") {
+      queryClient.invalidateQueries({ queryKey: ["friendRequestCount"] });
+      queryClient.invalidateQueries({ queryKey: ["receivedRequests"] });
+      queryClient.invalidateQueries({ queryKey: ["friends", loggedInUserId] });
+    } else {
+      queryClient.invalidateQueries({ queryKey: ["eventInvitationCount"] });
+      queryClient.invalidateQueries({ queryKey: ["invitationRequests"] });
+    }
+  };
+
   const accept = async () => {
     try {
       const endpoint =
@@ -38,6 +50,7 @@ function AcceptRejectButton({
       });
 
       setStatus({ isPending: false, incomingRequest: false });
+      invalidateAllRelatedQueries();
 
       // ✅ Uppdatera cachar med v5 syntax
       if (type === "friend") {
@@ -70,6 +83,7 @@ function AcceptRejectButton({
       });
 
       setStatus({ isPending: false, incomingRequest: false });
+      invalidateAllRelatedQueries();
 
       // ✅ Uppdatera cachar med v5 syntax
       if (type === "friend") {

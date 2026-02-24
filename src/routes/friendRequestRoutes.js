@@ -9,43 +9,43 @@ router.post(
   "/send",
   authenticateJWT,
   verifyCsrfToken,
-  friendController.sendFriendRequest
+  friendController.sendFriendRequest,
 );
 router.put(
   "/accept",
   authenticateJWT,
   verifyCsrfToken,
-  friendController.acceptFriendRequest
+  friendController.acceptFriendRequest,
 );
 router.put(
   "/reject",
   authenticateJWT,
   verifyCsrfToken,
-  friendController.rejectFriendRequest
+  friendController.rejectFriendRequest,
 );
-
-router.get("/list", authenticateJWT, friendController.getFriends);
-router.get("/count/:userId", friendController.getFriendCount);
-
-router.get("/incoming", authenticateJWT, friendController.getIncoming);
-router.get(
-  "/incoming/count",
-  authenticateJWT,
-  friendController.getIncomingCount
-);
-
 router.put(
   "/unfollow",
   authenticateJWT,
   verifyCsrfToken,
-  friendController.unfollow
+  friendController.unfollow,
 );
 
 router.put(
   "/last-seen",
   authenticateJWT,
   verifyCsrfToken,
-  friendController.updateLastSeen
+  friendController.updateLastSeen,
+);
+
+router.get("/list", authenticateJWT, friendController.getFriends);
+router.get("/count/:userId", friendController.getFriendCount);
+router.get("/suggestions", authenticateJWT, friendController.getSuggestions);
+
+router.get("/incoming", authenticateJWT, friendController.getIncoming);
+router.get(
+  "/incoming/count",
+  authenticateJWT,
+  friendController.getIncomingCount,
 );
 
 export default router;

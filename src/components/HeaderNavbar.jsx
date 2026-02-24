@@ -25,12 +25,14 @@ const HeaderNavbar = () => {
 
   const { data: notificationCountData } = useGetFriendRequestCount(
     authData?.userId,
-    authData?.accessToken
+    authData?.accessToken,
   );
 
   const { data: invitationCountData } = useEventInvitationCount(
-    authData?.accessToken
+    authData?.accessToken,
   );
+
+  console.log("invitationsCount:", invitationCountData);
   const invitationCount = invitationCountData?.count || 0;
 
   const friendRequestCount = notificationCountData?.count || 0;

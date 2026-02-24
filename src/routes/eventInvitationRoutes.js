@@ -18,13 +18,13 @@ router.get("/incoming", authenticateJWT, getIncomingEventInvitations);
 router.get(
   "/incoming/count",
   authenticateJWT,
-  getIncomingEventInvitationCountController
+  getIncomingEventInvitationCountController,
 );
 
 // POST accept
-router.post("/accept", authenticateJWT, verifyCsrfToken, acceptEventInvitation);
+router.put("/accept", authenticateJWT, verifyCsrfToken, acceptEventInvitation);
 
 // POST reject
-router.post("/reject", authenticateJWT, verifyCsrfToken, rejectEventInvitation);
+router.put("/reject", authenticateJWT, verifyCsrfToken, rejectEventInvitation);
 
 export default router;

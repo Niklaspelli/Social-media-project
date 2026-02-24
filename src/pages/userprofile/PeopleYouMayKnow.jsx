@@ -1,15 +1,17 @@
 import { Card, Image, Button } from "react-bootstrap";
 import usePeopleYouMayKnow from "../../queryHooks/friends/usePeopleYouMayKnow";
+import AddFriendButton from "./AddFriendButton";
 import { useAuth } from "../../context/AuthContext";
 
 function PeopleYouMayKnow() {
   const { authData } = useAuth();
+
   const { data: suggestions = [] } = usePeopleYouMayKnow(authData?.accessToken);
 
   if (suggestions.length === 0) return null;
 
   return (
-    <Card className="mb-3 shadow-sm text-white bg-info">
+    <Card className="mb-3 shadow-sm text-black bg-white">
       <Card.Body>
         <Card.Title className="fs-6 text-black mb-3">
           People You May Know
@@ -37,13 +39,13 @@ function PeopleYouMayKnow() {
               </div>
             </div>
 
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => console.log("Send request to:", user.id)}
-            >
-              Add Friend
-            </Button>
+            <div className="mb-3">
+              <AddFriendButton
+                senderId={authData?.userId}
+                receiverId={user.id}
+                token={authData?.accessToken}
+              />
+            </div>
           </div>
         ))}
       </Card.Body>

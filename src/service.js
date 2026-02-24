@@ -29,11 +29,27 @@ app.use(
 );
 
 // ✅ 3. Rate limiting
-const limiter = rateLimit({
+/* const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
 });
-app.use(limiter);
+app.use(limiter); */
+
+// En generösare limit för vanlig data-hämtning
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 1000,
+});
+
+// En striktare limit för känsliga anrop
+const strictLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 timme
+  max: 10,
+});
+
+app.use("/api/overview", apiLimiter);
+app.use("/api/responses", apiLimiter);
+app.use("/auth/login", strictLimiter);
 
 // ✅ 4. Global CSRF-skydd för skrivande metoder
 app.use((req, res, next) => {
