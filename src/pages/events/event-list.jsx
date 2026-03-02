@@ -81,20 +81,63 @@ function EventList() {
 export default EventList;
  */
 
-import { Container, Row, Col } from "react-bootstrap";
+import { useState } from "react";
+import { Container, Row, Col, ButtonGroup, Button } from "react-bootstrap";
 import EventCard from "./event-card";
 
-function EventList({ events = [], token, handleDelete }) {
+function EventList({
+  events: eventsData = { upcoming: [], past: [] },
+  token,
+  handleDelete,
+}) {
+  // 1. Skapa en state för att växla vy
+  const [view, setView] = useState("upcoming");
+
+  // 2. Säkerställ att vi hanterar objektet från backend korrekt
+  // Om eventsData råkar vara en array (gammal kod), faller vi tillbaka snyggt
+  const upcoming = Array.isArray(eventsData)
+    ? eventsData
+    : eventsData.upcoming || [];
+  const past = Array.isArray(eventsData) ? [] : eventsData.past || [];
+
+  // 3. Välj vilken lista som ska visas just nu
+  const activeEvents = view === "upcoming" ? upcoming : past;
+
   return (
     <Container>
-      <Row>
-        {events.length === 0 && <p>No events found</p>}
+      {/* TOGGLE KNAPPAR */}
+      <div className="d-flex justify-content-center mb-4">
+        <ButtonGroup aria-label="Event view toggle" className="shadow-sm">
+          <Button
+            variant={view === "upcoming" ? "primary" : "outline-primary"}
+            onClick={() => setView("upcoming")}
+            style={{ minWidth: "120px" }}
+          >
+            Upcoming ({upcoming.length})
+          </Button>
+          <Button
+            variant={view === "past" ? "primary" : "outline-primary"}
+            onClick={() => setView("past")}
+            style={{ minWidth: "120px" }}
+          >
+            History ({past.length})
+          </Button>
+        </ButtonGroup>
+      </div>
 
-        {events.map((event) => (
-          <Col key={event.id} xs={12} md={6} lg={4} className="mb-3">
-            <EventCard event={event} token={token} onDelete={handleDelete} />
+      {/* LISTAN */}
+      <Row>
+        {activeEvents.length === 0 ? (
+          <Col className="text-center py-5">
+            <p className="text-muted">No {view} events found.</p>
           </Col>
-        ))}
+        ) : (
+          activeEvents.map((event) => (
+            <Col key={event.id} xs={12} md={6} lg={4} className="mb-3">
+              <EventCard event={event} token={token} onDelete={handleDelete} />
+            </Col>
+          ))
+        )}
       </Row>
     </Container>
   );

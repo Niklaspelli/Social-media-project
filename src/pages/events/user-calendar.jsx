@@ -19,25 +19,37 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-export default function UserCalendar({ events }) {
+export default function UserCalendar({ events: eventsProp }) {
+  // Vi döper om propen internt
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(null);
 
+  // 1. SÄKERSTÄLL ATT VI HAR EN ARRAY:
+  // Vi slår ihop upcoming och past till en enda lista för kalendern
+  const events = useMemo(() => {
+    if (!eventsProp) return [];
+    // Om det redan är en array (fallback), använd den.
+    // Annars slå ihop upcoming och past.
+    if (Array.isArray(eventsProp)) return eventsProp;
+
+    return [...(eventsProp.upcoming || []), ...(eventsProp.past || [])];
+  }, [eventsProp]);
+
   const toLocalDate = (dateString) => {
     const date = new Date(dateString);
-    // justera för lokal tidszon
     return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
   };
 
+  // Nu fungerar .map() eftersom 'events' garanterat är en array härifrån och ner
   console.log(
     "Calendar events →",
     events.map((e) => ({
       id: e.id,
       title: e.title,
-      raw: e.datetime,
       parsed: new Date(e.datetime),
-    }))
+    })),
   );
+
   const calendarEvents = events
     .filter((e) => e.datetime)
     .map((event) => ({
@@ -47,11 +59,11 @@ export default function UserCalendar({ events }) {
       allDay: false,
       id: event.id,
     }));
-  // Filtrera event som matchar vald dag
+
   const dailyEvents = useMemo(() => {
     if (!selectedDate) return [];
     return events.filter((event) =>
-      isSameDay(new Date(event.datetime), selectedDate)
+      isSameDay(new Date(event.datetime), selectedDate),
     );
   }, [selectedDate, events]);
 

@@ -1,4 +1,84 @@
-import { useState, useEffect } from "react";
+import { useMemo } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { Container, Card, Spinner, Alert } from "react-bootstrap";
+
+import { useAuth } from "../../context/AuthContext";
+import { useUserEvents } from "../../queryHooks/events/useUserEvents";
+import useFriends from "../../queryHooks/friends/useFetchFriends";
+import useUpdateEvent from "../../queryHooks/events/useUpdateEvent";
+import EventForm from "./event-form";
+import SuccessDialog from "../../components/SuccessDialog";
+
+const EventUpdate = () => {
+  const { id } = useParams();
+  const { authData } = useAuth();
+
+  const { data: eventsData, isLoading: eventsLoading } = useUserEvents();
+  const { data: friends = [] } = useFriends(
+    authData?.userId,
+    authData?.accessToken,
+  );
+
+  // FIX 2: Skapa en platt array så att .find() fungerar
+  const event = useMemo(() => {
+    if (!eventsData) return null;
+
+    // Om backend skickar objektet {upcoming, past}, slå ihop dem
+    const allEvents = Array.isArray(eventsData)
+      ? eventsData
+      : [...(eventsData.upcoming || []), ...(eventsData.past || [])];
+
+    return allEvents.find((e) => String(e.id) === String(id));
+  }, [eventsData, id]);
+
+  const {
+    mutate: updateEvent,
+    isLoading: isUpdating,
+    isSuccess,
+    isError,
+    error,
+  } = useUpdateEvent();
+
+  const handleUpdate = (formData) => {
+    updateEvent({
+      id: id,
+      ...formData,
+    });
+  };
+
+  if (eventsLoading) return <Spinner animation="border" />;
+
+  if (!event && !eventsLoading) {
+    return <Alert variant="danger">Eventet hittades inte (ID: {id})</Alert>;
+  }
+
+  return (
+    <Container className="mt-5">
+      <Card
+        className="bg-dark text-white p-4 mx-auto"
+        style={{ maxWidth: "600px" }}
+      >
+        <EventForm
+          initialData={event}
+          onSubmit={handleUpdate}
+          isLoading={isUpdating}
+          buttonText="Save Changes"
+          friends={friends}
+        />
+        {isSuccess && (
+          <SuccessDialog
+            message="Uppdaterat!"
+            navigateTo={`/events/event-details/${id}`}
+          />
+        )}
+      </Card>
+    </Container>
+  );
+};
+
+export default EventUpdate;
+
+/* import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Form,
@@ -82,7 +162,7 @@ const EventUpdate = () => {
     setSelectedFriends((prev) =>
       prev.includes(friendId)
         ? prev.filter((id) => id !== friendId)
-        : [...prev, friendId]
+        : [...prev, friendId],
     );
   };
 
@@ -311,3 +391,4 @@ const EventUpdate = () => {
 };
 
 export default EventUpdate;
+ */

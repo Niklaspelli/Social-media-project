@@ -17,11 +17,9 @@ export default function ThreadDetail({ thread }) {
 
   return (
     <div className="m-4" onClick={(e) => e.stopPropagation()}>
+      <ThreadResponse threadId={thread.id} />
       {/* Lista alla responses hittills */}
       <ThreadResponseList responses={responses} threadId={thread.id} />
-
-      {/* Lägg till möjlighet att skriva nytt svar */}
-      <ThreadResponse threadId={thread.id} />
 
       {/* "Load more" knapp */}
       {hasMore && (

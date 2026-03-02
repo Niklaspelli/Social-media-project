@@ -1,4 +1,60 @@
-import { useState } from "react";
+import { Card, Container, Alert } from "react-bootstrap";
+import { useAuth } from "../../context/AuthContext"; // Kontrollera att sökvägen är korrekt
+import useCreateEvent from "../../queryHooks/events/useCreateEvent"; // Din event-hook
+import useFriends from "../../queryHooks/friends/useFetchFriends";
+import SuccessDialog from "../../components/SuccessDialog";
+import EventForm from "./event-form";
+
+import "./event-styling.css";
+
+const CreateEvent = () => {
+  const { authData } = useAuth();
+  const { mutate, isLoading, isSuccess, isError, error } = useCreateEvent();
+  const { data: friends = [] } = useFriends(
+    authData.userId,
+    authData.accessToken,
+  );
+
+  const handleCreate = (formData) => {
+    mutate({
+      ...formData,
+      invitedUserIds: formData.invitees, // Mappa till det backend förväntar sig
+      accessToken: authData.accessToken,
+    });
+  };
+
+  return (
+    <Container className="mt-5 text-white">
+      <h2 className="text-center mb-4">Create new event</h2>
+      <Card
+        className="bg-dark text-white p-4 shadow mx-auto"
+        style={{ maxWidth: "600px" }}
+      >
+        <EventForm
+          onSubmit={handleCreate}
+          isLoading={isLoading}
+          buttonText="Create Event"
+          friends={friends}
+        />
+        {isSuccess && (
+          <SuccessDialog
+            message="Event created!"
+            navigateTo={`/events/${authData.userId}`}
+          />
+        )}
+        {isError && (
+          <Alert variant="danger" className="mt-3">
+            {error.message}
+          </Alert>
+        )}
+      </Card>
+    </Container>
+  );
+};
+
+export default CreateEvent;
+
+/* import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Form,
@@ -302,3 +358,4 @@ const CreateEvent = () => {
 };
 
 export default CreateEvent;
+ */
