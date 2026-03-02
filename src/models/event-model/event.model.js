@@ -20,13 +20,13 @@ export const createEvent = ({
       (err, result) => {
         if (err) return reject(err);
         resolve(result.insertId);
-      }
+      },
     );
   });
 };
 
 // Hämta alla events som användaren skapat och tacka ja till.
-export const getUserEvents = (userId) => {
+/* export const getUserEvents = (userId) => {
   const sql = `
     -- Events användaren har skapat
     SELECT 
@@ -50,6 +50,74 @@ export const getUserEvents = (userId) => {
     WHERE ei.invited_user_id = ? AND ei.status = 'accepted'
 
     ORDER BY datetime ASC;
+  `;
+
+  return new Promise((resolve, reject) => {
+    db.query(sql, [userId, userId], (err, results) => {
+      if (err) return reject(err);
+      resolve(results);
+    });
+  });
+}; */
+
+// Hämta KOMMANDE events (Skapade + Tackat ja till)
+export const getUserEvents = (userId) => {
+  const sql = `
+    -- Events användaren har skapat som inte har varit än
+    SELECT 
+      e.*,
+      u.username AS creator_name,
+      'creator' AS relation
+    FROM events e
+    JOIN users u ON e.creator_id = u.id
+    WHERE e.creator_id = ? AND e.datetime >= NOW()
+
+    UNION ALL
+
+    -- Events användaren tackat ja till som inte har varit än
+    SELECT 
+      e.*,
+      u.username AS creator_name,
+      'attendee' AS relation
+    FROM events e
+    JOIN event_invitations ei ON e.id = ei.event_id
+    JOIN users u ON e.creator_id = u.id
+    WHERE ei.invited_user_id = ? AND ei.status = 'accepted' AND e.datetime >= NOW()
+
+    ORDER BY datetime ASC;
+  `;
+
+  return new Promise((resolve, reject) => {
+    db.query(sql, [userId, userId], (err, results) => {
+      if (err) return reject(err);
+      resolve(results);
+    });
+  });
+};
+
+// Hämta GAMLA events (Historik)
+export const getPastEvents = (userId) => {
+  const sql = `
+    SELECT 
+      e.*,
+      u.username AS creator_name,
+      'creator' AS relation
+    FROM events e
+    JOIN users u ON e.creator_id = u.id
+    WHERE e.creator_id = ? AND e.datetime < NOW()
+
+    UNION ALL
+
+    SELECT 
+      e.*,
+      u.username AS creator_name,
+      'attendee' AS relation
+    FROM events e
+    JOIN event_invitations ei ON e.id = ei.event_id
+    JOIN users u ON e.creator_id = u.id
+    WHERE ei.invited_user_id = ? AND ei.status = 'accepted' AND e.datetime < NOW()
+
+    ORDER BY datetime DESC; -- Senaste eventet först i historiken
   `;
 
   return new Promise((resolve, reject) => {
@@ -91,7 +159,7 @@ export const updateEvent = ({
       (err, result) => {
         if (err) return reject(err);
         resolve(result.affectedRows);
-      }
+      },
     );
   });
 };
