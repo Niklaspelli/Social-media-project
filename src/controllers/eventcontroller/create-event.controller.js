@@ -1,6 +1,7 @@
 import {
   createEvent,
   getUserEvents,
+  getPastEvents,
   getEventById,
   updateEvent,
   deleteEvent,
@@ -68,11 +69,32 @@ export const createEventController = async (req, res) => {
 };
 
 // Hämta alla events skapade av användaren
-export const getUserEventsController = async (req, res) => {
+/* export const getUserEventsController = async (req, res) => {
   try {
     const userId = req.user.id;
     const events = await getUserEvents(userId);
     res.json(events);
+  } catch (err) {
+    console.error("Error fetching user events:", err);
+    res.status(500).json({ error: "Internt serverfel" });
+  }
+}; */
+
+export const getUserEventsController = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Kör båda frågorna parallellt
+    const [upcoming, past] = await Promise.all([
+      getUserEvents(userId),
+      getPastEvents(userId),
+    ]);
+
+    // Skicka tillbaka ett objekt med båda listorna
+    res.json({
+      upcoming,
+      past,
+    });
   } catch (err) {
     console.error("Error fetching user events:", err);
     res.status(500).json({ error: "Internt serverfel" });
