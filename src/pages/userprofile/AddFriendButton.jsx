@@ -70,6 +70,8 @@ const AddFriendButton = ({ receiverId, token }) => {
 
   if (Number(senderId) === Number(receiverId)) return null;
 
+  //Till branch-2026
+
   return (
     <Button
       variant={variant}
