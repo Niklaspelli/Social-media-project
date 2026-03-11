@@ -1,4 +1,4 @@
-import { db } from "../config/db.js";
+/* import { db } from "../config/db.js";
 
 export const sendFriendRequest = (req, res) => {
   const senderId = req.user.id;
@@ -58,7 +58,7 @@ export const sendFriendRequest = (req, res) => {
 
         return res.status(201).json({ message: "Friend request sent!" });
       });
-    }
+    },
   );
 };
 
@@ -162,21 +162,21 @@ export const getFriendshipStatus = (req, res) => {
 };
 
 export const getFriendsList = (req, res) => {
-  const loggedInUserId = req.user?.id;
+  const loggedInUserId = req.user?.id || req.params.userId;
 
   if (!loggedInUserId) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
   const sql = `
-    SELECT u.id, u.username, u.avatar, u.last_seen
+    SELECT u.id, u.username, u.avatar, u.last_seen, fr.status -- Vi lägger till fr.status här!
     FROM users u
     JOIN friend_requests fr ON (
       (fr.sender_id = u.id AND fr.receiver_id = ?) OR
       (fr.receiver_id = u.id AND fr.sender_id = ?)
     )
     WHERE u.id != ?
-      AND fr.status = 'accepted'
+      AND fr.status IN ('accepted', 'pending') -- Vi tillåter båda statusarna
   `;
 
   db.query(
@@ -189,7 +189,7 @@ export const getFriendsList = (req, res) => {
       }
 
       return res.status(200).json(results);
-    }
+    },
   );
 };
 
@@ -266,7 +266,7 @@ export const getIncomingFriendRequestCount = async (req, res) => {
 
       const count = results[0].count;
       res.json({ count });
-    }
+    },
   );
 };
 
@@ -397,6 +397,7 @@ export const getPeopleYouMayKnow = (req, res) => {
       }
 
       res.json(results);
-    }
+    },
   );
 };
+ */

@@ -75,7 +75,6 @@ export const friendController = {
         console.error("Database error:", err);
         return res.status(500).json({ error: "Database error" });
       }
-
       res.json(results);
     });
   },

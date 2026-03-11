@@ -16,10 +16,7 @@ const useFriends = (userId, token) => {
       throw new Error(msg || "Failed to fetch friends");
     }
 
-    const data = await res.json();
-
-    // extra safeguard: only return accepted friends
-    return data.filter((f) => f.status !== "accepted");
+    return await res.json();
   };
 
   return useQuery({

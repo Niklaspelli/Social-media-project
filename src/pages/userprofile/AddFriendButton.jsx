@@ -9,11 +9,14 @@ const AddFriendButton = ({ receiverId, token }) => {
   const senderId = authData.userId;
   const queryClient = useQueryClient();
 
-  const { data: friends = [], refetch } = useFriends(senderId, token);
+  const { data: allConnections = [] } = useFriends(senderId, token);
 
-  if (senderId === receiverId) return null;
+  const isFriend = allConnections.find(
+    (f) => Number(f.id) === Number(receiverId),
+  );
 
-  const isFriend = friends.some((friend) => friend.id === Number(receiverId));
+  const isAccepted = isFriend?.status === "accepted";
+  const isPending = isFriend?.status === "pending";
 
   const addFriendMutation = useMutation({
     mutationFn: () =>
@@ -41,13 +44,39 @@ const AddFriendButton = ({ receiverId, token }) => {
   });
 
   const handleClick = () => {
-    if (isFriend) unfollowMutation.mutate();
+    if (isAccepted) unfollowMutation.mutate();
+    else if (isPending) return;
     else addFriendMutation.mutate();
   };
 
+  // Bestäm text och färg baserat på status
+  const getButtonConfig = () => {
+    if (isAccepted) {
+      return { variant: "danger", text: "Unfollow", disabled: false };
+    }
+    if (isPending) {
+      return {
+        variant: "secondary",
+        text: "Friend Request Sent",
+        disabled: true,
+      };
+    }
+    return { variant: "primary", text: "Add Friend", disabled: false };
+  };
+
+  const { variant, text, disabled: configDisabled } = getButtonConfig();
+
+  const isWorking = addFriendMutation.isPending || unfollowMutation.isPending;
+
+  if (Number(senderId) === Number(receiverId)) return null;
+
   return (
-    <Button variant={isFriend ? "danger" : "primary"} onClick={handleClick}>
-      {isFriend ? "Unfollow" : "Add Friend"}
+    <Button
+      variant={variant}
+      onClick={handleClick}
+      disabled={configDisabled || isWorking}
+    >
+      {isWorking ? "Working..." : text}
     </Button>
   );
 };

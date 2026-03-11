@@ -9,21 +9,22 @@ function FriendList() {
   const { authData } = useAuth();
   const { id } = useParams();
 
-  // FIX 1: Definiera token så att useFriends inte kraschar
   const token = authData?.accessToken;
   const targetUserId = id || authData?.userId;
   const isOwnProfile = !id || Number(id) === Number(authData?.userId);
 
-  // Hämtar namnet för rubriken
   const { data: profile } = useUserProfile(targetUserId);
-
-  // Hämtar vännerna - nu med en definierad 'token'
   const {
-    data: friends = [],
+    data: allConnections = [],
     isLoading,
     isError,
     error,
   } = useFriends(targetUserId, token);
+
+  console.log("all connections:", allConnections);
+
+  // 🔥 FIX: Filtrera så att endast faktiska vänner visas i listan
+  const friends = allConnections.filter((f) => f.status === "accepted");
 
   const isOnline = (lastSeen) => {
     if (!lastSeen) return false;
@@ -42,61 +43,54 @@ function FriendList() {
 
   return (
     <Container style={{ color: "white" }}>
-      {/* FIX 2: Dynamisk rubrik */}
       <h2 className="mt-4 text-center">
         {isOwnProfile
           ? "Your Friends"
           : profile?.username
             ? `${profile.username}'s Friends`
             : "Friends"}
+        {/* Valfritt: Visa antal vänner */}
+        <span style={{ fontSize: "0.5em", color: "gray", marginLeft: "10px" }}>
+          ({friends.length})
+        </span>
       </h2>
 
       <Row>
-        {friends.map((friend, index) => (
-          <Col
-            key={`${friend.id}-${index}`}
-            xs={12}
-            md={4}
-            className="mb-4 text-center"
-          >
-            <Link
-              to={`/user/${friend.id}`}
-              style={{ textDecoration: "none", color: "inherit" }}
+        {friends.length === 0 ? (
+          <p className="text-center mt-4 text-muted">No friends found yet.</p>
+        ) : (
+          friends.map((friend, index) => (
+            <Col
+              key={`${friend.id}-${index}`}
+              xs={12}
+              md={4}
+              className="mb-4 text-center"
             >
-              <Image
-                src={friend.avatar}
-                alt={friend.username}
-                roundedCircle
-                width={100}
-                height={100}
-                style={{ objectFit: "cover" }}
-              />
-              <p className="mb-0 mt-2">{friend.username}</p>
-              <small
-                style={{
-                  color: isOnline(friend.last_seen) ? "lightgreen" : "gray",
-                }}
+              {/* Din befintliga Link och profil-kod här... */}
+              <Link
+                to={`/user/${friend.id}`}
+                style={{ textDecoration: "none", color: "inherit" }}
               >
-                {isOnline(friend.last_seen)
-                  ? "Online"
-                  : `Last seen ${new Date(friend.last_seen).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`}
-              </small>
-              <span
-                style={{
-                  display: "inline-block",
-                  marginLeft: "8px",
-                  width: 12,
-                  height: 12,
-                  borderRadius: "50%",
-                  backgroundColor: isOnline(friend.last_seen)
-                    ? "limegreen"
-                    : "gray",
-                  border: "2px solid white",
-                }}
-              ></span>
-            </Link>
-          </Col>
-        ))}
+                <Image
+                  src={friend.avatar}
+                  alt={friend.username}
+                  roundedCircle
+                  width={100}
+                  height={100}
+                  style={{ objectFit: "cover" }}
+                />
+                <p className="mb-0 mt-2">{friend.username}</p>
+                <small
+                  style={{
+                    color: isOnline(friend.last_seen) ? "lightgreen" : "gray",
+                  }}
+                >
+                  {isOnline(friend.last_seen) ? "Online" : "Offline"}
+                </small>
+              </Link>
+            </Col>
+          ))
+        )}
       </Row>
     </Container>
   );

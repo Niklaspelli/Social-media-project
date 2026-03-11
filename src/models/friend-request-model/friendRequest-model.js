@@ -48,15 +48,14 @@ export const FriendRequest = {
 
   getFriends(userId, callback) {
     const sql = `
-      SELECT u.id, u.username, u.avatar, u.last_seen
+      SELECT u.id, u.username, u.avatar, u.last_seen, fr.status
       FROM users u
       JOIN friend_requests fr ON (
         (fr.sender_id = u.id AND fr.receiver_id = ?)
         OR
         (fr.receiver_id = u.id AND fr.sender_id = ?)
       )
-      WHERE fr.status = 'accepted'
-        AND u.id != ?
+      WHERE (fr.status = 'accepted' OR fr.status = 'pending') AND u.id != ?
     `;
     db.query(sql, [userId, userId, userId], callback);
   },
